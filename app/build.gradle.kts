@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
+
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -7,7 +9,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.vcampusexpenses"
+        applicationId = "com.btec.vcampusexpenses"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -32,7 +34,9 @@ android {
 }
 
 dependencies {
-    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation(libs.glide)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
