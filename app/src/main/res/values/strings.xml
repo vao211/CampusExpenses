@@ -9,4 +9,6 @@
     <string name="register">Register</string>
     <string name="login">Login</string>
     <string name="or_using">or using</string>
+    <string name="confirm_password">Confirm password\n</string>
+    <string name="logout">Logout</string>
 </resources>

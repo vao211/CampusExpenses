@@ -18,26 +18,15 @@
         android:textSize="30sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:layout_gravity="center_horizontal"/>
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/user_name"
-        android:importantForAutofill="no"
-        android:id="@+id/edtUserName"
-        android:layout_marginTop="30dp"
-        android:textColorHint="@android:color/darker_gray"
-        android:inputType="textPersonName"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/password"
-        android:importantForAutofill="no"
-        android:id="@+id/edtPassword"
-        android:layout_marginTop="30dp"
-        android:textColorHint="@android:color/darker_gray"
-        android:inputType="textPassword"/>
-
+<!--    <EditText-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:hint="@string/user_name"-->
+<!--        android:importantForAutofill="no"-->
+<!--        android:id="@+id/edtUserName"-->
+<!--        android:layout_marginTop="30dp"-->
+<!--        android:textColorHint="@android:color/darker_gray"-->
+<!--        android:inputType="textPersonName"/>-->
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -48,6 +37,24 @@
         android:inputType=""
         android:textColorHint="@android:color/darker_gray"
         tools:ignore="TextFields"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/password"
+        android:importantForAutofill="no"
+        android:id="@+id/edtPassword"
+        android:layout_marginTop="30dp"
+        android:textColorHint="@android:color/darker_gray"
+        android:inputType="textPassword"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/confirm_password"
+        android:importantForAutofill="no"
+        android:id="@+id/edtConfirmPassword"
+        android:textColorHint="@android:color/darker_gray"
+        android:inputType="textPassword"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,12 +67,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center">
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+        <ImageButton
+            android:id="@+id/btnGoogleLogin"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:src="@drawable/google"
-            android:layout_gravity="center_horizontal"
-            tools:ignore="ContentDescription"/>
+            android:background="?attr/selectableItemBackgroundBorderless"
+            />
     </LinearLayout>
     <Button
         android:layout_width="wrap_content"

@@ -21,8 +21,8 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/user_name"
-        android:id="@+id/edtUserName"
+        android:hint="@string/email"
+        android:id="@+id/edtEmail"
         android:importantForAutofill="no"
         android:textSize="20sp"
         tools:ignore="TextFields" />
@@ -67,11 +67,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center">
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+        <ImageButton
+            android:id="@+id/btnGoogleLogin"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:src="@drawable/google"
-            android:layout_gravity="center_horizontal"
-            tools:ignore="ContentDescription" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+        />
     </LinearLayout>
 </LinearLayout>
