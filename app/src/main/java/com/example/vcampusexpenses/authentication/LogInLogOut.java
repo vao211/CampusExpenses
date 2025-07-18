@@ -3,6 +3,8 @@ package com.example.vcampusexpenses.authentication;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
+
 import com.example.vcampusexpenses.DisplayToast;
 import com.example.vcampusexpenses.LoginActivity;
 import com.example.vcampusexpenses.MainActivity;
@@ -76,7 +78,7 @@ public class LogInLogOut {
         //Google
         googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onComplete(Task<Void> task) {
+            public void onComplete(@NonNull Task<Void> task) {
                 sessionManager.logout();
                 Intent intent = new Intent(context, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
