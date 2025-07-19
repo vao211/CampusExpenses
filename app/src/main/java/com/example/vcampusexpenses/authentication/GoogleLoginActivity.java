@@ -14,6 +14,7 @@ import com.example.vcampusexpenses.DisplayToast;
 import com.example.vcampusexpenses.LoginActivity;
 import com.example.vcampusexpenses.MainActivity;
 import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.RegistrationPageActivity;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -56,7 +57,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         sessionManager = new SessionManager(this);
         startGoogleSignIn();
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+//        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
     }
 
     private void startGoogleSignIn() {
@@ -97,7 +98,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
                                     "Firebase authentication successful");
 //                            sessionManager.saveLoginSession(firebaseAuth.getCurrentUser().getEmail());
                             sessionManager.saveLoginSession(account.getEmail());
-                            Intent intent = new Intent(GoogleLoginActivity.this, MainActivity.class);
+                            Intent intent = new Intent(GoogleLoginActivity.this, RegistrationPageActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             finish();
@@ -105,7 +106,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
                             DisplayToast.Display(GoogleLoginActivity.this,
                                     "Authentication failed: "
                                             + task.getException().getMessage());
-                            Intent intent = new Intent(GoogleLoginActivity.this, LoginActivity.class);
+                            Intent intent = new Intent(GoogleLoginActivity.this, RegistrationPageActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             finish();

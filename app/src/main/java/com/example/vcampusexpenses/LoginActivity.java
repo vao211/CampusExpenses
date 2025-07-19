@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,8 +12,6 @@ import com.example.vcampusexpenses.authentication.GoogleLoginActivity;
 import com.example.vcampusexpenses.authentication.LogInLogOut;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
     EditText edtEmail, edtPassword;

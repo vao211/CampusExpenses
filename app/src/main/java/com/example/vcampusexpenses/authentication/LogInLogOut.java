@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.example.vcampusexpenses.DisplayToast;
 import com.example.vcampusexpenses.LoginActivity;
 import com.example.vcampusexpenses.MainActivity;
+import com.example.vcampusexpenses.RegistrationPageActivity;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -46,7 +47,7 @@ public class LogInLogOut {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
                                 sessionManager.saveLoginSession(user.getEmail());
-                                Intent intent = new Intent(context, MainActivity.class);
+                                Intent intent = new Intent(context, RegistrationPageActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 context.startActivity(intent);
 
@@ -63,6 +64,7 @@ public class LogInLogOut {
                     });
         }
     }
+    @SuppressWarnings("deprecation")
     public static void LogOut(Context context) {
         SessionManager sessionManager = new SessionManager(context);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
