@@ -6,7 +6,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.bumptech.glide.Glide;
 import com.example.vcampusexpenses.database.UserDB;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,6 +23,7 @@ public class RegistrationPageActivity extends AppCompatActivity {
     private CheckBox chkTerms;
     private FirebaseAuth mAuth;
     private SessionManager sessionManager;
+    private ImageView gif_registration;
     private UserDB userDB;
 
     @Override
@@ -27,6 +32,7 @@ public class RegistrationPageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration_page);
 
         // Khởi tạo views
+        gif_registration = findViewById(R.id.gif_registration);
         edtDisplayName = findViewById(R.id.edtDisplayName);
         edtRealName = findViewById(R.id.edtRealName);
         datePicker = findViewById(R.id.datePicker);
@@ -37,10 +43,15 @@ public class RegistrationPageActivity extends AppCompatActivity {
         userDB = new UserDB();
 
         loadUserData();
-
+        LoadGif();
         btnSubmit.setOnClickListener(v -> submitUserInfo());
     }
-
+    private void LoadGif() {
+        Glide.with(this)
+                .asGif()
+                .load(R.drawable.registration)
+                .into(gif_registration);
+    }
     private void loadUserData() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
