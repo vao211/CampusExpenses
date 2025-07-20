@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.gson)
     implementation(libs.material.v150)
     implementation(libs.firebase.firestore)
     implementation(libs.credentials)
