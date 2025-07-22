@@ -25,6 +25,7 @@ public class RegistrationPageActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private ImageView gif_registration;
     private UserDB userDB;
+    private Button btnSubmit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,7 @@ public class RegistrationPageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration_page);
 
         // Khởi tạo views
+        btnSubmit = findViewById(R.id.btnSubmit);
         gif_registration = findViewById(R.id.gif_registration);
         edtDisplayName = findViewById(R.id.edtDisplayName);
         edtRealName = findViewById(R.id.edtRealName);
@@ -43,8 +45,14 @@ public class RegistrationPageActivity extends AppCompatActivity {
         userDB = new UserDB();
 
         loadUserData();
+        Submit();
         LoadGif();
         btnSubmit.setOnClickListener(v -> submitUserInfo());
+    }
+    private void Submit() {
+        btnSubmit.setOnClickListener(v -> {
+            submitUserInfo();
+        });
     }
     private void LoadGif() {
         Glide.with(this)
