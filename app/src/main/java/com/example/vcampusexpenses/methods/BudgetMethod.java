@@ -2,8 +2,9 @@ package com.example.vcampusexpenses.methods;
 
 import android.content.Context;
 
-import com.example.vcampusexpenses.datamanager.JsonDataFile;
+import com.example.vcampusexpenses.datamanager.JsonDataManager;
 import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
 import com.google.gson.JsonArray;
@@ -15,11 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 public class BudgetMethod {
-    private final JsonDataFile dataFile;
+    private final JsonDataManager dataFile;
     private final String userId;
 
     public BudgetMethod(Context context, String userId) {
-        this.dataFile = new JsonDataFile(context);
+        this.dataFile = new JsonDataManager(context);
         this.userId = userId;
     }
 
@@ -271,5 +272,41 @@ public class BudgetMethod {
             }
         }
         return false;
+    }
+
+    protected void updateBudgets(Transaction transaction) {
+        if (transaction.isTransfer()) {
+            return; //transfer không ảnh hưởng đến ngân sách
+        }
+
+        List<Budget> budgets = getListUserBudgets();
+        for (Budget budget : budgets) {
+            if (budget.appliesToTransaction(transaction)) {
+                budget.updateRemaining(transaction);
+                JsonObject userData = dataFile.getUserData(userId);
+                JsonObject budgetJson = userData.getAsJsonObject("budgets").getAsJsonObject(budget.getBudgetId());
+                budgetJson.addProperty("remainingAmount", budget.getRemainingAmount());
+            }
+        }
+        dataFile.saveData();
+    }
+    protected void reverseBudgetUpdate(Transaction transaction) {
+        if (transaction.isTransfer()) {
+            return;
+        }
+        List<Budget> budgets = getListUserBudgets();
+        for (Budget budget : budgets) {
+            if (budget.appliesToTransaction(transaction)) {
+                if (transaction.getType().equals("INCOME")) {
+                    budget.setRemainingAmount(budget.getRemainingAmount() - transaction.getAmount());
+                } else if (transaction.getType().equals("OUTCOME")) {
+                    budget.setRemainingAmount(budget.getRemainingAmount() + transaction.getAmount());
+                }
+                JsonObject userData = dataFile.getUserData(userId);
+                JsonObject budgetJson = userData.getAsJsonObject("budgets").getAsJsonObject(budget.getBudgetId());
+                budgetJson.addProperty("remainingAmount", budget.getRemainingAmount());
+            }
+        }
+        dataFile.saveData();
     }
 }

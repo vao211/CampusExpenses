@@ -2,7 +2,7 @@ package com.example.vcampusexpenses.methods;
 
 import android.content.Context;
 
-import com.example.vcampusexpenses.datamanager.JsonDataFile;
+import com.example.vcampusexpenses.datamanager.JsonDataManager;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryMethod {
-    private final JsonDataFile dataFile;
+    private final JsonDataManager dataFile;
     private final String userId;
     public CategoryMethod(Context context, String userId) {
-        this.dataFile = new JsonDataFile(context);
+        this.dataFile = new JsonDataManager(context);
         this.userId = userId;
     }
     public void addCategory(Category category) {

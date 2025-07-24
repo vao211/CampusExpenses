@@ -20,13 +20,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JsonDataFile {
+public class JsonDataManager {
     private static final String FILE_NAME = "expense_data.json";
     private final Context context;
     private final File file;
     private UserData userData;
 
-    public JsonDataFile(Context context) {
+    public JsonDataManager(Context context) {
         this.context = context;
         this.file = new File(context.getFilesDir(), FILE_NAME);
         initializeFile();
