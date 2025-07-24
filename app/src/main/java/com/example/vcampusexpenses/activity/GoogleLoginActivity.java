@@ -1,5 +1,6 @@
 package com.example.vcampusexpenses.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -7,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.vcampusexpenses.datamanager.JsonDataManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.authentication.GoogleAuthen;
@@ -35,7 +37,9 @@ public class GoogleLoginActivity extends AppCompatActivity {
 
         startGoogleSignIn();
     }
-
+    private static void createSampleData(Context context, String userId) {
+        JsonDataManager dataManager = new JsonDataManager(context, userId);
+    }
     private void startGoogleSignIn() {
         Intent signInIntent = googleAuthen.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -55,6 +59,9 @@ public class GoogleLoginActivity extends AppCompatActivity {
                         public void onSuccess(GoogleSignInAccount account) {
                             sessionManager.saveLoginSession(account.getEmail());
                             DisplayToast.Display(GoogleLoginActivity.this, "Firebase authentication successful");
+
+                            createSampleData(GoogleLoginActivity.this, account.getId());
+
                             Intent intent = new Intent(GoogleLoginActivity.this, RegistrationPageActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);

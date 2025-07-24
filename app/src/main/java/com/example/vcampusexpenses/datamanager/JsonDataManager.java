@@ -29,14 +29,20 @@ public class JsonDataManager {
     public JsonDataManager(Context context) {
         this.context = context;
         this.file = new File(context.getFilesDir(), FILE_NAME);
-        initializeFile();
+        initializeFile("default_user");
+    }
+
+    public JsonDataManager(Context context, String userId) {
+        this.context = context;
+        this.file = new File(context.getFilesDir(), FILE_NAME);
+        initializeFile(userId);
     }
 
     public Context getContext() {
         return context;
     }
 
-    private void initializeFile() {
+    private void initializeFile(String userId) {
         if (!file.exists()) {
             // Create sample data
             Map<String, Account> accounts = new HashMap<>();
@@ -54,7 +60,7 @@ public class JsonDataManager {
             Map<String, Transaction> transactions = new HashMap<>();
 
             Data data = new Data(accounts, categories, budgets, transactions);
-            userData = new UserData(new User("default_user", data));
+            userData = new UserData(new User(userId, data));
             saveData();
         } else {
             loadData();

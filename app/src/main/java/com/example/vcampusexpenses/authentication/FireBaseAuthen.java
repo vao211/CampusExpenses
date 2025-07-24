@@ -21,8 +21,8 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.Objects;
 
 public class FireBaseAuthen {
-    private static void createSampleData(Context context) {
-        JsonDataManager dataManager = new JsonDataManager(context);
+    private static void createSampleData(Context context, String userId) {
+        JsonDataManager dataManager = new JsonDataManager(context, userId);
     }
     public static void LogIn(Context context, String email, String password) {
         SessionManager sessionManager = new SessionManager(context);
@@ -50,7 +50,9 @@ public class FireBaseAuthen {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
                                 sessionManager.saveLoginSession(user.getEmail());
-                                createSampleData(context);
+
+                                createSampleData(context, user.getUid());
+
                                 Intent intent = new Intent(context, RegistrationPageActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 context.startActivity(intent);
