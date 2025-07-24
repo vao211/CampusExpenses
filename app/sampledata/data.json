@@ -1,0 +1,45 @@
+{
+  "user": {
+    "userId": "....",
+    "data": {
+      "account": {
+        "account1":{
+          "name":"Cash",
+          "balance": 0
+        }
+      },
+      "categories": {
+        "cat1": {
+          "name": "Quần Áo"
+        },
+        "cat2": {
+          "name": "Ăn uống"
+        },
+        "cat3": {
+          "name": "Giáo dục"
+        },
+        "cat4": {
+          "name": "Sức khỏe"
+        },
+        "cat6": {
+          "name": "Internet"
+        },
+        "cat7": {
+          "name": "Điện thoại"
+        },
+        "cat8": {
+          "name": "Tiền điện"
+        },
+        "cat9": {
+          "name": "Tiền nước"
+        }
+      },
+      "budgets": {
+
+      },
+      "transactions": {
+
+      }
+    }
+  }
+}
