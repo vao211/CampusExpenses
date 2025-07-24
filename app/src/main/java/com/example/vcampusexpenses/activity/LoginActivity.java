@@ -1,4 +1,4 @@
-package com.example.vcampusexpenses;
+package com.example.vcampusexpenses.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,8 +8,8 @@ import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.vcampusexpenses.authentication.GoogleLoginActivity;
-import com.example.vcampusexpenses.authentication.LogInLogOut;
+import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.authentication.FireBaseAuthen;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -37,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         Login();
         GoToRegister();
     }
+
     private void GoogleLogin() {
         btnGoogleLogin.setOnClickListener(v -> {
             Intent intent = new Intent(this, GoogleLoginActivity.class);
@@ -52,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void Login() {
         btnLogin.setOnClickListener(v -> {
-            LogInLogOut.LogIn(this, edtEmail.getText().toString(), edtPassword.getText().toString());
+            FireBaseAuthen.LogIn(this, edtEmail.getText().toString(), edtPassword.getText().toString());
         });
     }
     private void GoToRegister() {

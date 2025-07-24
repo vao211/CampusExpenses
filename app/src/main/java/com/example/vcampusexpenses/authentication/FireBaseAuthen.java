@@ -5,10 +5,10 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
-import com.example.vcampusexpenses.DisplayToast;
-import com.example.vcampusexpenses.LoginActivity;
-import com.example.vcampusexpenses.MainActivity;
-import com.example.vcampusexpenses.RegistrationPageActivity;
+import com.example.vcampusexpenses.utils.DisplayToast;
+import com.example.vcampusexpenses.activity.LoginActivity;
+import com.example.vcampusexpenses.activity.RegistrationPageActivity;
+import com.example.vcampusexpenses.datamanager.JsonDataManager;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -20,7 +20,10 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Objects;
 
-public class LogInLogOut {
+public class FireBaseAuthen {
+    private static void createSampleData(Context context) {
+        JsonDataManager dataManager = new JsonDataManager(context);
+    }
     public static void LogIn(Context context, String email, String password) {
         SessionManager sessionManager = new SessionManager(context);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -47,6 +50,7 @@ public class LogInLogOut {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
                                 sessionManager.saveLoginSession(user.getEmail());
+                                createSampleData(context);
                                 Intent intent = new Intent(context, RegistrationPageActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 context.startActivity(intent);

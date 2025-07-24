@@ -19,6 +19,12 @@ public class UserDB {
         fbAuth  = FirebaseAuth.getInstance();
         fireStoreDB = FirebaseFirestore.getInstance();
     }
+    public String getCurrentUserId() {
+        if(fbAuth.getCurrentUser() != null){
+            return "0";
+        }
+        return fbAuth.getCurrentUser().getUid();
+    }
     public void loadUserData(String userId, UserDataCallback callback) {
         if (userId == null || userId.isEmpty()) {
             callback.onError("UserID cannot be null or empty");

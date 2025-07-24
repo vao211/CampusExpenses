@@ -1,4 +1,4 @@
-package com.example.vcampusexpenses;
+package com.example.vcampusexpenses.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.vcampusexpenses.utils.DisplayToast;
+import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.database.UserDB;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;

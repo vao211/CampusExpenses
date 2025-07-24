@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp">
+        <ImageView
+            android:id="@+id/img_budget"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/budget"/>
+        <TextView
+            android:id="@+id/txtNameBudget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/budget"
+            android:textSize="30sp"
+            android:layout_toEndOf="@+id/img_budget"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/img_budget"
+            android:layout_below="@+id/txtNameBudget"
+            android:textSize="15sp"
+            android:text="@string/budget_amount"
+            tools:ignore="SmallSp" />
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,7 +1,6 @@
-package com.example.vcampusexpenses;
+package com.example.vcampusexpenses.utils;
 
 import android.content.Context;
-import android.view.Display;
 import android.widget.Toast;
 
 public class DisplayToast {

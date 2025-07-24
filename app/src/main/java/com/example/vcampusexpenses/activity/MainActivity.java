@@ -1,16 +1,15 @@
-package com.example.vcampusexpenses;
+package com.example.vcampusexpenses.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.example.vcampusexpenses.authentication.LogInLogOut;
+import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.authentication.FireBaseAuthen;
 import com.example.vcampusexpenses.fragments.AnalysisFragment;
 import com.example.vcampusexpenses.fragments.CategoriesFragment;
 import com.example.vcampusexpenses.fragments.HomeFragment;
@@ -23,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
     private Button btnLogout;
     private TextView txtUserEmail2;
     private SessionManager sessionManager;
-    private BottomNavigationView bottomNavigationView;
 
 
     @Override
@@ -31,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
         txtUserEmail2 = findViewById(R.id.txtUserEmail2);
@@ -81,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void Logout(){
         btnLogout.setOnClickListener(v -> {
-            LogInLogOut.LogOut(this);
+            FireBaseAuthen.LogOut(this);
             finish();
         });
     }

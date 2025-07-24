@@ -1,4 +1,4 @@
-package com.example.vcampusexpenses;
+package com.example.vcampusexpenses.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.vcampusexpenses.R;
 
 public class WelcomeActivity extends AppCompatActivity {
     private ImageView gif_welcome;
