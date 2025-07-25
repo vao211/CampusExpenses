@@ -72,8 +72,8 @@ public class JsonDataManager {
             Gson gson = new Gson();
             userData = gson.fromJson(reader, UserData.class);
         } catch (IOException e) {
-            DisplayToast.Display(context, "Lỗi đọc dữ liệu: " + e.getMessage());
-            throw new RuntimeException("Lỗi đọc dữ liệu", e);
+            DisplayToast.Display(context, "Load data error: " + e.getMessage());
+            return;
         }
     }
 
@@ -82,8 +82,8 @@ public class JsonDataManager {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(userData, writer);
         } catch (IOException e) {
-            DisplayToast.Display(context, "Lỗi lưu dữ liệu: " + e.getMessage());
-            throw new RuntimeException("Lỗi lưu dữ liệu", e);
+            DisplayToast.Display(context, "Save data error: " + e.getMessage());
+            return;
         }
     }
 
@@ -92,7 +92,7 @@ public class JsonDataManager {
             Gson gson = new Gson();
             return gson.toJsonTree(userData.getUser().getData()).getAsJsonObject();
         }
-        DisplayToast.Display(context, "Không tìm thấy dữ liệu cho userId: " + userId);
+        DisplayToast.Display(context, "User data not found for userId: " + userId);
         return new JsonObject();
     }
 }
