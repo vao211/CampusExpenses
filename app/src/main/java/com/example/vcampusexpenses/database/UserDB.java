@@ -1,5 +1,9 @@
 package com.example.vcampusexpenses.database;
 
+import android.content.Context;
+
+import com.example.vcampusexpenses.datamanager.JsonDataManager;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -20,10 +24,10 @@ public class UserDB {
         fireStoreDB = FirebaseFirestore.getInstance();
     }
     public String getCurrentUserId() {
-        if(fbAuth.getCurrentUser() != null){
-            return "0";
+        if (fbAuth.getCurrentUser() != null) {
+            return fbAuth.getCurrentUser().getUid();
         }
-        return fbAuth.getCurrentUser().getUid();
+        return null;
     }
     public void loadUserData(String userId, UserDataCallback callback) {
         if (userId == null || userId.isEmpty()) {
