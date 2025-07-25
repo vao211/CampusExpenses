@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -15,6 +16,7 @@ import com.example.vcampusexpenses.adapters.CategoryAdapter;
 import com.example.vcampusexpenses.database.UserDB;
 import com.example.vcampusexpenses.methods.CategoryMethod;
 import com.example.vcampusexpenses.model.Category;
+import com.example.vcampusexpenses.utils.DisplayToast;
 
 import java.util.List;
 
@@ -22,6 +24,8 @@ public class CategoriesFragment extends Fragment {
     private RecyclerView recyclerViewCategories;
     private TextView txtEmptyCategories;
     private CategoryMethod categoryMethod;
+
+    private ImageButton btnAddCategory;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -32,9 +36,9 @@ public class CategoriesFragment extends Fragment {
         UserDB userDB = new UserDB();
         String userId = userDB.getCurrentUserId();
         categoryMethod = new CategoryMethod(requireContext(), userId);
-
+        btnAddCategory = view.findViewById(R.id.btn_addCategory);
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(requireContext()));
-
+        addCategory();
         return view;
     }
 
@@ -43,7 +47,12 @@ public class CategoriesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         loadCategories();
     }
-
+    private void addCategory() {
+        btnAddCategory.setOnClickListener(v -> {
+            //add category
+            DisplayToast.Display(requireContext(), "Add category (thêm sau)");
+        });
+    }
     private void loadCategories() {
         if (txtEmptyCategories == null || recyclerViewCategories == null) {
             return;
