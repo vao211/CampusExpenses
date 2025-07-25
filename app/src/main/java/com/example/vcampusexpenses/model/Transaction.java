@@ -36,7 +36,6 @@ public class Transaction {
         this.description = description;
     }
 
-    // Kiểm tra hợp lệ
     public boolean isValid() {
         if (amount <= 0) return false;
         if (type.equals("TRANSFER")) {

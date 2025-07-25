@@ -18,7 +18,7 @@ public class Budget {
     private List<String> accountIds = new ArrayList<>();
     private Map<String, Double> categoryLimits = new HashMap<>(); // categoryId -> limit
 
-    // Constructor for getUserBudgets
+    //Constructor cho getListUserBudgets
     public Budget(String budgetId, String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
         this.budgetId = budgetId;
         this.name = name;
@@ -28,11 +28,10 @@ public class Budget {
         this.endDate = endDate;
     }
 
-    // Default constructor for creating new Budget instances
     public Budget() {
     }
 
-    // Check if a transaction applies to this Budget
+    //kiem tra transaction co thuoc ve Budget
     public boolean appliesToTransaction(Transaction transaction) {
         if (transaction.isTransfer()) return false;
 
@@ -54,23 +53,22 @@ public class Budget {
                 categoryLimits.containsKey(transaction.getCategoryId());
     }
 
-    // Update remainingAmount based on transaction
     public void updateRemaining(Transaction transaction) {
         if (transaction.getType().equals("INCOME")) {
-            remainingAmount += transaction.getAmount(); // Income increases remaining
+            remainingAmount += transaction.getAmount();
         } else if (transaction.getType().equals("OUTCOME")) {
-            remainingAmount -= transaction.getAmount(); // Outcome decreases remaining
+            remainingAmount -= transaction.getAmount();
         }
     }
 
-    // Add a single account ID to accountIds
+    //them account va budget
     public void addAccount(String accountId) {
         if (!accountIds.contains(accountId)) {
             accountIds.add(accountId);
         }
     }
 
-    // Add a category limit
+    //them category va budget
     public void addCategoryLimit(String categoryId, double limit) {
         categoryLimits.put(categoryId, limit);
     }

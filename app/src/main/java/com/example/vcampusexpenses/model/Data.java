@@ -8,7 +8,6 @@ public class Data {
     private Map<String, Budget> budgets;
     private Map<String, Transaction> transactions;
 
-    // Constructor
     public Data(Map<String, Account> account, Map<String, Category> categories,
                 Map<String, Budget> budgets, Map<String, Transaction> transactions) {
         this.account = account;
@@ -17,7 +16,6 @@ public class Data {
         this.transactions = transactions;
     }
 
-    // Getters and Setters
     public Map<String, Account> getAccount() {
         return account;
     }
