@@ -8,6 +8,8 @@ public class SessionManager {
     private static final String KEY_EMAIL = "email";
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private static final String KEY_REGISTRATION_COMPLETED = "registrationCompleted";
+    private static final String KEY_USER_ID = "userId";
+
     private final SharedPreferences pref;
     private final SharedPreferences.Editor editor;
 
@@ -16,7 +18,8 @@ public class SessionManager {
         editor = pref.edit();
     }
 
-    public void saveLoginSession(String email) {
+    public void saveLoginSession(String email, String userId) {
+        editor.putString(KEY_USER_ID, userId);
         editor.putString(KEY_EMAIL, email);
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.apply();
@@ -30,6 +33,9 @@ public class SessionManager {
         return pref.getString(KEY_EMAIL, null);
     }
 
+    public String getUserId() {
+        return pref.getString(KEY_USER_ID, null);
+    }
     public void setRegistrationCompleted() {
         editor.putBoolean(KEY_REGISTRATION_COMPLETED, true);
         editor.apply();
