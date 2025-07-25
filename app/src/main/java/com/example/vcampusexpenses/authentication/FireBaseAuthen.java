@@ -49,7 +49,7 @@ public class FireBaseAuthen {
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
-                                sessionManager.saveLoginSession(user.getEmail());
+                                sessionManager.saveLoginSession(user.getEmail(), user.getUid());
 
                                 createSampleData(context, user.getUid());
 
