@@ -1,10 +1,12 @@
 package com.example.vcampusexpenses.methods;
 
 import android.content.Context;
-
 import com.example.vcampusexpenses.datamanager.JsonDataManager;
+import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Transaction;
+import com.example.vcampusexpenses.model.UserData;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
 import com.google.gson.JsonArray;
@@ -12,39 +14,80 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class BudgetMethod {
     private final JsonDataManager dataFile;
+    private final UserData userData;
     private final String userId;
 
     public BudgetMethod(Context context, String userId) {
-        this.dataFile = new JsonDataManager(context);
+        this.dataFile = new JsonDataManager(context, userId);
+        this.userData = dataFile.getUserDataObject();
         this.userId = userId;
     }
 
+    public String getBudgetId(String budgetName) {
+        if (budgetName == null || budgetName.trim().isEmpty()) {
+            DisplayToast.Display(dataFile.getContext(), "Invalid budget name");
+            return null;
+        }
+        JsonObject jsonData = dataFile.getUserData(userId);
+        if (jsonData == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return null;
+        }
+        JsonObject budgets = jsonData.getAsJsonObject("budgets");
+        if (budgets == null) {
+            DisplayToast.Display(dataFile.getContext(), "No budgets found");
+            return null;
+        }
+        for (Map.Entry<String, JsonElement> entry : budgets.entrySet()) {
+            JsonObject budgetJson = entry.getValue().getAsJsonObject();
+            if (budgetJson.has("name") && budgetJson.get("name").getAsString().equals(budgetName)) {
+                return budgetJson.get("budgetId").getAsString();
+            }
+        }
+        DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetName);
+        return null;
+    }
     public void addBudget(Budget budget) {
         if (budget == null
                 || budget.getName() == null
-                || budget.getTotalAmount() <= 0){
-            DisplayToast.Display(dataFile.getContext(),"Budget Info is invalid");
+                || budget.getTotalAmount() <= 0) {
+            DisplayToast.Display(dataFile.getContext(), "Budget Info is invalid");
+            return;
         }
 
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject accounts = userData.getAsJsonObject("accounts");
-        JsonObject categories = userData.getAsJsonObject("categories");
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        Map<String, Category> categories = userData.getUser().getData().getCategories();
+        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+
+        if (accounts == null || categories == null || budgets == null) {
+            accounts = accounts == null ? new HashMap<>() : accounts;
+            categories = categories == null ? new HashMap<>() : categories;
+            budgets = budgets == null ? new HashMap<>() : budgets;
+            userData.getUser().getData().setAccount(accounts);
+            userData.getUser().getData().setCategories(categories);
+            userData.getUser().getData().setBudgets(budgets);
+        }
 
         //Kiểm tra account tồn tại
         for (String accountId : budget.getAccountIds()) {
-            if (!accounts.has(accountId)) {
+            if (!accounts.containsKey(accountId)) {
                 DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountId);
                 return;
             }
         }
         //Kiểm tra category tồn tại
         for (String categoryId : budget.getCategoryLimits().keySet()) {
-            if (!categories.has(categoryId)) {
+            if (!categories.containsKey(categoryId)) {
                 DisplayToast.Display(dataFile.getContext(), "Category not found: " + categoryId);
                 return;
             }
@@ -53,47 +96,18 @@ public class BudgetMethod {
         String budgetId = IdGenerator.generateId(IdGenerator.ModelType.BUDGET);
         budget.setBudgetId(budgetId);
 
-        JsonObject budgetJson = new JsonObject();
-        budgetJson.addProperty("budgetId", budgetId);
-        budgetJson.addProperty("name", budget.getName());
-        budgetJson.addProperty("totalAmount", budget.getTotalAmount());
-        budgetJson.addProperty("remainingAmount", budget.getRemainingAmount());
-        budgetJson.addProperty("startDate", budget.getStartDate());
-        budgetJson.addProperty("endDate", budget.getEndDate());
-
-        // Thêm account vào budget
-        JsonArray accountIds = new JsonArray();
-        for (String accountId : budget.getAccountIds()) {
-            accountIds.add(accountId);
-        }
-        budgetJson.add("accountIds", accountIds);
-
-//        // Thêm categoryLimits vào budget
-//        JsonObject categoryLimits = new JsonObject();
-//        for (String categoryId : budget.getCategoryLimits().keySet()) {
-//            categoryLimits.addProperty(categoryId, budget.getCategoryLimits().get(categoryId));
-//        }
-//        budgetJson.add("categoryLimits", categoryLimits);
-
-        //thêm categoryLimits
-        JsonObject categoryLimits = new JsonObject();
-        for (Map.Entry<String, Double> entry : budget.getCategoryLimits().entrySet()) {
-            categoryLimits.addProperty(entry.getKey(), entry.getValue());
-        }
-        budgetJson.add("categoryLimits", categoryLimits);
-
-        //thêm budget vào json
-        userData.getAsJsonObject("budgets").add(budgetId, budgetJson);
+        //thêm budget vào budgets
+        budgets.put(budgetId, budget);
 
         //update danh sách budget của các Account
         for (String accountId : budget.getAccountIds()) {
-            JsonObject accountJson = accounts.getAsJsonObject(accountId);
-            JsonArray budgetsArray = accountJson.getAsJsonArray("budgets");
+            Account account = accounts.get(accountId);
+            List<String> budgetsArray = account.getBudgetIds();
             if (budgetsArray == null) {
-                budgetsArray = new JsonArray();
-                accountJson.add("budgets", budgetsArray);
+                budgetsArray = new ArrayList<>();
+                account.setBudgetIds(budgetsArray);
             }
-            if (!checkContainsInJsonArray(budgetsArray, budgetId)) {
+            if (!budgetsArray.contains(budgetId)) {
                 budgetsArray.add(budgetId);
             }
         }
@@ -105,23 +119,32 @@ public class BudgetMethod {
     public void updateBudget(String budgetId, Budget newBudget) {
         if (newBudget == null
                 || newBudget.getName() == null
-                || newBudget.getTotalAmount() <= 0){
-            DisplayToast.Display(dataFile.getContext(),"Budget Info is invalid");
+                || newBudget.getTotalAmount() <= 0) {
+            DisplayToast.Display(dataFile.getContext(), "Budget Info is invalid");
+            return;
         }
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject budgets = userData.getAsJsonObject("budgets");
-        JsonObject accounts = userData.getAsJsonObject("accounts");
-        JsonObject categories = userData.getAsJsonObject("categories");
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        Map<String, Category> categories = userData.getUser().getData().getCategories();
+
+        if (accounts == null || categories == null || budgets == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
 
         //Kiểm tra budget tồn tại
-        if (!budgets.has(budgetId)) {
+        if (!budgets.containsKey(budgetId)) {
             DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetId);
             return;
         }
 
         //Kiểm tra account tồn tại
         for (String accountId : newBudget.getAccountIds()) {
-            if (!accounts.has(accountId)) {
+            if (!accounts.containsKey(accountId)) {
                 DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountId);
                 return;
             }
@@ -129,100 +152,74 @@ public class BudgetMethod {
 
         //Kiểm tra category tồn tại trong categoryLimits
         for (String categoryId : newBudget.getCategoryLimits().keySet()) {
-            if (!categories.has(categoryId)) {
+            if (!categories.containsKey(categoryId)) {
                 DisplayToast.Display(dataFile.getContext(), "Category not found: " + categoryId);
                 return;
             }
         }
 
         //Xóa budget khỏi account
-        JsonObject oldBudgetJson = budgets.getAsJsonObject(budgetId);
-        JsonArray oldAccountIds = oldBudgetJson.getAsJsonArray("accountIds");
-        for(JsonElement accountId : oldAccountIds) {
-            JsonObject accountJson = accounts.getAsJsonObject(accountId.getAsString());
-            JsonArray budgetsArray = accountJson.getAsJsonArray("budgets");
-
-            //Xóa budget khỏi danh sách budgets của account (ghi đè)
+        Budget oldBudget = budgets.get(budgetId);
+        List<String> oldAccountIds = oldBudget.getAccountIds();
+        for (String accountId : oldAccountIds) {
+            Account account = accounts.get(accountId);
+            List<String> budgetsArray = account.getBudgetIds();
             if (budgetsArray != null) {
-                JsonArray newBudgetsArray = new JsonArray();
-                for (JsonElement budgetIdElement : budgetsArray) {
-                    if (!budgetIdElement.getAsString().equals(budgetId)) {
-                        newBudgetsArray.add(budgetIdElement);
-                    }
-                }
-                accountJson.add("budgets", newBudgetsArray);
+                //Xóa budget khỏi danh sách budgets của account (ghi đè)
+                budgetsArray.remove(budgetId);
             }
         }
 
         //Update budget
-        JsonObject budgetJson = new JsonObject();
-        budgetJson.addProperty("budgetId", budgetId);
-        budgetJson.addProperty("name", newBudget.getName());
-        budgetJson.addProperty("totalAmount", newBudget.getTotalAmount());
-        budgetJson.addProperty("remainingAmount", newBudget.getRemainingAmount());
-        budgetJson.addProperty("startDate", newBudget.getStartDate());
-        budgetJson.addProperty("endDate", newBudget.getEndDate());
-
-        //hêm account mới  vào budget
-        JsonArray accountIds = new JsonArray();
-        for (String accountId : newBudget.getAccountIds()) {
-            accountIds.add(accountId);
-        }
-        budgetJson.add("accountIds", accountIds);
-
-        //thêm categoryLimits
-        JsonObject categoryLimits = new JsonObject();
-        for (Map.Entry<String, Double> entry : newBudget.getCategoryLimits().entrySet()) {
-            categoryLimits.addProperty(entry.getKey(), entry.getValue());
-        }
-        budgetJson.add("categoryLimits", categoryLimits);
-        budgets.add(budgetId, budgetJson);
+        newBudget.setBudgetId(budgetId);
+        budgets.put(budgetId, newBudget);
 
         //update danh sách budget của các Account mới
-        for(String accountId : newBudget.getAccountIds()) {
-            JsonObject accountJson = accounts.getAsJsonObject(accountId);
-            JsonArray budgetsArray = accountJson.getAsJsonArray("budgets");
+        for (String accountId : newBudget.getAccountIds()) {
+            Account account = accounts.get(accountId);
+            List<String> budgetsArray = account.getBudgetIds();
             if (budgetsArray == null) {
-                budgetsArray = new JsonArray();
-                accountJson.add("budgets", budgetsArray);
+                budgetsArray = new ArrayList<>();
+                account.setBudgetIds(budgetsArray);
             }
             //kiếm tra đã có budget này trong danh sách chưa
-            if (!checkContainsInJsonArray(budgetsArray, budgetId)) {
+            if (!budgetsArray.contains(budgetId)) {
                 budgetsArray.add(budgetId);
             }
-
-            dataFile.saveData();
-            DisplayToast.Display(dataFile.getContext(), "Update budget successfully");
         }
+
+        dataFile.saveData();
+        DisplayToast.Display(dataFile.getContext(), "Update budget successfully");
     }
 
     public void deleteBudget(String budgetId) {
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject budgets = userData.getAsJsonObject("budgets");
-        JsonObject accounts = userData.getAsJsonObject("accounts");
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+
+        if (budgets == null || accounts == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
 
         //Kiểm tra budget tồn tại
-        if (!budgets.has(budgetId)) {
+        if (!budgets.containsKey(budgetId)) {
             DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetId);
             return;
         }
 
         //xóa budget khỏi account
-        JsonObject budgetJson = budgets.getAsJsonObject(budgetId);
-        JsonArray accountIds = budgetJson.getAsJsonArray("accountIds");
-        for(JsonElement accountId : accountIds) {
-            JsonObject accountJson = accounts.getAsJsonObject(accountId.getAsString());
-            JsonArray budgetsArray = accountJson.getAsJsonArray("budgets");
-
+        Budget budget = budgets.get(budgetId);
+        List<String> accountIds = budget.getAccountIds();
+        for (String accountId : accountIds) {
+            Account account = accounts.get(accountId);
+            List<String> budgetsArray = account.getBudgetIds();
             //xóa budget khỏi danh sách budgets
             if (budgetsArray != null) {
-                JsonArray newBudgetsArray = new JsonArray();
-                for (JsonElement budgetIdElement : budgetsArray) {
-                    if (!budgetIdElement.getAsString().equals(budgetId)) {
-                        newBudgetsArray.add(budgetIdElement);
-                    }
-                }
-                accountJson.add("budgets", newBudgetsArray);
+                budgetsArray.remove(budgetId);
             }
         }
 
@@ -234,37 +231,17 @@ public class BudgetMethod {
 
     public List<Budget> getListUserBudgets() {
         List<Budget> listBudgets = new ArrayList<>();
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject budgets = userData.getAsJsonObject("budgets");
-
-        for (String budgetId : budgets.keySet()) {
-            JsonObject budgetJson = budgets.getAsJsonObject(budgetId);
-            Budget budget = new Budget(
-                    budgetId,
-                    budgetJson.get("name").getAsString(),
-                    budgetJson.get("totalAmount").getAsDouble(),
-                    budgetJson.get("remainingAmount").getAsDouble(),
-                    budgetJson.get("startDate").getAsString(),
-                    budgetJson.get("endDate").getAsString()
-            );
-
-            //thêm account id
-            JsonArray accountIds = budgetJson.getAsJsonArray("accountIds");
-            for (JsonElement accountId : accountIds) {
-                budget.addAccount(accountId.getAsString());
-            }
-
-            //thêm category limits
-            JsonObject categoryLimits = budgetJson.getAsJsonObject("categoryLimits");
-            if (categoryLimits != null) {
-                for (String categoryId : categoryLimits.keySet()) {
-                    budget.addCategoryLimit(categoryId, categoryLimits.get(categoryId).getAsDouble());
-                }
-            }
-            listBudgets.add(budget);
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return listBudgets;
+        }
+        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        if (budgets != null) {
+            listBudgets.addAll(budgets.values());
         }
         return listBudgets;
     }
+
     private boolean checkContainsInJsonArray(JsonArray array, String value) {
         for (JsonElement element : array) {
             if (element.getAsString().equals(value)) {
@@ -274,7 +251,7 @@ public class BudgetMethod {
         return false;
     }
 
-    protected void updateBudgets(Transaction transaction) {
+    protected void updateBudgetsInTransaction(Transaction transaction) {
         if (transaction.isTransfer()) {
             return; //transfer không ảnh hưởng đến ngân sách
         }
@@ -283,16 +260,14 @@ public class BudgetMethod {
         for (Budget budget : budgets) {
             if (budget.appliesToTransaction(transaction)) {
                 budget.updateRemaining(transaction);
-                JsonObject userData = dataFile.getUserData(userId);
-                JsonObject budgetJson = userData.getAsJsonObject("budgets").getAsJsonObject(budget.getBudgetId());
-                budgetJson.addProperty("remainingAmount", budget.getRemainingAmount());
             }
         }
         dataFile.saveData();
     }
+
     protected void reverseBudgetUpdate(Transaction transaction) {
         if (transaction.isTransfer()) {
-            return;
+            return; //transfer không ảnh hưởng đến ngân sách
         }
         List<Budget> budgets = getListUserBudgets();
         for (Budget budget : budgets) {
@@ -302,9 +277,6 @@ public class BudgetMethod {
                 } else if (transaction.getType().equals("OUTCOME")) {
                     budget.setRemainingAmount(budget.getRemainingAmount() + transaction.getAmount());
                 }
-                JsonObject userData = dataFile.getUserData(userId);
-                JsonObject budgetJson = userData.getAsJsonObject("budgets").getAsJsonObject(budget.getBudgetId());
-                budgetJson.addProperty("remainingAmount", budget.getRemainingAmount());
             }
         }
         dataFile.saveData();

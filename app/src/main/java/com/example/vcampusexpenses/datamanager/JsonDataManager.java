@@ -5,14 +5,17 @@ import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.Budget;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Data;
-import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.model.User;
 import com.example.vcampusexpenses.model.UserData;
+import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -26,16 +29,17 @@ public class JsonDataManager {
     private final File file;
     private UserData userData;
 
-    public JsonDataManager(Context context) {
-        this.context = context;
-        this.file = new File(context.getFilesDir(), FILE_NAME);
-        initializeFile("default_user");
-    }
-
     public JsonDataManager(Context context, String userId) {
         this.context = context;
         this.file = new File(context.getFilesDir(), FILE_NAME);
         initializeFile(userId);
+    }
+
+    public JsonDataManager(Context context) {
+        this.context = context;
+        SessionManager sessionManager = new SessionManager(context);
+        this.file = new File(context.getFilesDir(), FILE_NAME);
+        initializeFile(sessionManager.getUserId());
     }
 
     public Context getContext() {
@@ -44,7 +48,7 @@ public class JsonDataManager {
 
     private void initializeFile(String userId) {
         if (!file.exists()) {
-            // Create sample data
+            // Create sample data for the given userId
             Map<String, Account> accounts = new HashMap<>();
             String accountId = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
             accounts.put(accountId, new Account(accountId, "Cash", 0.0));
@@ -57,33 +61,56 @@ public class JsonDataManager {
             }
 
             Map<String, Budget> budgets = new HashMap<>();
-            Map<String, Transaction> transactions = new HashMap<>();
+            Map<String, com.example.vcampusexpenses.model.Transaction> transactions = new HashMap<>();
 
             Data data = new Data(accounts, categories, budgets, transactions);
             userData = new UserData(new User(userId, data));
             saveData();
         } else {
             loadData();
+            // Ensure the loaded data matches the userId
+            if (userData == null || !userData.getUser().getUserId().equals(userId)) {
+                // Reset data for the new userId
+                userData = new UserData(new User(userId, new Data(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>())));
+                saveData();
+            }
         }
     }
 
     public synchronized void loadData() {
+        if (!file.exists()) {
+            DisplayToast.Display(context, "No data to load");
+            return;
+        }
         try (FileReader reader = new FileReader(file)) {
             Gson gson = new Gson();
-            userData = gson.fromJson(reader, UserData.class);
-        } catch (IOException e) {
+            JsonParser parser = new JsonParser();
+            JsonElement jsonElement = parser.parse(reader);
+            if (!jsonElement.isJsonObject()) {
+                DisplayToast.Display(context, "Invalid JSON format in file");
+                return;
+            }
+            userData = gson.fromJson(jsonElement, UserData.class);
+            if (userData == null) {
+                DisplayToast.Display(context, "Failed to load data: JSON is invalid");
+            }
+        } catch (IOException | com.google.gson.JsonSyntaxException e) {
             DisplayToast.Display(context, "Load data error: " + e.getMessage());
-            return;
+            userData = null;
         }
     }
 
     public synchronized void saveData() {
+        if (userData == null) {
+            DisplayToast.Display(context, "No data to save");
+            return;
+        }
         try (FileWriter writer = new FileWriter(file)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(userData, writer);
+            writer.flush(); // Ensure data is written
         } catch (IOException e) {
             DisplayToast.Display(context, "Save data error: " + e.getMessage());
-            return;
         }
     }
 
@@ -94,5 +121,9 @@ public class JsonDataManager {
         }
         DisplayToast.Display(context, "User data not found for userId: " + userId);
         return new JsonObject();
+    }
+
+    public UserData getUserDataObject() {
+        return userData;
     }
 }

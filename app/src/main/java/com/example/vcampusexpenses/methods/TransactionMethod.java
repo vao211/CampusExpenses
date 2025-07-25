@@ -1,64 +1,70 @@
 package com.example.vcampusexpenses.methods;
 
 import android.content.Context;
-
 import com.example.vcampusexpenses.datamanager.JsonDataManager;
 import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Transaction;
+import com.example.vcampusexpenses.model.UserData;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
-import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TransactionMethod {
     private final JsonDataManager dataFile;
+    private final UserData userData;
     private final String userId;
 
     public TransactionMethod(Context context, String userId) {
-        this.dataFile = new JsonDataManager(context);
+        this.dataFile = new JsonDataManager(context, userId);
+        this.userData = dataFile.getUserDataObject();
         this.userId = userId;
     }
 
     protected void saveTransaction(Transaction transaction) {
-        JsonObject transactionJson = new JsonObject();
-        transactionJson.addProperty("transactionId", transaction.getTransactionId());
-        transactionJson.addProperty("type", transaction.getType());
-        transactionJson.addProperty("amount", transaction.getAmount());
-        transactionJson.addProperty("date", transaction.getDate());
-        transactionJson.addProperty("description", transaction.getDescription());
-
-        if (transaction.isTransfer()) {
-            transactionJson.addProperty("fromAccountId", transaction.getFromAccountId());
-            transactionJson.addProperty("toAccountId", transaction.getToAccountId());
-        } else {
-            transactionJson.addProperty("accountId", transaction.getAccountId());
-            transactionJson.addProperty("categoryId", transaction.getCategoryId());
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
         }
-
-        dataFile.getUserData(userId)
-                .getAsJsonObject("transactions")
-                .add(transaction.getTransactionId(), transactionJson);
-
+        Map<String, Transaction> transactions = userData.getUser().getData().getTransactions();
+        if (transactions == null) {
+            transactions = new HashMap<>();
+            userData.getUser().getData().setTransactions(transactions);
+        }
+        transactions.put(transaction.getTransactionId(), transaction);
         dataFile.saveData();
     }
+
     private void processIncome(Transaction transaction) {
         AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
         Account account = accountMethod.getAccount(transaction.getAccountId());
+        if (account == null) {
+            DisplayToast.Display(dataFile.getContext(), "Account not found");
+            return;
+        }
         account.updateBalance(transaction.getAmount());
         accountMethod.saveAccount(account);
         BudgetMethod budgetMethod = new BudgetMethod(dataFile.getContext(), userId);
-        budgetMethod.updateBudgets(transaction);
+        budgetMethod.updateBudgetsInTransaction(transaction);
     }
 
     private void processOutcome(Transaction transaction) {
         AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
         BudgetMethod budgetMethod = new BudgetMethod(dataFile.getContext(), userId);
         Account account = accountMethod.getAccount(transaction.getAccountId());
+        if (account == null) {
+            DisplayToast.Display(dataFile.getContext(), "Account not found");
+            return;
+        }
         if (account.getBalance() >= transaction.getAmount()) {
             account.updateBalance(-transaction.getAmount());
             accountMethod.saveAccount(account);
-            budgetMethod.updateBudgets(transaction);
+            budgetMethod.updateBudgetsInTransaction(transaction);
         } else {
             DisplayToast.Display(dataFile.getContext(), "not enough balance");
             return;
@@ -69,6 +75,10 @@ public class TransactionMethod {
         AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
         Account fromAccount = accountMethod.getAccount(transaction.getFromAccountId());
         Account toAccount = accountMethod.getAccount(transaction.getToAccountId());
+        if (fromAccount == null || toAccount == null) {
+            DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
+            return;
+        }
         if (fromAccount.getBalance() >= transaction.getAmount()) {
             fromAccount.updateBalance(-transaction.getAmount());
             toAccount.updateBalance(transaction.getAmount());
@@ -79,31 +89,42 @@ public class TransactionMethod {
             return;
         }
     }
+
     public void addTransaction(Transaction transaction) {
-        if(transaction == null || !transaction.isValid()){
+        if (transaction == null || !transaction.isValid()) {
             DisplayToast.Display(dataFile.getContext(), "InValid Transaction");
             return;
         }
 
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject accounts = userData.getAsJsonObject("accounts");
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        Map<String, Category> categories = userData.getUser().getData().getCategories();
+        if (accounts == null || categories == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
 
         //nếu là transfer, kiểm tra tài khoản tồn tại
-        if(transaction.isTransfer()){
-            if(!accounts.has(transaction.getFromAccountId()) ||
-                    !accounts.has(transaction.getToAccountId())){
+        if (transaction.isTransfer()) {
+            if (!accounts.containsKey(transaction.getFromAccountId()) ||
+                    !accounts.containsKey(transaction.getToAccountId())) {
                 DisplayToast.Display(dataFile.getContext(), "Invalid Account");
+                return;
             }
         }
         //không phải transfer (income/outcome)
         else {
-            if(!accounts.has(transaction.getAccountId())){
+            if (!accounts.containsKey(transaction.getAccountId())) {
                 DisplayToast.Display(dataFile.getContext(), "Account not found");
+                return;
             }
             //kiểm tra danh mục
-            JsonObject categories = userData.getAsJsonObject("categories");
-            if(!categories.has(transaction.getCategoryId())){
+            if (!categories.containsKey(transaction.getCategoryId())) {
                 DisplayToast.Display(dataFile.getContext(), "Category not found");
+                return;
             }
         }
 
@@ -124,7 +145,7 @@ public class TransactionMethod {
         //sinh transactionId tự động
         String transactionId = IdGenerator.generateId(IdGenerator.ModelType.TRANSACTION);
         transaction.setTransactionId(transactionId);
-        switch (transaction.getType()){
+        switch (transaction.getType()) {
             case "INCOME":
                 processIncome(transaction);
                 break;
@@ -139,54 +160,41 @@ public class TransactionMethod {
                 return;
         }
         saveTransaction(transaction);
-        DisplayToast.Display(dataFile.getContext(),
-                "Transaction added successfully");
+        DisplayToast.Display(dataFile.getContext(), "Transaction added successfully");
     }
 
     public void deleteTransaction(String transactionId) {
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject transactions = userData.getAsJsonObject("transactions");
-
-        JsonObject transactionObjectJson = transactions.getAsJsonObject(transactionId);
-        if (!transactions.has(transactionId)) {
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Transaction> transactions = userData.getUser().getData().getTransactions();
+        if (transactions == null || !transactions.containsKey(transactionId)) {
             DisplayToast.Display(dataFile.getContext(), "Transaction not found");
             return;
         }
         //tạo giao dịch để khôi phục số dư
-        Transaction transactionTemp;
-        String type = transactionObjectJson.get("type").getAsString();
-        if (type.equals("TRANSFER")) {
-            transactionTemp = new Transaction(
-                    transactionObjectJson.get("fromAccountId").getAsString(),
-                    transactionObjectJson.get("toAccountId").getAsString(),
-                    transactionObjectJson.get("amount").getAsDouble(),
-                    transactionObjectJson.get("date").getAsString(),
-                    transactionObjectJson.get("description").getAsString()
-            );
-        }
-        else {
-            transactionTemp = new Transaction(
-                    transactionObjectJson.get("accountId").getAsString(),
-                    transactionObjectJson.get("categoryId").getAsString(),
-                    transactionObjectJson.get("amount").getAsDouble(),
-                    transactionObjectJson.get("date").getAsString(),
-                    transactionObjectJson.get("description").getAsString()
-            );
-        }
-        transactionTemp.setTransactionId(transactionId);
+        Transaction transactionTemp = transactions.get(transactionId);
 
-        //Đảo nguoực giao dịch
+        //Đảo ngược giao dịch
         AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
-        if (transactionTemp.isTransfer()){
+        if (transactionTemp.isTransfer()) {
             Account fromAccount = accountMethod.getAccount(transactionTemp.getFromAccountId());
             Account toAccount = accountMethod.getAccount(transactionTemp.getToAccountId());
+            if (fromAccount == null || toAccount == null) {
+                DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
+                return;
+            }
             fromAccount.updateBalance(transactionTemp.getAmount());
             toAccount.updateBalance(-transactionTemp.getAmount());
             accountMethod.saveAccount(fromAccount);
             accountMethod.saveAccount(toAccount);
-        }
-        else {
+        } else {
             Account account = accountMethod.getAccount(transactionTemp.getAccountId());
+            if (account == null) {
+                DisplayToast.Display(dataFile.getContext(), "Account not found");
+                return;
+            }
             if (transactionTemp.getType().equals("INCOME")) {
                 account.updateBalance(-transactionTemp.getAmount());
             } else if (transactionTemp.getType().equals("OUTCOME")) {
@@ -204,78 +212,65 @@ public class TransactionMethod {
     }
 
     public void updateTransaction(String transactionId, Transaction newTransaction) {
-        if(newTransaction == null || !newTransaction.isValid()){
+        if (newTransaction == null || !newTransaction.isValid()) {
             DisplayToast.Display(dataFile.getContext(), "InValid Transaction");
             return;
         }
-        JsonObject userData = dataFile.getUserData(userId);
-        //all transacrtion
-        JsonObject transactionsJson = userData.getAsJsonObject("transactions");
-        JsonObject accountsJson = transactionsJson.getAsJsonObject(transactionId);
-
-        JsonObject oldTransactionJson = transactionsJson.getAsJsonObject(transactionId);
-        if(oldTransactionJson == null){
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Transaction> transactions = userData.getUser().getData().getTransactions();
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        Map<String, Category> categories = userData.getUser().getData().getCategories();
+        if (transactions == null || accounts == null || categories == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        if (!transactions.containsKey(transactionId)) {
             DisplayToast.Display(dataFile.getContext(), "Transaction not found");
             return;
         }
 
-        if(newTransaction.isTransfer()){
-            if(!accountsJson.has(newTransaction.getFromAccountId()) ||
-                    !accountsJson.has(newTransaction.getToAccountId())){
+        if (newTransaction.isTransfer()) {
+            if (!accounts.containsKey(newTransaction.getFromAccountId()) ||
+                    !accounts.containsKey(newTransaction.getToAccountId())) {
                 DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
                 return;
             }
-        }
-        else {
-            if(!accountsJson.has(newTransaction.getAccountId())) {
+        } else {
+            if (!accounts.containsKey(newTransaction.getAccountId())) {
                 DisplayToast.Display(dataFile.getContext(), "Account not found");
                 return;
             }
-        }
-
-        if(!newTransaction.isTransfer()){
-            JsonObject categories = userData.getAsJsonObject("categories");
-            if(!categories.has(newTransaction.getCategoryId())){
+            if (!categories.containsKey(newTransaction.getCategoryId())) {
                 DisplayToast.Display(dataFile.getContext(), "Category not found");
                 return;
             }
         }
 
         //temp transaction để khôi phục số dư
-        Transaction tempTransaction;
-        String type = oldTransactionJson.get("type").getAsString();
-        if (type.equals("TRANSFER")) {
-            tempTransaction = new Transaction(
-                    oldTransactionJson.get("fromAccountId").getAsString(),
-                    oldTransactionJson.get("toAccountId").getAsString(),
-                    oldTransactionJson.get("amount").getAsDouble(),
-                    oldTransactionJson.get("date").getAsString(),
-                    oldTransactionJson.get("description").getAsString()
-            );
-        }
-        else {
-            tempTransaction = new Transaction(
-                    oldTransactionJson.get("accountId").getAsString(),
-                    oldTransactionJson.get("categoryId").getAsString(),
-                    oldTransactionJson.get("amount").getAsDouble(),
-                    oldTransactionJson.get("date").getAsString(),
-                    oldTransactionJson.get("description").getAsString()
-            );
-        }
-        tempTransaction.setTransactionId(transactionId);
+        Transaction tempTransaction = transactions.get(transactionId);
 
         //đảo ngược giao dịch
         AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
-        if (tempTransaction.isTransfer()){
+        if (tempTransaction.isTransfer()) {
             Account fromAccount = accountMethod.getAccount(tempTransaction.getFromAccountId());
             Account toAccount = accountMethod.getAccount(tempTransaction.getToAccountId());
+            if (fromAccount == null || toAccount == null) {
+                DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
+                return;
+            }
             fromAccount.updateBalance(tempTransaction.getAmount());
             toAccount.updateBalance(-tempTransaction.getAmount());
             accountMethod.saveAccount(fromAccount);
             accountMethod.saveAccount(toAccount);
-        }
-        else {
+        } else {
             Account account = accountMethod.getAccount(tempTransaction.getAccountId());
+            if (account == null) {
+                DisplayToast.Display(dataFile.getContext(), "Account not found");
+                return;
+            }
             if (tempTransaction.getType().equals("INCOME")) {
                 account.updateBalance(-tempTransaction.getAmount());
             } else if (tempTransaction.getType().equals("OUTCOME")) {
@@ -286,21 +281,35 @@ public class TransactionMethod {
             BudgetMethod budgetMethod = new BudgetMethod(dataFile.getContext(), userId);
             budgetMethod.reverseBudgetUpdate(tempTransaction);
         }
-        //transaction mowsi
+        //transaction mới
         newTransaction.setTransactionId(transactionId);
-        switch (newTransaction.getType()){
+        switch (newTransaction.getType()) {
             case "INCOME":
                 processIncome(newTransaction);
                 break;
             case "OUTCOME":
                 processOutcome(newTransaction);
                 break;
+            case "TRANSFER":
+                processTransfer(newTransaction);
+                break;
             default:
                 DisplayToast.Display(dataFile.getContext(), "Invalid Transaction Type");
                 return;
         }
         saveTransaction(newTransaction);
-        dataFile.saveData();
         DisplayToast.Display(dataFile.getContext(), "Transaction updated successfully");
+    }
+    public List<Transaction> getListTransactions() {
+        List<Transaction> transactions = new ArrayList<>();
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "");
+            return transactions;
+        }
+        Map<String, Transaction> transactionMap = userData.getUser().getData().getTransactions();
+        if (transactionMap != null) {
+            transactions.addAll(transactionMap.values());
+        }
+        return transactions;
     }
 }

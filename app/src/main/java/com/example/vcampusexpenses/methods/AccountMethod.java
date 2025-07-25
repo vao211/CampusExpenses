@@ -1,9 +1,11 @@
 package com.example.vcampusexpenses.methods;
 
 import android.content.Context;
-
 import com.example.vcampusexpenses.datamanager.JsonDataManager;
 import com.example.vcampusexpenses.model.Account;
+import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.Transaction;
+import com.example.vcampusexpenses.model.UserData;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
 import com.google.gson.JsonArray;
@@ -11,65 +13,91 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AccountMethod {
     private final JsonDataManager dataFile;
+    private final UserData userData;
     private final String userId;
 
     public AccountMethod(Context context, String userId) {
-        this.dataFile = new JsonDataManager(context);
+        this.dataFile = new JsonDataManager(context, userId);
+        this.userData = dataFile.getUserDataObject();
         this.userId = userId;
     }
 
-    protected void saveAccount(Account account) {
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject accountJson = new JsonObject();
-        accountJson.addProperty("accountId", account.getAccountId());
-        accountJson.addProperty("name", account.getName());
-        accountJson.addProperty("balance", account.getBalance());
-        JsonArray budgetsArray = new JsonArray();
-        for (String budgetId : account.getBudgetIds()) {
-            budgetsArray.add(budgetId);
+    public String getAccountId(String accountName) {
+        if (accountName == null || accountName.trim().isEmpty()) {
+            DisplayToast.Display(dataFile.getContext(), "Invalid account name");
+            return null;
         }
-        accountJson.add("budgets", budgetsArray);
-        userData.getAsJsonObject("accounts").add(account.getAccountId(), accountJson);
+        JsonObject jsonData = dataFile.getUserData(userId);
+        if (jsonData == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return null;
+        }
+        JsonObject accounts = jsonData.getAsJsonObject("accounts");
+        if (accounts == null) {
+            DisplayToast.Display(dataFile.getContext(), "No accounts found");
+            return null;
+        }
+        for (Map.Entry<String, JsonElement> entry : accounts.entrySet()) {
+            JsonObject accountJson = entry.getValue().getAsJsonObject();
+            if (accountJson.has("name") && accountJson.get("name").getAsString().equals(accountName)) {
+                return accountJson.get("accountId").getAsString();
+            }
+        }
+        DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountName);
+        return null;
+    }
+
+    protected void saveAccount(Account account) {
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        if (accounts == null) {
+            accounts = new HashMap<>();
+            userData.getUser().getData().setAccount(accounts);
+        }
+        accounts.put(account.getAccountId(), account);
         dataFile.saveData();
     }
+
     public Account getAccount(String accountId) {
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject accountJson = userData.getAsJsonObject("accounts").getAsJsonObject(accountId);
-        if(accountJson == null){
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return null;
+        }
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        if (accounts == null || !accounts.containsKey(accountId)) {
             DisplayToast.Display(dataFile.getContext(), "Account Not Found: " + accountId);
             return null;
         }
-        JsonArray budgetsArray = accountJson.getAsJsonArray("budgets");
-        List<String> budgets = new ArrayList<>();
-        if (budgetsArray != null) {
-            for (JsonElement budgetId : budgetsArray) {
-                budgets.add(budgetId.getAsString());
-            }
-        }
-        return new Account(
-                accountId,
-                accountJson.get("name").getAsString(),
-                accountJson.get("balance").getAsDouble(),
-                budgets
-        );
+        return accounts.get(accountId);
     }
-    public void addAccount(Account account){
-        if(account == null || account.getName() == null
-                || account.getName().trim().isEmpty()){
+
+    public void addAccount(Account account) {
+        if (account == null || account.getName() == null || account.getName().trim().isEmpty()) {
             DisplayToast.Display(dataFile.getContext(), "InValid Account Name");
             return;
         }
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject accounts = userData.getAsJsonObject("accounts");
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        if (accounts == null) {
+            accounts = new HashMap<>();
+            userData.getUser().getData().setAccount(accounts);
+        }
 
         //check trùng tên
-        for(String key : accounts.keySet()){
-            JsonObject existingAccount = accounts.getAsJsonObject(key);
-            if(existingAccount.get("name").getAsString().equals(account.getName())){
+        for (Account existingAccount : accounts.values()) {
+            if (existingAccount.getName().equals(account.getName())) {
                 DisplayToast.Display(dataFile.getContext(), "Account Name Already Exists");
                 return;
             }
@@ -79,81 +107,76 @@ public class AccountMethod {
         account.setAccountId(accountId);
         saveAccount(account);
     }
-    public void updateAccount(String accountId, String newName, double balance){
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject accounts = userData.getAsJsonObject("accounts");
-        if(!accounts.has(accountId)){
+
+    public void updateAccount(String accountId, String newName, double balance) {
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        if (accounts == null || !accounts.containsKey(accountId)) {
             DisplayToast.Display(dataFile.getContext(), "Account Not Found: " + accountId);
             return;
         }
-        if(newName == null || newName.trim().isEmpty()){
+        if (newName == null || newName.trim().isEmpty()) {
             DisplayToast.Display(dataFile.getContext(), "InValid Account Name");
             return;
         }
-        for(String key : accounts.keySet()){
-            JsonObject existingAccount = accounts.getAsJsonObject(key);
-            if(existingAccount.get("name").getAsString().equals(newName)
-                    && !existingAccount.get("accountId").getAsString().equals(accountId)){
+        for (Account existingAccount : accounts.values()) {
+            if (existingAccount.getName().equals(newName) && !existingAccount.getAccountId().equals(accountId)) {
                 DisplayToast.Display(dataFile.getContext(), "Account Name Already Exists");
                 return;
             }
         }
-        JsonObject accountJson = accounts.getAsJsonObject(accountId);
-        accountJson.addProperty("name", newName);
-        accountJson.addProperty("balance", balance);
+        Account account = accounts.get(accountId);
+        account.setName(newName);
+        account.setBalance(balance);
         dataFile.saveData();
         DisplayToast.Display(dataFile.getContext(), "Update Account Successfully");
     }
+
     public void deleteAccount(String accountId) {
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject accounts = userData.getAsJsonObject("accounts");
-        JsonObject transactions = userData.getAsJsonObject("transactions");
-        JsonObject budgets = userData.getAsJsonObject("budgets");
-        if (!accounts.has(accountId)) {
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return;
+        }
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        Map<String, Transaction> transactions = userData.getUser().getData().getTransactions();
+        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        if (accounts == null || !accounts.containsKey(accountId)) {
             DisplayToast.Display(dataFile.getContext(), "Account Not Found: " + accountId);
             return;
         }
-        for (String transactionId : transactions.keySet()) {
-            JsonObject transactionJson = transactions.getAsJsonObject(transactionId);
-            if (!transactionJson.get("type").getAsString().equals("TRANSFER") &&
-                    transactionJson.get("accountId").getAsString().equals(accountId)) {
-                DisplayToast.Display(dataFile.getContext(), "Cannot Delete Account Because It Is Used In Transaction");
-                return;
+        if (transactions != null) {
+            for (Transaction transaction : transactions.values()) {
+                if (!transaction.isTransfer() && transaction.getAccountId().equals(accountId)) {
+                    DisplayToast.Display(dataFile.getContext(), "Cannot Delete Account Because It Is Used In Transaction");
+                    return;
+                }
             }
         }
-        for (String budgetId : budgets.keySet()) {
-            JsonObject budgetJson = budgets.getAsJsonObject(budgetId);
-            JsonObject categoryLimits = budgetJson.getAsJsonObject("categoryLimits");
-            if (categoryLimits != null && categoryLimits.has(accountId)) {
-                DisplayToast.Display(dataFile.getContext(), "Cannot Delete Account Because It Is Used In Budget");
-                return;
+        if (budgets != null) {
+            for (Budget budget : budgets.values()) {
+                if (budget.getAccountIds() != null && budget.getAccountIds().contains(accountId)) {
+                    DisplayToast.Display(dataFile.getContext(), "Cannot Delete Account Because It Is Used In Budget");
+                    return;
+                }
             }
         }
         accounts.remove(accountId);
         dataFile.saveData();
         DisplayToast.Display(dataFile.getContext(), "Delete Account Successfully");
     }
-    public List<Account> getListAccounts(){
-        List<Account> accountList = new ArrayList<>();
-        JsonObject userData = dataFile.getUserData(userId);
-        JsonObject accountsJson = userData.getAsJsonObject("accounts");
 
-        for (String accountId : accountsJson.keySet()) {
-            JsonObject accountJson = accountsJson.getAsJsonObject(accountId);
-            JsonArray budgetsArrayJson = accountJson.getAsJsonArray("budgets");
-            List<String> budgets = new ArrayList<>();
-            if (budgetsArrayJson != null) {
-                for (JsonElement budgetId : budgetsArrayJson) {
-                    budgets.add(budgetId.getAsString());
-                }
-            }
-            Account account = new Account(
-                    accountId,
-                    accountJson.get("name").getAsString(),
-                    accountJson.get("balance").getAsDouble(),
-                    budgets
-            );
-            accountList.add(account);
+    public List<Account> getListAccounts() {
+        List<Account> accountList = new ArrayList<>();
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return accountList;
+        }
+        Map<String, Account> accounts = userData.getUser().getData().getAccount();
+        if (accounts != null) {
+            accountList.addAll(accounts.values());
         }
         return accountList;
     }
