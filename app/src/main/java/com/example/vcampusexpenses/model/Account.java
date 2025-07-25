@@ -15,7 +15,11 @@ public class Account {
         this.balance = balance;
         this.budgets = new ArrayList<>();
     }
-
+    public Account(String name, double balance) {
+        this.name = name;
+        this.balance = balance;
+        this.budgets = new ArrayList<>();
+    }
     public Account(String accountId, String name, double balance, List<String> budgets) {
         this.accountId = accountId;
         this.name = name;
