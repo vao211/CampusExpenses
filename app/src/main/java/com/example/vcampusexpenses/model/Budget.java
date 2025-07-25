@@ -26,9 +26,18 @@ public class Budget {
         this.remainingAmount = remainingAmount;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.accountIds = new ArrayList<>();
+        this.categoryLimits = new HashMap<>();
     }
 
-    public Budget() {
+    public Budget(String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
+        this.name = name;
+        this.totalAmount = totalAmount;
+        this.remainingAmount = remainingAmount;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.accountIds = new ArrayList<>();
+        this.categoryLimits = new HashMap<>();
     }
 
     //kiem tra transaction co thuoc ve Budget
