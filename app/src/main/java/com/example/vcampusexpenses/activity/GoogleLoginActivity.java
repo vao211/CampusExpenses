@@ -16,6 +16,7 @@ import com.example.vcampusexpenses.session.SessionManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
 @SuppressWarnings("deprecation")
 public class GoogleLoginActivity extends AppCompatActivity {
@@ -23,6 +24,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
     private ImageView gifLoading;
     private GoogleAuthen googleAuthen;
     private SessionManager sessionManager;
+    private FirebaseAuth fbAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +59,11 @@ public class GoogleLoginActivity extends AppCompatActivity {
                     googleAuthen.firebaseAuthWithGoogle(account.getIdToken(), account, new GoogleAuthen.AuthCallback() {
                         @Override
                         public void onSuccess(GoogleSignInAccount account) {
-                            sessionManager.saveLoginSession(account.getEmail());
+                            //
+                            fbAuth = FirebaseAuth.getInstance();
+                            sessionManager.saveLoginSession(account.getEmail(), fbAuth.getUid());
                             DisplayToast.Display(GoogleLoginActivity.this, "Firebase authentication successful");
-
-                            createSampleData(GoogleLoginActivity.this, account.getId());
+                            createSampleData(GoogleLoginActivity.this, fbAuth.getUid());
 
                             Intent intent = new Intent(GoogleLoginActivity.this, RegistrationPageActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
