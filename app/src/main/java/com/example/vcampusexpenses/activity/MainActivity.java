@@ -38,8 +38,6 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     //test hiển thị user
-    private Button btnLogout, btnTest;
-    private TextView txtUserEmail2;
     private SessionManager sessionManager;
 
 
@@ -51,14 +49,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
-        txtUserEmail2 = findViewById(R.id.txtUserEmail2);
-        btnLogout = findViewById(R.id.btnLogout);
         sessionManager = new SessionManager(this);
-
-        btnTest = findViewById(R.id.btnTest);
-        test();
-        LoadUserEmail();
-        Logout();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -90,28 +81,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("SetTextI18n")
-    private void LoadUserEmail(){
-        String email = sessionManager.getSavedEmail();
-        if (email != null) {
-            txtUserEmail2.setText("UserEmail: "+ email);
-        }
-    }
-    private void Logout(){
-        btnLogout.setOnClickListener(v -> {
-            FireBaseAuthen.LogOut(this);
-            finish();
-        });
-    }
+//    private void Logout(){
+//        btnLogout.setOnClickListener(v -> {
+//            FireBaseAuthen.LogOut(this);
+//            finish();
+//        });
+//    }
 
     // Hàm Test add, KHÔNG ĐƯỢC CHẠY. Chỉ xem để biết cách dùng.
     private void test() {
         String userId = sessionManager.getUserId();
-        btnTest.setOnClickListener(v -> {
-            if (userId == null || userId.trim().isEmpty()) {
-                DisplayToast.Display(this, "User ID is invalid. Please log in again.");
-                return;
-            }
 
             AccountMethod accountMethod = new AccountMethod(this, userId);
             CategoryMethod categoryMethod = new CategoryMethod(this, userId);
@@ -148,6 +127,6 @@ public class MainActivity extends AppCompatActivity {
 
             // Hiển thị thông báo hoàn tất
             DisplayToast.Display(this, "Test completed. Check Logcat and JSON file.");
-        });
+
     }
 }
