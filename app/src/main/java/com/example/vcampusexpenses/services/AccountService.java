@@ -1,4 +1,4 @@
-package com.example.vcampusexpenses.methods;
+package com.example.vcampusexpenses.services;
 
 import android.content.Context;
 import com.example.vcampusexpenses.datamanager.JsonDataManager;
@@ -8,7 +8,6 @@ import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.model.UserData;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -17,12 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AccountMethod {
+public class AccountService {
     private final JsonDataManager dataFile;
     private final UserData userData;
     private final String userId;
 
-    public AccountMethod(Context context, String userId) {
+    public AccountService(Context context, String userId) {
         this.dataFile = new JsonDataManager(context, userId);
         this.userData = dataFile.getUserDataObject();
         this.userId = userId;

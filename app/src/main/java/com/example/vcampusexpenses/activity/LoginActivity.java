@@ -10,13 +10,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.authentication.FireBaseAuthen;
+import com.example.vcampusexpenses.authentication.GuestAuthen;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
     EditText edtEmail, edtPassword;
     Button btnLogin, btnRegister;
-    ImageButton btnGoogleLogin;
+    ImageButton btnGoogleLogin, btnGuestLogin;
     FirebaseAuth mAuth;
     private SessionManager sessionManager;
     @Override
@@ -29,13 +30,20 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnRegister = findViewById(R.id.btnRegister);
         btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
+        btnGuestLogin = findViewById(R.id.btn_guestLogin);
         mAuth = FirebaseAuth.getInstance();
         sessionManager = new SessionManager(this);
 
         CheckLoggedIn();
+        GuestLogin();
         GoogleLogin();
         Login();
         GoToRegister();
+    }
+    private void GuestLogin(){
+        btnGuestLogin.setOnClickListener(v -> {
+            GuestAuthen.LogIn(this);
+        });
     }
 
     private void GoogleLogin() {
