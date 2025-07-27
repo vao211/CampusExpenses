@@ -14,8 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.adapters.CategoryAdapter;
 import com.example.vcampusexpenses.database.UserDB;
-import com.example.vcampusexpenses.methods.CategoryMethod;
+import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.model.Category;
+import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
 
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
 public class CategoriesFragment extends Fragment {
     private RecyclerView recyclerViewCategories;
     private TextView txtEmptyCategories;
-    private CategoryMethod categoryMethod;
+    private CategoryService categoryService;
 
     private ImageButton btnAddCategory;
 
@@ -32,10 +33,9 @@ public class CategoriesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_categories, container, false);
         recyclerViewCategories = view.findViewById(R.id.rvCategory);
         txtEmptyCategories = view.findViewById(R.id.txtEmptyCategories);
-
-        UserDB userDB = new UserDB();
-        String userId = userDB.getCurrentUserId();
-        categoryMethod = new CategoryMethod(requireContext(), userId);
+        SessionManager sessionManager = new SessionManager(requireContext());
+        String userId = sessionManager.getUserId();
+        categoryService = new CategoryService(requireContext(), userId);
         btnAddCategory = view.findViewById(R.id.btn_addCategory);
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(requireContext()));
         addCategory();
@@ -58,7 +58,7 @@ public class CategoriesFragment extends Fragment {
             return;
         }
 
-        List<Category> categoryList = categoryMethod.getListCategories();
+        List<Category> categoryList = categoryService.getListCategories();
 
         if (categoryList == null || categoryList.isEmpty()) {
             txtEmptyCategories.setVisibility(View.VISIBLE);
