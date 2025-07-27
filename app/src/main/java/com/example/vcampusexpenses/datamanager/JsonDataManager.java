@@ -35,6 +35,7 @@ public class JsonDataManager {
         initializeFile(userId);
     }
 
+    //guest login
     public JsonDataManager(Context context) {
         this.context = context;
         SessionManager sessionManager = new SessionManager(context);
