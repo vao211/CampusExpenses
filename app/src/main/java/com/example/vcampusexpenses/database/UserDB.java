@@ -1,9 +1,5 @@
 package com.example.vcampusexpenses.database;
 
-import android.content.Context;
-
-import com.example.vcampusexpenses.datamanager.JsonDataManager;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 

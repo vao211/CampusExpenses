@@ -5,14 +5,13 @@ import android.content.Intent;
 
 import com.example.vcampusexpenses.activity.LoginActivity;
 import com.example.vcampusexpenses.activity.MainActivity;
-import com.example.vcampusexpenses.activity.RegistrationPageActivity;
-import com.example.vcampusexpenses.datamanager.JsonDataManager;
+import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
 
 public class GuestAuthen {
     private static void createSampleData(Context context) {
-        JsonDataManager dataManager = new JsonDataManager(context);
+        UserDataManager dataManager = new UserDataManager(context);
     }
     public static void LogIn(Context context){
         SessionManager sessionManager = new SessionManager(context);

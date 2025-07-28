@@ -23,20 +23,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JsonDataManager {
+public class UserDataManager {
     private static final String FILE_NAME = "expense_data.json";
     private final Context context;
     private final File file;
     private UserData userData;
 
-    public JsonDataManager(Context context, String userId) {
+    public UserDataManager(Context context, String userId) {
         this.context = context;
         this.file = new File(context.getFilesDir(), FILE_NAME);
         initializeFile(userId);
     }
 
     //guest login
-    public JsonDataManager(Context context) {
+    public UserDataManager(Context context) {
         this.context = context;
         SessionManager sessionManager = new SessionManager(context);
         this.file = new File(context.getFilesDir(), FILE_NAME);
