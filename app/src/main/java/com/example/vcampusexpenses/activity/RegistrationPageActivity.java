@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.vcampusexpenses.services.SettingService;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.database.UserDB;
@@ -129,6 +130,8 @@ public class RegistrationPageActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(String displayName, String realName, String dateOfBirth) {
                     sessionManager.setRegistrationCompleted();
+                    SettingService settingService = new SettingService(RegistrationPageActivity.this);
+                    settingService.setDisplayName(displayName);
                     DisplayToast.Display(RegistrationPageActivity.this, "Registration successful");
                     Intent intent = new Intent(RegistrationPageActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
