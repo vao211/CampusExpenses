@@ -35,7 +35,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/txt_user"
+        android:id="@+id/txt_displayName"
         android:textSize="40sp"
         android:layout_marginTop="10dp"
         android:text="@string/guest"
@@ -56,11 +56,22 @@
         android:id="@+id/btn_login"
         android:text="@string/login"
         android:textSize="15sp"
-        app:layout_constraintTop_toBottomOf="@id/txt_user"
+        app:layout_constraintTop_toBottomOf="@id/txt_displayName"
         app:layout_constraintStart_toEndOf="@id/img_avatar"
         app:layout_constraintBottom_toBottomOf="@id/img_avatar"
         android:layout_marginBottom="10dp"
         />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_email"
+        android:text=""
+        android:textSize="15sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/txt_displayName"
+        app:layout_constraintStart_toEndOf="@id/img_avatar"
+        app:layout_constraintBottom_toBottomOf="@id/img_avatar"
+        android:layout_marginBottom="10dp"/>
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -85,7 +96,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/injson"
+        android:text="@string/vnd"
         android:id="@+id/txt_type_currency"
         android:textSize="12sp"
         android:layout_marginStart="15dp"
@@ -241,14 +252,35 @@
         android:layout_marginStart="15dp"
         app:layout_constraintStart_toEndOf="@id/btn_about"
         app:layout_constraintTop_toBottomOf="@id/txt_about"/>
-
-
-    <Button
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_about"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
         android:text="@string/logout"
         android:id="@+id/btn_logout"
+        android:src="@drawable/ic_logout"
+        android:background="?attr/selectableItemBackgroundBorderless"
         />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_logout"
+        android:text="@string/logout"
+        android:textSize="15sp"
+        app:layout_constraintStart_toEndOf="@id/btn_logout"
+        app:layout_constraintTop_toBottomOf="@id/txt_description_about"
+        app:layout_constraintBottom_toBottomOf="@id/btn_logout"
+        android:layout_marginStart="15dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Log out of this account"
+        android:id="@+id/txt_description_logout"
+        android:textSize="12sp"
+        android:layout_marginStart="15dp"
+        app:layout_constraintStart_toEndOf="@id/btn_logout"
+        app:layout_constraintTop_toBottomOf="@id/txt_logout"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
