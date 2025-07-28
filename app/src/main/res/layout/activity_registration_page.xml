@@ -8,57 +8,44 @@
     android:layout_height="match_parent"
     android:padding="13dp">
 
-    <ScrollView
+    <EditText
+        android:id="@+id/edtDisplayName"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/btnSubmit">
+        android:hint="@string/display_name"
+        android:inputType="textPersonName" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+    <EditText
+        android:id="@+id/edtRealName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        app:layout_constraintTop_toBottomOf="@id/edtDisplayName"
+        android:hint="@string/your_name"
+        android:inputType="textPersonName" />
 
-            <ImageView
-                android:id="@+id/gif_registration"
-                android:layout_width="100sp"
-                android:layout_height="100sp"
-                android:layout_gravity="center"
-                android:src="@drawable/registration"
-                tools:ignore="ContentDescription" />
+    <DatePicker
+        android:id="@+id/datePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/edtRealName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_gravity="center"
+        android:calendarTextColor="#E69A2C"
+        android:datePickerMode="calendar" />
 
-            <EditText
-                android:id="@+id/edtDisplayName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints=""
-                android:hint="@string/display_name"
-                android:inputType="textPersonName" />
-
-            <EditText
-                android:id="@+id/edtRealName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints=""
-                android:hint="@string/your_name"
-                android:inputType="textPersonName" />
-
-            <DatePicker
-                android:id="@+id/datePicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:calendarTextColor="#E69A2C"
-                android:datePickerMode="calendar" />
-
-            <CheckBox
-                android:id="@+id/chkTerms"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/i_agree_to_the_terms_of_service" />
-        </LinearLayout>
-    </ScrollView>
-
+    <CheckBox
+        android:id="@+id/chkTerms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/datePicker"
+        app:layout_constraintBottom_toTopOf="@id/btnSubmit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/i_agree_to_the_terms_of_service" />
     <Button
         android:id="@+id/btnSubmit"
         android:layout_width="match_parent"

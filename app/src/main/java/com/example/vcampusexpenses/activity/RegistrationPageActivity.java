@@ -35,9 +35,7 @@ public class RegistrationPageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_page);
 
-        // Khởi tạo views
         btnSubmit = findViewById(R.id.btnSubmit);
-        gif_registration = findViewById(R.id.gif_registration);
         edtDisplayName = findViewById(R.id.edtDisplayName);
         edtRealName = findViewById(R.id.edtRealName);
         datePicker = findViewById(R.id.datePicker);
@@ -49,19 +47,12 @@ public class RegistrationPageActivity extends AppCompatActivity {
 
         loadUserData();
         Submit();
-        LoadGif();
         btnSubmit.setOnClickListener(v -> submitUserInfo());
     }
     private void Submit() {
         btnSubmit.setOnClickListener(v -> {
             submitUserInfo();
         });
-    }
-    private void LoadGif() {
-        Glide.with(this)
-                .asGif()
-                .load(R.drawable.registration)
-                .into(gif_registration);
     }
     private void loadUserData() {
         FirebaseUser user = mAuth.getCurrentUser();
