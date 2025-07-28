@@ -91,7 +91,9 @@ public class UserDataManager {
                 DisplayToast.Display(context, "Invalid JSON format in file");
                 return;
             }
+
             userData = gson.fromJson(jsonElement, UserData.class);
+
             if (userData == null) {
                 DisplayToast.Display(context, "Failed to load data: JSON is invalid");
             }
