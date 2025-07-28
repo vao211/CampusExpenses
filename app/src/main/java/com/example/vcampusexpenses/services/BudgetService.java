@@ -1,4 +1,4 @@
-package com.example.vcampusexpenses.methods;
+package com.example.vcampusexpenses.services;
 
 import android.content.Context;
 import com.example.vcampusexpenses.datamanager.JsonDataManager;
@@ -18,12 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BudgetMethod {
+public class BudgetService {
     private final JsonDataManager dataFile;
     private final UserData userData;
     private final String userId;
 
-    public BudgetMethod(Context context, String userId) {
+    public BudgetService(Context context, String userId) {
         this.dataFile = new JsonDataManager(context, userId);
         this.userData = dataFile.getUserDataObject();
         this.userId = userId;

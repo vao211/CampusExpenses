@@ -1,4 +1,4 @@
-package com.example.vcampusexpenses.methods;
+package com.example.vcampusexpenses.services;
 
 import android.content.Context;
 import com.example.vcampusexpenses.datamanager.JsonDataManager;
@@ -15,12 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TransactionMethod {
+public class TransactionService {
     private final JsonDataManager dataFile;
     private final UserData userData;
     private final String userId;
 
-    public TransactionMethod(Context context, String userId) {
+    public TransactionService(Context context, String userId) {
         this.dataFile = new JsonDataManager(context, userId);
         this.userData = dataFile.getUserDataObject();
         this.userId = userId;
@@ -41,30 +41,30 @@ public class TransactionMethod {
     }
 
     private void processIncome(Transaction transaction) {
-        AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
-        Account account = accountMethod.getAccount(transaction.getAccountId());
+        AccountService accountService = new AccountService(dataFile.getContext(), userId);
+        Account account = accountService.getAccount(transaction.getAccountId());
         if (account == null) {
             DisplayToast.Display(dataFile.getContext(), "Account not found");
             return;
         }
         account.updateBalance(transaction.getAmount());
-        accountMethod.saveAccount(account);
-        BudgetMethod budgetMethod = new BudgetMethod(dataFile.getContext(), userId);
-        budgetMethod.updateBudgetsInTransaction(transaction);
+        accountService.saveAccount(account);
+        BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
+        budgetService.updateBudgetsInTransaction(transaction);
     }
 
     private void processOutcome(Transaction transaction) {
-        AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
-        BudgetMethod budgetMethod = new BudgetMethod(dataFile.getContext(), userId);
-        Account account = accountMethod.getAccount(transaction.getAccountId());
+        AccountService accountService = new AccountService(dataFile.getContext(), userId);
+        BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
+        Account account = accountService.getAccount(transaction.getAccountId());
         if (account == null) {
             DisplayToast.Display(dataFile.getContext(), "Account not found");
             return;
         }
         if (account.getBalance() >= transaction.getAmount()) {
             account.updateBalance(-transaction.getAmount());
-            accountMethod.saveAccount(account);
-            budgetMethod.updateBudgetsInTransaction(transaction);
+            accountService.saveAccount(account);
+            budgetService.updateBudgetsInTransaction(transaction);
         } else {
             DisplayToast.Display(dataFile.getContext(), "not enough balance");
             return;
@@ -72,9 +72,9 @@ public class TransactionMethod {
     }
 
     private void processTransfer(Transaction transaction) {
-        AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
-        Account fromAccount = accountMethod.getAccount(transaction.getFromAccountId());
-        Account toAccount = accountMethod.getAccount(transaction.getToAccountId());
+        AccountService accountService = new AccountService(dataFile.getContext(), userId);
+        Account fromAccount = accountService.getAccount(transaction.getFromAccountId());
+        Account toAccount = accountService.getAccount(transaction.getToAccountId());
         if (fromAccount == null || toAccount == null) {
             DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
             return;
@@ -82,8 +82,8 @@ public class TransactionMethod {
         if (fromAccount.getBalance() >= transaction.getAmount()) {
             fromAccount.updateBalance(-transaction.getAmount());
             toAccount.updateBalance(transaction.getAmount());
-            accountMethod.saveAccount(fromAccount);
-            accountMethod.saveAccount(toAccount);
+            accountService.saveAccount(fromAccount);
+            accountService.saveAccount(toAccount);
         } else {
             DisplayToast.Display(dataFile.getContext(), "Not enough balance to transfer");
             return;
@@ -130,8 +130,8 @@ public class TransactionMethod {
 
         //kiem tra budget của outcome
         if (transaction.getType().equals("OUTCOME")) {
-            BudgetMethod budgetMethod = new BudgetMethod(dataFile.getContext(), userId);
-            List<Budget> budgets = budgetMethod.getListUserBudgets();
+            BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
+            List<Budget> budgets = budgetService.getListUserBudgets();
             for (Budget budget : budgets) {
                 if (budget.appliesToTransaction(transaction)) {
                     Double categoryLimit = budget.getCategoryLimits().get(transaction.getCategoryId());
@@ -177,20 +177,20 @@ public class TransactionMethod {
         Transaction transactionTemp = transactions.get(transactionId);
 
         //Đảo ngược giao dịch
-        AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
+        AccountService accountService = new AccountService(dataFile.getContext(), userId);
         if (transactionTemp.isTransfer()) {
-            Account fromAccount = accountMethod.getAccount(transactionTemp.getFromAccountId());
-            Account toAccount = accountMethod.getAccount(transactionTemp.getToAccountId());
+            Account fromAccount = accountService.getAccount(transactionTemp.getFromAccountId());
+            Account toAccount = accountService.getAccount(transactionTemp.getToAccountId());
             if (fromAccount == null || toAccount == null) {
                 DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
                 return;
             }
             fromAccount.updateBalance(transactionTemp.getAmount());
             toAccount.updateBalance(-transactionTemp.getAmount());
-            accountMethod.saveAccount(fromAccount);
-            accountMethod.saveAccount(toAccount);
+            accountService.saveAccount(fromAccount);
+            accountService.saveAccount(toAccount);
         } else {
-            Account account = accountMethod.getAccount(transactionTemp.getAccountId());
+            Account account = accountService.getAccount(transactionTemp.getAccountId());
             if (account == null) {
                 DisplayToast.Display(dataFile.getContext(), "Account not found");
                 return;
@@ -200,10 +200,10 @@ public class TransactionMethod {
             } else if (transactionTemp.getType().equals("OUTCOME")) {
                 account.updateBalance(transactionTemp.getAmount());
             }
-            accountMethod.saveAccount(account);
+            accountService.saveAccount(account);
             //đảo ngược tác động lên ngân sách
-            BudgetMethod budgetMethod = new BudgetMethod(dataFile.getContext(), userId);
-            budgetMethod.reverseBudgetUpdate(transactionTemp);
+            BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
+            budgetService.reverseBudgetUpdate(transactionTemp);
         }
         //xóa temp
         transactions.remove(transactionId);
@@ -253,20 +253,20 @@ public class TransactionMethod {
         Transaction tempTransaction = transactions.get(transactionId);
 
         //đảo ngược giao dịch
-        AccountMethod accountMethod = new AccountMethod(dataFile.getContext(), userId);
+        AccountService accountService = new AccountService(dataFile.getContext(), userId);
         if (tempTransaction.isTransfer()) {
-            Account fromAccount = accountMethod.getAccount(tempTransaction.getFromAccountId());
-            Account toAccount = accountMethod.getAccount(tempTransaction.getToAccountId());
+            Account fromAccount = accountService.getAccount(tempTransaction.getFromAccountId());
+            Account toAccount = accountService.getAccount(tempTransaction.getToAccountId());
             if (fromAccount == null || toAccount == null) {
                 DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
                 return;
             }
             fromAccount.updateBalance(tempTransaction.getAmount());
             toAccount.updateBalance(-tempTransaction.getAmount());
-            accountMethod.saveAccount(fromAccount);
-            accountMethod.saveAccount(toAccount);
+            accountService.saveAccount(fromAccount);
+            accountService.saveAccount(toAccount);
         } else {
-            Account account = accountMethod.getAccount(tempTransaction.getAccountId());
+            Account account = accountService.getAccount(tempTransaction.getAccountId());
             if (account == null) {
                 DisplayToast.Display(dataFile.getContext(), "Account not found");
                 return;
@@ -276,10 +276,10 @@ public class TransactionMethod {
             } else if (tempTransaction.getType().equals("OUTCOME")) {
                 account.updateBalance(tempTransaction.getAmount());
             }
-            accountMethod.saveAccount(account);
+            accountService.saveAccount(account);
             //đảo ngược tác động lên ngân sách
-            BudgetMethod budgetMethod = new BudgetMethod(dataFile.getContext(), userId);
-            budgetMethod.reverseBudgetUpdate(tempTransaction);
+            BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
+            budgetService.reverseBudgetUpdate(tempTransaction);
         }
         //transaction mới
         newTransaction.setTransactionId(transactionId);

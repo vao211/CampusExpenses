@@ -1,4 +1,4 @@
-package com.example.vcampusexpenses.methods;
+package com.example.vcampusexpenses.services;
 
 import android.content.Context;
 import com.example.vcampusexpenses.datamanager.JsonDataManager;
@@ -16,12 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CategoryMethod {
+public class CategoryService {
     private final JsonDataManager dataFile;
     private final UserData userData;
     private final String userId;
 
-    public CategoryMethod(Context context, String userId) {
+    public CategoryService(Context context, String userId) {
         this.dataFile = new JsonDataManager(context, userId);
         this.userData = dataFile.getUserDataObject();
         this.userId = userId;
