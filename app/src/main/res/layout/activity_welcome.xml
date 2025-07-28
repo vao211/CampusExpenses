@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:background="#FAF7F7">
+    android:background="@drawable/background">
 <ImageView
     android:id="@+id/gif_welcome"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="200dp"
+    android:layout_height="200dp"
     android:src="@drawable/welcome"
     />
 <TextView
@@ -24,7 +24,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="@string/next"
-    android:onClick="goNext"
     />
 
 

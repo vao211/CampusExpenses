@@ -1,0 +1,2 @@
+<!-- drawable/arrow_collapse_left.xml --><vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="30dp" android:width="30dp" android:viewportWidth="24" android:viewportHeight="24"><path android:fillColor="#000000" android:pathData="M11.92,19.92L4,12L11.92,4.08L13.33,5.5L7.83,11H22V13H7.83L13.34,18.5L11.92,19.92M4,12V2H2V22H4V12Z" /></vector>

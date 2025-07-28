@@ -1,9 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.CampusExpenses" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- Theme cho light mode -->
+    <style name="Theme.CampusExpenses" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Các thuộc tính theme của bạn -->
+<!--        <item name="colorPrimary">@color/purple_500</item>-->
+        <item name="colorPrimary">#EDA441</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
 
-    <style name="Theme.CampusExpenses" parent="Base.Theme.CampusExpenses" />
+    <!-- Theme cho dark mode (nếu cần) -->
+    <style name="Theme.CampusExpensesDark" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Các thuộc tính dark mode -->
+    </style>
 </resources>

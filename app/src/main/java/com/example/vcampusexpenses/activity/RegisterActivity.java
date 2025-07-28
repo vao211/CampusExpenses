@@ -1,19 +1,22 @@
-package com.example.vcampusexpenses;
+package com.example.vcampusexpenses.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.vcampusexpenses.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 
 public class RegisterActivity extends AppCompatActivity {
     EditText edtPassword, edtEmail, edtConfirmPassword;
     Button btnRegister, btnLogin;
+    ImageButton btnGoogleLogin;
     FirebaseAuth mAuth;
 
     @Override
@@ -26,15 +29,25 @@ public class RegisterActivity extends AppCompatActivity {
         edtEmail = findViewById(R.id.edtEmail);
         btnRegister = findViewById(R.id.btnRegister);
         btnLogin = findViewById(R.id.btnLogin);
+        btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
         mAuth = FirebaseAuth.getInstance();
 
         Register();
+        GoogleLogin();
         GotoLogin();
+    }
+    private void GoogleLogin() {
+        btnGoogleLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(this, GoogleLoginActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
     private void GotoLogin(){
         btnLogin.setOnClickListener(v -> {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
+            finish();
         });
     }
     private void Register(){

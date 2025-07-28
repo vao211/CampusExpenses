@@ -12,7 +12,20 @@
           "package_name": "com.btec.vcampusexpenses"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "614210499739-62lfivlas82vjs34nnfj8qe532nr93v8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.btec.vcampusexpenses",
+            "certificate_hash": "2505aa2721d71eb752470e71baadb67608113235"
+          }
+        },
+        {
+          "client_id": "614210499739-jbs4sm6b3lqeqce4f92quisdc1hih6ld.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDj8kqdy3OWfmaqSrpOI7hkv038c9zc2TU"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "614210499739-jbs4sm6b3lqeqce4f92quisdc1hih6ld.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
