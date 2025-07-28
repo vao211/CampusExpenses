@@ -4,7 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:padding="8dp">
+    android:background="@drawable/btn_border"
+    android:layout_margin="5dp"
+
+    android:padding="12dp">
 
 <!--    <TextView-->
 <!--        android:id="@+id/txtCategoryId"-->
@@ -25,13 +28,14 @@
 
     <ImageButton
         android:id="@+id/btnEditItemCategory"
-        android:src="@drawable/edit"
-        android:background="@drawable/btn_border"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
-        android:layout_marginEnd="5dp"/>
+        android:layout_marginEnd="5dp"
+        android:layout_weight="1"
+        android:background="@drawable/btn_border"
+        android:padding="3dp"
+        android:src="@drawable/edit" />
     <ImageButton
         android:id="@+id/btnDeleteItemCategory"
         android:src="@drawable/delete"
@@ -40,6 +44,6 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:layout_gravity="end|center_vertical"
-        />
+        android:padding="3dp"/>
 
 </LinearLayout>

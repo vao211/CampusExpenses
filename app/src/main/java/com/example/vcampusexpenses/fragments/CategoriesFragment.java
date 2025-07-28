@@ -51,6 +51,7 @@ public class CategoriesFragment extends Fragment {
         btnAddCategory.setOnClickListener(v -> {
             //add category
             DisplayToast.Display(requireContext(), "Add category (thêm sau)");
+
         });
     }
     private void loadCategories() {
@@ -70,4 +71,5 @@ public class CategoriesFragment extends Fragment {
             recyclerViewCategories.setAdapter(categoryAdapter);
         }
     }
+
 }
