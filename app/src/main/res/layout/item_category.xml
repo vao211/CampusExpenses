@@ -19,9 +19,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="8"
-        android:textSize="25sp"
+        android:textSize="20sp"
         android:textColor="@android:color/black"
-        android:textStyle="bold"
         android:gravity="center_vertical"/>
 
     <ImageButton

@@ -90,9 +90,11 @@ public class MainActivity extends AppCompatActivity {
 
             Category category1 = new Category("Test1");
             categoryService.addCategory(category1);
-            String categoryUpdate = new String("testID");
-            String categoryUpdateName = new String("testName");
+            String categoryUpdate = "testID";
+            String categoryUpdateName = "testName";
             categoryService.updateCategory(categoryUpdate, categoryUpdateName);
+            String deleteCategoryID = "testDelID";
+            categoryService.deleteCategory(deleteCategoryID);
 
 
             Budget budget = new Budget("Test budget", 1000, 1000, "2023-01-01", "2023-12-31");
