@@ -1,5 +1,6 @@
 package com.example.vcampusexpenses.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-
         //Fragment mặc định
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -66,13 +66,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
     }
-
-//    private void Logout(){
-//        btnLogout.setOnClickListener(v -> {
-//            FireBaseAuthen.LogOut(this);
-//            finish();
-//        });
-//    }
 
     // Hàm Test add, KHÔNG ĐƯỢC CHẠY. Chỉ xem để biết cách dùng.
     private void test() {

@@ -10,11 +10,15 @@ import android.widget.ImageButton;
 import androidx.fragment.app.Fragment;
 
 import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.activity.LoginActivity;
+import com.example.vcampusexpenses.activity.MainActivity;
 import com.example.vcampusexpenses.activity.SettingActivity;
+import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
 
 public class HomeFragment extends Fragment {
     ImageButton btnSetting, btnAdd;
+    private SessionManager sessionManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
