@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.example.vcampusexpenses.datamanager.JsonDataManager;
+import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.authentication.GoogleAuthen;
@@ -40,7 +40,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
         startGoogleSignIn();
     }
     private static void createSampleData(Context context, String userId) {
-        JsonDataManager dataManager = new JsonDataManager(context, userId);
+        UserDataManager dataManager = new UserDataManager(context, userId);
     }
     private void startGoogleSignIn() {
         Intent signInIntent = googleAuthen.getSignInIntent();

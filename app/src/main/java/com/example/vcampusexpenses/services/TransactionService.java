@@ -1,7 +1,7 @@
 package com.example.vcampusexpenses.services;
 
 import android.content.Context;
-import com.example.vcampusexpenses.datamanager.JsonDataManager;
+import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.Budget;
 import com.example.vcampusexpenses.model.Category;
@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 public class TransactionService {
-    private final JsonDataManager dataFile;
+    private final UserDataManager dataFile;
     private final UserData userData;
     private final String userId;
 
     public TransactionService(Context context, String userId) {
-        this.dataFile = new JsonDataManager(context, userId);
+        this.dataFile = new UserDataManager(context, userId);
         this.userData = dataFile.getUserDataObject();
         this.userId = userId;
     }

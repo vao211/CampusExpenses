@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.activity.LoginActivity;
 import com.example.vcampusexpenses.activity.RegistrationPageActivity;
-import com.example.vcampusexpenses.datamanager.JsonDataManager;
+import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -22,7 +22,7 @@ import java.util.Objects;
 
 public class FireBaseAuthen {
     private static void createSampleData(Context context, String userId) {
-        JsonDataManager dataManager = new JsonDataManager(context, userId);
+        UserDataManager dataManager = new UserDataManager(context, userId);
     }
     public static void LogIn(Context context, String email, String password) {
         SessionManager sessionManager = new SessionManager(context);
