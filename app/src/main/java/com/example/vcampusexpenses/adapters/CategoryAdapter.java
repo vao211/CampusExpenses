@@ -3,6 +3,7 @@ package com.example.vcampusexpenses.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,8 +28,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
         Category category = categoryList.get(position);
-        holder.tvCategoryId.setText("ID: " + category.getCategoryId());
+//        holder.tvCategoryId.setText("ID: " + category.getCategoryId());
         holder.tvCategoryName.setText(category.getName());
+        holder.btnEditItemCategory.setOnClickListener(view -> {});
+        holder.btnDeleteItemCategory.setOnClickListener(view -> {});
+
     }
 
     @Override
@@ -39,11 +43,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     static class CategoryViewHolder extends RecyclerView.ViewHolder {
         TextView tvCategoryId;
         TextView tvCategoryName;
+        ImageButton btnEditItemCategory, btnDeleteItemCategory;
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvCategoryId = itemView.findViewById(R.id.txtCategoryId);
+//            tvCategoryId = itemView.findViewById(R.id.txtCategoryId);
             tvCategoryName = itemView.findViewById(R.id.txtCategoryName);
+            btnEditItemCategory = itemView.findViewById(R.id.btnEditItemCategory);
+            btnDeleteItemCategory = itemView.findViewById(R.id.btnDeleteItemCategory);
         }
     }
 }
