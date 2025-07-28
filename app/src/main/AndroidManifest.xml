@@ -19,6 +19,8 @@
         <activity android:name=".activity.MainActivity"/>
         <activity android:name=".activity.GoogleLoginActivity"/>
         <activity android:name=".activity.RegistrationPageActivity"/>
+        <activity android:name=".activity.SettingActivity" />
+        <activity android:name=".activity.LogoutActivity" />
         <activity
             android:name=".activity.WelcomeActivity"
             android:exported="true">

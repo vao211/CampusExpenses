@@ -17,7 +17,6 @@ public class LogoutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_logout);
         gifLoading = findViewById(R.id.gif_loading);
         loadGif();
-
     }
 
     private void loadGif() {

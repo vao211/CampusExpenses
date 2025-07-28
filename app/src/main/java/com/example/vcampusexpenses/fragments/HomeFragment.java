@@ -10,8 +10,11 @@ import android.widget.ImageButton;
 import androidx.fragment.app.Fragment;
 
 import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.activity.SettingActivity;
+import com.example.vcampusexpenses.utils.DisplayToast;
 
 public class HomeFragment extends Fragment {
+    ImageButton btnSetting, btnAdd;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -20,20 +23,20 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         // 2. Ánh xạ view từ layout đã inflate
-        ImageButton btnAdd = view.findViewById(R.id.btn_add); // Sử dụng view.findViewById thay vì getActivity()
+        btnAdd = view.findViewById(R.id.btn_add); // Sử dụng view.findViewById
+        btnSetting = view.findViewById(R.id.btnSetting);
 
-        // 3. Thiết lập sự kiện click cho nút thêm
-//        btnAdd.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // Tạo intent để mở AddTransactionAndBudgetActivity
-//                Intent intent = new Intent(getActivity(), AddTransactionAndBudgetActivity.class);
-//                startActivity(intent);
-//            }
-//        }
-//        );
+        // 3. Thiết lập sự kiện click cho nút
+        goToSettingActivity();
 
         // 4. Trả về view đã inflate
         return view;
+    }
+
+    private void goToSettingActivity() {
+        btnSetting.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SettingActivity.class);
+            startActivity(intent);
+        });
     }
 }

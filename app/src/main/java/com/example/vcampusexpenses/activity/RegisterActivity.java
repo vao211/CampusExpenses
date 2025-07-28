@@ -40,12 +40,14 @@ public class RegisterActivity extends AppCompatActivity {
         btnGoogleLogin.setOnClickListener(v -> {
             Intent intent = new Intent(this, GoogleLoginActivity.class);
             startActivity(intent);
+            finish();
         });
     }
     private void GotoLogin(){
         btnLogin.setOnClickListener(v -> {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
+            finish();
         });
     }
     private void Register(){

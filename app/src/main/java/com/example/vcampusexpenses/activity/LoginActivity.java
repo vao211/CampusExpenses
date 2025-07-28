@@ -43,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
     private void GuestLogin(){
         btnGuestLogin.setOnClickListener(v -> {
             GuestAuthen.LogIn(this);
+            finish();
         });
     }
 
@@ -68,6 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(v -> {
             Intent intent = new Intent(this, RegisterActivity.class);
             startActivity(intent);
+            finish();
         });
     }
 }
