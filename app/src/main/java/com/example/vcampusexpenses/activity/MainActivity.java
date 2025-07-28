@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
 
             Category category1 = new Category("Test1");
             categoryService.addCategory(category1);
+            Category categoryUpdate = new Category("test","Test Category Update");
+//            categoryService.updateCategory(categoryUpdate);
 
             Budget budget = new Budget("Test budget", 1000, 1000, "2023-01-01", "2023-12-31");
             budget.addCategoryLimit(categoryService.getCategoryId("Test1"), 500);
@@ -113,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
 
             // Hiển thị thông báo hoàn tất
             DisplayToast.Display(this, "Test completed. Check Logcat and JSON file.");
+
+
+
 
     }
 }
