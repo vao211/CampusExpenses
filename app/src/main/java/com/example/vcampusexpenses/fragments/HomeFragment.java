@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.activity.SettingActivity;
-import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.text.SimpleDateFormat;
@@ -28,7 +27,7 @@ public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
 
     // Views
-    private ImageButton btnSetting, btnAdd;
+    private ImageButton btnSetting, btnAdd, btnCalendar;
     private ImageButton btnPreviousPeriod, btnNextPeriod;
     private TextView txtDateFilterDisplay;
 
@@ -73,11 +72,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void initializeViews(View view) {
+        btnCalendar = view.findViewById(R.id.btn_calendar);
         btnAdd = view.findViewById(R.id.btn_add);
         btnSetting = view.findViewById(R.id.btnSetting);
         btnPreviousPeriod = view.findViewById(R.id.btnPreviousPeriod);
         btnNextPeriod = view.findViewById(R.id.btnNextPeriod);
-        txtDateFilterDisplay = view.findViewById(R.id.tv_date_filter_display);
+        txtDateFilterDisplay = view.findViewById(R.id.txt_date_filter_display);
     }
 
     private void setupClickListeners() {
@@ -86,6 +86,7 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
+        btnCalendar.setOnClickListener(v-> showPeriodSelectionDialog());
         txtDateFilterDisplay.setOnClickListener(v -> showPeriodSelectionDialog());
         btnPreviousPeriod.setOnClickListener(v -> navigatePeriod(-1));
         btnNextPeriod.setOnClickListener(v -> navigatePeriod(1));
