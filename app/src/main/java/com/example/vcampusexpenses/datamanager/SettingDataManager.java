@@ -52,12 +52,12 @@ public class SettingDataManager {
             setting = gson.fromJson(jsonElement, Setting.class);
 
             if (setting == null) {
-                DisplayToast.Display(context, "Failed to load data: JSON is invalid");
+                DisplayToast.Display(context, "Failed to load setting data: JSON is invalid");
                 setting = new Setting("Guest", "VND", true);
                 saveData();
             }
         } catch (IOException | com.google.gson.JsonSyntaxException e) {
-            DisplayToast.Display(context, "Load data error: " + e.getMessage());
+            DisplayToast.Display(context, "Load setting data error: " + e.getMessage());
             setting = new Setting("Guest", "VND", true);
             saveData();
         }
