@@ -2,6 +2,7 @@ package com.example.vcampusexpenses.fragments;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,33 +51,30 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
     }
     private void addCategory() {
         btnAddCategory.setOnClickListener(v -> {
-            //add category
-            DisplayToast.Display(requireContext(), "Add category (thêm sau)");
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            builder.setTitle("Add Category");
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                builder.setTitle("Add Category");
 
-            final EditText input = new EditText(requireContext());
-            input.setHint("Enter Category Name");
-            builder.setView(input);
+                final EditText input = new EditText(requireContext());
+                input.setHint("Enter Name");
+                builder.setView(input);
 
-            //xác nhận
-            builder.setPositiveButton("Add", (dialog, which) -> {
-                String categoryName = input.getText().toString().trim();
-                // Kiểm tra tên không rỗng
-                if (categoryName.isEmpty()) {
-                    DisplayToast.Display(requireContext(), "Category name can't be null");
-                    return;
-                }
-                //Tạo đối tượng Category và gọi addCategory
-                Category newCategory = new Category(categoryName);
-                newCategory.setName(categoryName);
-                categoryService.addCategory(newCategory);
-                loadCategories(); // Làm mới danh sách sau khi thêm
-            });
+                builder.setPositiveButton("Add", (dialog, which) -> {
+                    String categoryName = input.getText().toString().trim();
+                    if (categoryName.isEmpty()) {
+                        DisplayToast.Display(requireContext(), "Name can not be empty");
+                        return;
+                    }
+                    Category newCategory = new Category(categoryName);
+                    categoryService.addCategory(newCategory);
+                    loadCategories(); // Làm mới danh sách sau khi thêm
+                });
 
-            // hủy
-            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+                // Nút hủy
+                builder.setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.cancel();
+                });
 
+                builder.show();
         });
     }
     private void loadCategories() {
@@ -100,7 +98,7 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
     public void editCategory(String categoryID) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         //Làm cảnh báo cho người dùng
-        builder.setTitle("Enter new Category name");
+        builder.setTitle("Update Category");
         final EditText input = new EditText(requireContext());
         input.setHint("Enter new Category name");
         builder.setView(input);
