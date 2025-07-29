@@ -8,6 +8,7 @@
     tools:context=".fragments.HomeFragment">
 
     <TextView
+        android:id="@+id/txt_home_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/home"
@@ -15,8 +16,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="3dp"
-        android:id="@+id/tv_home_title"/>
+        android:layout_marginTop="3dp"/>
 
     <ImageButton
         android:id="@+id/btnSetting"
@@ -29,53 +29,62 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <ImageButton
+        android:id="@+id/btn_calendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_calendar"
+        app:layout_constraintEnd_toStartOf="@+id/btnPreviousPeriod"
+        app:layout_constraintTop_toBottomOf="@id/txt_home_title"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="16dp"/>
 
+    <ImageButton
+        android:id="@+id/btnPreviousPeriod"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_back"
+        android:contentDescription="@string/previous_period"
+        android:padding="8dp"
+        app:layout_constraintStart_toEndOf="@+id/btn_calendar"
+        app:layout_constraintTop_toBottomOf="@id/txt_home_title"
+        android:layout_marginTop="16dp"/>
 
-    <LinearLayout
-        android:id="@+id/date_filter_container"
+    <TextView
+        android:id="@+id/txt_date_filter_display"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/this_month"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:padding="12dp"
+        android:minWidth="150dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintStart_toEndOf="@+id/btnPreviousPeriod"
+        app:layout_constraintEnd_toStartOf="@+id/btnNextPeriod"
+        app:layout_constraintTop_toBottomOf="@id/txt_home_title"
+        android:layout_marginTop="16dp"/>
+
+    <ImageButton
+        android:id="@+id/btnNextPeriod"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_next"
+        android:contentDescription="@string/next_period"
+        android:padding="8dp"
+        app:layout_constraintStart_toEndOf="@+id/txt_date_filter_display"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_home_title"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp">
-
-        <ImageButton
-            android:id="@+id/btnPreviousPeriod"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_back"
-            android:contentDescription="Previous Period"
-            android:padding="8dp"/>
-
-        <TextView
-            android:id="@+id/tv_date_filter_display"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="This Month"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"/>
-
-        <ImageButton
-            android:id="@+id/btnNextPeriod"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_next"
-            android:contentDescription="Next Period"
-            android:padding="8dp"/>
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@id/txt_home_title"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"/>
 
     <ImageButton
         android:id="@+id/btn_add"
@@ -87,7 +96,6 @@
         android:layout_marginEnd="17dp"
         android:layout_marginBottom="85dp"
         android:elevation="10dp"
-        tools:ignore="ContentDescription"
-        />
+        tools:ignore="ContentDescription"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
