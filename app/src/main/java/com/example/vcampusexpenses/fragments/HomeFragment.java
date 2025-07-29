@@ -2,7 +2,7 @@ package com.example.vcampusexpenses.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log; // For logging
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +23,6 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Objects; // For Objects.requireNonNull
 
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
@@ -31,15 +30,12 @@ public class HomeFragment extends Fragment {
     // Views
     private ImageButton btnSetting, btnAdd;
     private ImageButton btnPreviousPeriod, btnNextPeriod;
-    private TextView tvDateFilterDisplay;
+    private TextView txtDateFilterDisplay;
 
     // Date and Filter State
     private Calendar startDate;
     private Calendar endDate;
-    private SimpleDateFormat monthYearFormat; // For "MMMM yyyy"
-    private SimpleDateFormat dayMonthFormat;  // For "dd MMM" (short range display)
-    private SimpleDateFormat fullDateFormat;  // For "dd MMM yyyy" (custom range display)
-
+    private SimpleDateFormat dateFormat; // For "yyyy-MM-dd"
 
     private enum FilterType {
         THIS_MONTH, LAST_MONTH, LAST_7_DAYS, LAST_30_DAYS, CUSTOM_RANGE
@@ -63,19 +59,17 @@ public class HomeFragment extends Fragment {
             restoreInstanceState(savedInstanceState);
         } else {
             // Set initial default filter if no saved state
-            applyFilter(FilterType.THIS_MONTH, false); // Don't trigger data load initially, let onResume or similar handle
+            applyFilter(FilterType.THIS_MONTH, false);
         }
 
         setupClickListeners();
-        updateDateFilterDisplay(); // Ensure display is correct on create
+        updateDateFilterDisplay();
 
         return view;
     }
 
     private void initializeDateFormats() {
-        monthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
-        dayMonthFormat = new SimpleDateFormat("dd MMM", Locale.getDefault());
-        fullDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     }
 
     private void initializeViews(View view) {
@@ -83,7 +77,7 @@ public class HomeFragment extends Fragment {
         btnSetting = view.findViewById(R.id.btnSetting);
         btnPreviousPeriod = view.findViewById(R.id.btnPreviousPeriod);
         btnNextPeriod = view.findViewById(R.id.btnNextPeriod);
-        tvDateFilterDisplay = view.findViewById(R.id.tv_date_filter_display);
+        txtDateFilterDisplay = view.findViewById(R.id.tv_date_filter_display);
     }
 
     private void setupClickListeners() {
@@ -92,12 +86,9 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        tvDateFilterDisplay.setOnClickListener(v -> showPeriodSelectionDialog());
+        txtDateFilterDisplay.setOnClickListener(v -> showPeriodSelectionDialog());
         btnPreviousPeriod.setOnClickListener(v -> navigatePeriod(-1));
         btnNextPeriod.setOnClickListener(v -> navigatePeriod(1));
-
-        // btnAdd listener (if any)
-        // btnAdd.setOnClickListener(v -> { /* ... */ });
     }
 
     @Override
@@ -123,11 +114,9 @@ public class HomeFragment extends Fragment {
         }
         if (savedInstanceState.containsKey(FILTER_TYPE_KEY)) {
             currentFilterType = (FilterType) savedInstanceState.getSerializable(FILTER_TYPE_KEY);
-            if (currentFilterType == null) currentFilterType = FilterType.THIS_MONTH; // Safety default
+            if (currentFilterType == null) currentFilterType = FilterType.THIS_MONTH;
         }
-        // No need to call applyFilter here, just update display. Data load should be triggered by lifecycle (e.g. onResume)
     }
-
 
     private void showPeriodSelectionDialog() {
         final CharSequence[] items = {"This Month", "Last Month", "Last 7 Days", "Last 30 Days", "Custom Range..."};
@@ -141,7 +130,7 @@ public class HomeFragment extends Fragment {
             else if (items[item].equals("Last 30 Days")) selectedType = FilterType.LAST_30_DAYS;
             else if (items[item].equals("Custom Range...")) {
                 showCustomDateRangePicker();
-                return; // Picker handles its own applyFilter logic
+                return;
             }
 
             if (selectedType != null) {
@@ -151,12 +140,6 @@ public class HomeFragment extends Fragment {
         builder.show();
     }
 
-    /**
-     * Applies the selected filter, calculates start and end dates,
-     * updates the display, and optionally triggers data loading.
-     * @param filterType The type of filter to apply.
-     * @param loadData   True if data should be reloaded, false otherwise.
-     */
     private void applyFilter(FilterType filterType, boolean loadData) {
         currentFilterType = filterType;
         Calendar newStartDate = Calendar.getInstance();
@@ -176,36 +159,28 @@ public class HomeFragment extends Fragment {
                 break;
 
             case LAST_7_DAYS:
-                // endDate is today (or rather, its calculation reference point)
-                newStartDate.add(Calendar.DAY_OF_YEAR, -6); // Today - 6 days = 7 days total
+                newStartDate.add(Calendar.DAY_OF_YEAR, -6);
                 break;
 
             case LAST_30_DAYS:
-                newStartDate.add(Calendar.DAY_OF_YEAR, -29); // Today - 29 days = 30 days total
+                newStartDate.add(Calendar.DAY_OF_YEAR, -29);
                 break;
 
             case CUSTOM_RANGE:
-                // This case is typically set by the date range picker's callback.
-                // If applyFilter is called directly with CUSTOM_RANGE, it means
-                // we are restoring state or need to ensure current startDate/endDate are used.
                 if (this.startDate == null || this.endDate == null) {
-                    // Fallback if custom range is set but dates are missing (should not happen in normal flow)
                     Log.w(TAG, "Custom range applied but startDate or endDate is null. Defaulting to THIS_MONTH.");
-                    applyFilter(FilterType.THIS_MONTH, loadData); // Revert to a safe default
+                    applyFilter(FilterType.THIS_MONTH, loadData);
                     return;
                 }
-                // Use existing custom dates
                 newStartDate.setTimeInMillis(this.startDate.getTimeInMillis());
                 newEndDate.setTimeInMillis(this.endDate.getTimeInMillis());
                 break;
         }
 
-        // Ensure time components are set correctly for all non-custom, predefined ranges
         if (filterType != FilterType.CUSTOM_RANGE) {
             setCalendarToBeginningOfDay(newStartDate);
             setCalendarToEndOfDay(newEndDate);
         }
-        // For custom range, begin/end of day is handled in the picker's callback
 
         this.startDate = newStartDate;
         this.endDate = newEndDate;
@@ -218,58 +193,41 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateDateFilterDisplay() {
-        if (startDate == null || endDate == null || tvDateFilterDisplay == null) {
+        if (startDate == null || endDate == null || txtDateFilterDisplay == null) {
             Log.w(TAG, "Cannot update display, dates or TextView is null.");
-            if (tvDateFilterDisplay != null) tvDateFilterDisplay.setText("Select Period");
+            if (txtDateFilterDisplay != null) txtDateFilterDisplay.setText("Select Period");
             return;
         }
 
         String displayText;
-        switch (currentFilterType) {
-            case THIS_MONTH:
-            case LAST_MONTH:
-                displayText = monthYearFormat.format(startDate.getTime());
-                break;
-            case LAST_7_DAYS:
-            case LAST_30_DAYS:
-                displayText = String.format(Locale.getDefault(), "%s - %s",
-                        dayMonthFormat.format(startDate.getTime()),
-                        dayMonthFormat.format(endDate.getTime()));
-                break;
-            case CUSTOM_RANGE:
-                if (isSameDay(startDate, endDate)) {
-                    displayText = fullDateFormat.format(startDate.getTime());
-                } else {
-                    displayText = String.format(Locale.getDefault(), "%s - %s",
-                            fullDateFormat.format(startDate.getTime()),
-                            fullDateFormat.format(endDate.getTime()));
-                }
-                break;
-            default:
-                displayText = "Select Period";
+        if (currentFilterType == FilterType.THIS_MONTH || currentFilterType == FilterType.LAST_MONTH) {
+            // For THIS_MONTH and LAST_MONTH, show only year and month (yyyy-MM)
+            String monthYear = new SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(startDate.getTime());
+            displayText = monthYear;
+        } else if (isSameDay(startDate, endDate)) {
+            // For single-day custom range, show only one date
+            displayText = dateFormat.format(startDate.getTime());
+        } else {
+            // For other cases (LAST_7_DAYS, LAST_30_DAYS, or multi-day CUSTOM_RANGE)
+            displayText = String.format(Locale.getDefault(), "%s - %s",
+                    dateFormat.format(startDate.getTime()),
+                    dateFormat.format(endDate.getTime()));
         }
-        tvDateFilterDisplay.setText(displayText);
+        txtDateFilterDisplay.setText(displayText);
     }
 
     private void showCustomDateRangePicker() {
         MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
         builder.setTitleText("Select Date Range");
 
-        // Attempt to pre-fill with current custom range, or a sensible default
         long initialStart = startDate != null && currentFilterType == FilterType.CUSTOM_RANGE ?
                 startDate.getTimeInMillis() : MaterialDatePicker.todayInUtcMilliseconds();
         long initialEnd = endDate != null && currentFilterType == FilterType.CUSTOM_RANGE ?
                 endDate.getTimeInMillis() : MaterialDatePicker.todayInUtcMilliseconds();
 
-        // Ensure start is not after end for initial selection
         if (initialStart > initialEnd) initialStart = initialEnd;
 
         builder.setSelection(new Pair<>(initialStart, initialEnd));
-
-        // Optional: Set constraints (e.g., prevent future dates)
-        // CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-        // constraintsBuilder.setValidator(DateValidatorPointBackward.now());
-        // builder.setCalendarConstraints(constraintsBuilder.build());
 
         final MaterialDatePicker<Pair<Long, Long>> datePicker = builder.build();
 
@@ -277,14 +235,13 @@ public class HomeFragment extends Fragment {
             if (selection.first != null && selection.second != null) {
                 currentFilterType = FilterType.CUSTOM_RANGE;
 
-                // Picker gives UTC ms. Set to our Calendar instances.
                 this.startDate = Calendar.getInstance();
                 this.startDate.setTimeInMillis(selection.first);
-                setCalendarToBeginningOfDay(this.startDate); // Ensure it's start of the selected day
+                setCalendarToBeginningOfDay(this.startDate);
 
                 this.endDate = Calendar.getInstance();
                 this.endDate.setTimeInMillis(selection.second);
-                setCalendarToEndOfDay(this.endDate); // Ensure it's end of the selected day
+                setCalendarToEndOfDay(this.endDate);
 
                 updateDateFilterDisplay();
                 loadDataForCurrentPeriod();
@@ -297,10 +254,10 @@ public class HomeFragment extends Fragment {
         datePicker.show(getParentFragmentManager(), "MATERIAL_DATE_RANGE_PICKER");
     }
 
-    private void navigatePeriod(int direction) { // direction: -1 for previous, 1 for next
+    private void navigatePeriod(int direction) {
         if (startDate == null || endDate == null) {
             Log.w(TAG, "Cannot navigate period, dates are null.");
-            return; // Or apply a default filter
+            return;
         }
 
         Calendar navStartDate = (Calendar) startDate.clone();
@@ -324,23 +281,18 @@ public class HomeFragment extends Fragment {
                 break;
             case CUSTOM_RANGE:
                 long duration = endDate.getTimeInMillis() - startDate.getTimeInMillis();
-                if (duration <= 0) { // If single day or invalid range, shift by 1 day
+                if (duration <= 0) {
                     duration = 24 * 60 * 60 * 1000L;
                 }
                 navStartDate.add(Calendar.MILLISECOND, (int) (duration * direction));
                 navEndDate.add(Calendar.MILLISECOND, (int) (duration * direction));
                 break;
-            default:
-                return; // Should not happen
         }
 
-        // Apply calculated navigated dates
         this.startDate = navStartDate;
         this.endDate = navEndDate;
-        // Ensure time parts are correct after navigation, especially for predefined periods
         setCalendarToBeginningOfDay(this.startDate);
         setCalendarToEndOfDay(this.endDate);
-
 
         updateDateFilterDisplay();
         loadDataForCurrentPeriod();
@@ -353,18 +305,12 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        // --- YOUR DATA LOADING LOGIC GOES HERE ---
         Log.i(TAG, "Loading data for period: " +
-                fullDateFormat.format(startDate.getTime()) + " to " +
-                fullDateFormat.format(endDate.getTime()));
-        Toast.makeText(getContext(), "Filtering: " + tvDateFilterDisplay.getText(), Toast.LENGTH_SHORT).show();
-
-        // Example:
-        // viewModel.loadExpenses(startDate.getTimeInMillis(), endDate.getTimeInMillis());
-        // Or directly call a method in your fragment/activity to fetch and update UI
+                dateFormat.format(startDate.getTime()) + " to " +
+                dateFormat.format(endDate.getTime()));
+        Toast.makeText(getContext(), "Filtering: " + txtDateFilterDisplay.getText(), Toast.LENGTH_SHORT).show();
     }
 
-    // --- Utility Methods ---
     private void setCalendarToBeginningOfDay(Calendar cal) {
         if (cal == null) return;
         cal.set(Calendar.HOUR_OF_DAY, 0);
