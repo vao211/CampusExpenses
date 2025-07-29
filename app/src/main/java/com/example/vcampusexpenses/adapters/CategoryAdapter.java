@@ -57,9 +57,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
 //            tvCategoryId = itemView.findViewById(R.id.txtCategoryId);
-            tvCategoryName = itemView.findViewById(R.id.txtCategoryName);
-            btnEditItemCategory = itemView.findViewById(R.id.btnEditItemCategory);
-            btnDeleteItemCategory = itemView.findViewById(R.id.btnDeleteItemCategory);
+            tvCategoryName = itemView.findViewById(R.id.txt_categoryName);
+            btnEditItemCategory = itemView.findViewById(R.id.btn_editItemCategory);
+            btnDeleteItemCategory = itemView.findViewById(R.id.btn_deleteItemCategory);
         }
     }
 }
