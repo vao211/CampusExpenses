@@ -60,4 +60,6 @@
     <string name="view_this_project_on">View this project on</string>
     <string name="log_out_of_this_account">Log out of this account</string>
     <string name="thanks_for_using">Thanks for using!</string>
+    <string name="create_transaction">Create Transaction</string>
+    <string name="income">Income</string>
 </resources>
