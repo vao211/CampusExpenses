@@ -2,7 +2,6 @@ package com.example.vcampusexpenses.fragments;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.adapters.CategoryAdapter;
-import com.example.vcampusexpenses.database.UserDB;
 import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.session.SessionManager;
@@ -33,12 +31,12 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_categories, container, false);
-        recyclerViewCategories = view.findViewById(R.id.rvCategory);
-        txtEmptyCategories = view.findViewById(R.id.txtEmptyCategories);
+        recyclerViewCategories = view.findViewById(R.id.rv_category);
+        txtEmptyCategories = view.findViewById(R.id.txt_empty_categories);
         SessionManager sessionManager = new SessionManager(requireContext());
         String userId = sessionManager.getUserId();
         categoryService = new CategoryService(requireContext(), userId);
-        btnAddCategory = view.findViewById(R.id.btn_addCategory);
+        btnAddCategory = view.findViewById(R.id.btn_add_category);
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(requireContext()));
         addCategory();
         return view;
