@@ -91,7 +91,7 @@ public class SettingActivity extends AppCompatActivity {
     private void LogOut(){
         btn_logout.setOnClickListener(v ->{
             String userId = sessionManager.getUserId();
-            if(userId != "Guest"){
+            if(userId.equals("Guest")){
                 GuestAuthen.LogOut(this);
                 finish();
             }else{
