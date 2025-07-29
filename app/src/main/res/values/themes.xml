@@ -3,7 +3,7 @@
     <style name="Theme.CampusExpenses" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Các thuộc tính theme của bạn -->
 <!--        <item name="colorPrimary">@color/purple_500</item>-->
-        <item name="colorPrimary">#EDA441</item>
+        <item name="colorPrimary">#0C67B6</item>
         <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
 

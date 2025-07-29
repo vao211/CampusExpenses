@@ -41,4 +41,7 @@
     <string name="give_us_feedback_to_help_us_grow_better">Give us feedback to help us grow better</string>
     <string name="about">About</string>
     <string name="vnd">VND</string>
+    <string name="previous_period">Previous Period</string>
+    <string name="this_month">This Month</string>
+    <string name="next_period">Next Period</string>
 </resources>
