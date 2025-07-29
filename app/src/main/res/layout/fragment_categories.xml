@@ -1,50 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
     tools:context=".fragments.CategoriesFragment">
-    
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textSize="30sp"
-        android:text="@string/categories" />
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_addCategory"
-        android:src="@drawable/ic_add"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        <!-- GHI CHÚ: Nút thêm danh mục -->
+        <ImageButton
+            android:id="@+id/btn_add_category"
+            android:layout_width="41dp"
+            android:layout_height="42dp"
+            android:background="@color/white"
+            android:src="@drawable/btn_add"
+            android:contentDescription="Thêm danh mục"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="8dp" />
 
-    <ImageView
-        android:id="@+id/img_category"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_category"
-        android:layout_gravity="center"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="50dp"
-        />
-    <TextView
-        app:layout_constraintTop_toBottomOf="@id/img_category"
-        android:id="@+id/txtEmptyCategories"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/no_categories_available"
-        android:visibility="gone"
-        android:gravity="center"
-        android:textSize="16sp" />
+        <!-- GHI CHÚ: Hình ảnh danh mục -->
+        <ImageView
+            android:id="@+id/img_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/navbar_categories"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_add_category"
+            android:layout_marginTop="8dp" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCategory"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/img_category"
-        android:layout_marginTop="10dp"/>
+        <!-- GHI CHÚ: Văn bản hiển thị khi không có danh mục -->
+        <TextView
+            android:id="@+id/txt_empty_categories"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/no_categories_available"
+            android:visibility="gone"
+            android:gravity="center"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/img_category"
+            android:layout_marginTop="8dp" />
+
+        <!-- GHI CHÚ: RecyclerView để hiển thị danh sách danh mục, chiếm phần còn lại của màn hình -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_category"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="60dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_empty_categories" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
