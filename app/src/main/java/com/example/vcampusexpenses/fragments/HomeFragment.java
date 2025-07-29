@@ -16,6 +16,7 @@ import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
 import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.activity.AddTransactionActivity;
 import com.example.vcampusexpenses.activity.SettingActivity;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
@@ -72,6 +73,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initializeViews(View view) {
+        btnAdd = view.findViewById(R.id.btn_add);
         btnCalendar = view.findViewById(R.id.btn_calendar);
         btnAdd = view.findViewById(R.id.btn_add);
         btnSetting = view.findViewById(R.id.btnSetting);
@@ -83,6 +85,10 @@ public class HomeFragment extends Fragment {
     private void setupClickListeners() {
         btnSetting.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), SettingActivity.class);
+            startActivity(intent);
+        });
+        btnAdd.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), AddTransactionActivity.class);
             startActivity(intent);
         });
 

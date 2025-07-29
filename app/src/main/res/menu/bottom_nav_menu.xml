@@ -16,5 +16,4 @@
         android:id="@+id/nav_categories"
         android:icon="@drawable/ic_category"
         android:title="@string/categories"/>
-
 </menu>
