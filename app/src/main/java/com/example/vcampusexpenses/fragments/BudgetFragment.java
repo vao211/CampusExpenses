@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vcampusexpenses.R;
 
-public class AnalysisFragment extends Fragment {
+public class BudgetFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_analysis, container, false);

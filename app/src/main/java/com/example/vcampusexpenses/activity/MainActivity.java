@@ -1,13 +1,12 @@
 package com.example.vcampusexpenses.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.vcampusexpenses.R;
-import com.example.vcampusexpenses.fragments.AnalysisFragment;
+import com.example.vcampusexpenses.fragments.BudgetFragment;
 import com.example.vcampusexpenses.fragments.CategoriesFragment;
 import com.example.vcampusexpenses.fragments.HomeFragment;
 import com.example.vcampusexpenses.fragments.TransactionFragment;
@@ -51,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
-            } else if (itemId == R.id.nav_analysis) {
-                selectedFragment = new AnalysisFragment();
+            } else if (itemId == R.id.nav_budget) {
+                selectedFragment = new BudgetFragment();
             } else if (itemId == R.id.nav_transaction) {
                 selectedFragment = new TransactionFragment();
             } else if (itemId == R.id.nav_categories) {

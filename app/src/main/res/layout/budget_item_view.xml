@@ -12,7 +12,7 @@
             android:id="@+id/img_budget"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@drawable/budget"/>
+            android:src="@drawable/ic_budget"/>
         <TextView
             android:id="@+id/txtNameBudget"
             android:layout_width="match_parent"
