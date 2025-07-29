@@ -13,9 +13,15 @@ import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
     private final List<Category> categoryList;
+    private final OnCategoryClickListener listenter;
 
-    public CategoryAdapter(List<Category> categoryList) {
+    public interface OnCategoryClickListener{
+        void editCategory(String categoryID);
+        void deleteCategory(String categoryId);
+    }
+    public CategoryAdapter(List<Category> categoryList, OnCategoryClickListener listenter) {
         this.categoryList = categoryList;
+        this.listenter = listenter;
     }
 
     @NonNull
@@ -30,9 +36,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         Category category = categoryList.get(position);
 //        holder.tvCategoryId.setText("ID: " + category.getCategoryId());
         holder.tvCategoryName.setText(category.getName());
-        holder.btnEditItemCategory.setOnClickListener(view -> {});
-        holder.btnDeleteItemCategory.setOnClickListener(view -> {});
-
+        holder.btnEditItemCategory.setOnClickListener(view -> {
+            listenter.editCategory(category.getCategoryId());
+        });
+        holder.btnDeleteItemCategory.setOnClickListener(view -> {
+            listenter.deleteCategory(category.getCategoryId());
+        });
     }
 
     @Override
