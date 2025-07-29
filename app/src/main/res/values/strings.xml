@@ -44,4 +44,20 @@
     <string name="previous_period">Previous Period</string>
     <string name="this_month">This Month</string>
     <string name="next_period">Next Period</string>
+    <string name="notification_settings">Notification Settings</string>
+    <string name="enable_notifications">Enable Notifications</string>
+    <string name="disable_notifications">Disable Notifications</string>
+    <string name="choose_currency">Choose Currency</string>
+    <string name="usd">USD</string>
+    <string name="eur">EUR</string>
+    <string name="information_about_app_and_us">Information about app and us</string>
+    <string name="nguyen_thanh_vinh">Nguyen Thanh Vinh</string>
+    <string name="developed_by">Developed by</string>
+    <string name="budget_wise_project">Budget Wise Project</string>
+    <string name="nguyen_ngoc_duy_hung">Nguyen Ngoc Duy Hung</string>
+    <string name="nguyen_phu_hung">Nguyen Phu Hung</string>
+    <string name="vu_huy_hoang">Vu Huy Hoang</string>
+    <string name="view_this_project_on">View this project on</string>
+    <string name="log_out_of_this_account">Log out of this account</string>
+    <string name="thanks_for_using">Thanks for using!</string>
 </resources>

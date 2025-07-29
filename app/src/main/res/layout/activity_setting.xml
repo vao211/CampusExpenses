@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-`<ImageButton
+<ImageButton
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/btn_back"
@@ -246,7 +246,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/give_us_feedback_to_help_us_grow_better"
+        android:text="@string/information_about_app_and_us"
         android:id="@+id/txt_description_about"
         android:textSize="12sp"
         android:layout_marginStart="15dp"
@@ -277,7 +277,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Log out of this account"
+        android:text="@string/log_out_of_this_account"
         android:id="@+id/txt_description_logout"
         android:textSize="12sp"
         android:layout_marginStart="15dp"
