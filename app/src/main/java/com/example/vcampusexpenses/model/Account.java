@@ -5,9 +5,23 @@ import java.util.List;
 
 public class Account {
     private String accountId;
+    private String userId;
     private String name;
+    private String accountName;
     private double balance;
+    private String type;
     private List<String> budgets;
+
+    public Account() {
+        // Default constructor for Firestore
+    }
+
+    public Account(String userId, String accountName, double balance, String type) {
+        this.userId = userId;
+        this.accountName = accountName;
+        this.balance = balance;
+        this.type = type;
+    }
 
     public Account(String accountId, String name, double balance) {
         this.accountId = accountId;
@@ -43,12 +57,36 @@ public class Account {
         this.name = name;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
     public double getBalance() {
         return balance;
     }
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public List<String> getBudgetIds() {
