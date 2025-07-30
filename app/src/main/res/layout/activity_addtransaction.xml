@@ -78,7 +78,7 @@
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@drawable/ic_income"
+            android:src="@drawable/ic_outcome"
             android:background="?attr/selectableItemBackgroundBorderless" />
         <TextView
             android:layout_width="wrap_content"
@@ -110,7 +110,7 @@
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:src="@drawable/ic_income"
+            android:src="@drawable/ic_transfer"
             android:background="?attr/selectableItemBackgroundBorderless" />
         <TextView
             android:layout_width="wrap_content"
