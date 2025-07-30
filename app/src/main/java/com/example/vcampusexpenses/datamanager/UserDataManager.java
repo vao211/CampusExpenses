@@ -1,13 +1,14 @@
 package com.example.vcampusexpenses.datamanager;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.Budget;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Data;
 import com.example.vcampusexpenses.model.User;
 import com.example.vcampusexpenses.model.UserData;
-import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
 import com.google.gson.Gson;
@@ -25,31 +26,44 @@ import java.util.Map;
 
 public class UserDataManager {
     private static final String FILE_NAME = "expense_data.json";
+    private static volatile UserDataManager userManagerInstance; //volatile để thread-safe
     private final Context context;
     private final File file;
     private UserData userData;
+    private final String userId;
 
-    public UserDataManager(Context context, String userId) {
+    //Constructor private (Singleton)
+    private UserDataManager(Context context, String userId) {
         this.context = context;
+        this.userId = userId;
         this.file = new File(context.getFilesDir(), FILE_NAME);
+        Log.d("UserDataManager", "File path: " + file.getAbsolutePath());
+        Log.d("UserDataManager", "File exists: " + file.exists() + ", writable: " + file.canWrite());
         initializeFile(userId);
     }
 
-    //guest login
-    public UserDataManager(Context context) {
-        this.context = context;
-        SessionManager sessionManager = new SessionManager(context);
-        this.file = new File(context.getFilesDir(), FILE_NAME);
-        initializeFile(sessionManager.getUserId());
+    //Singleton
+    public static synchronized UserDataManager getInstance(Context context, String userId) {
+        if (userManagerInstance == null || !userManagerInstance.getUserId().equals(userId)) {
+            synchronized (UserDataManager.class) {
+                if (userManagerInstance == null || !userManagerInstance.getUserId().equals(userId)) {
+                    userManagerInstance = new UserDataManager(context.getApplicationContext(), userId);
+                }
+            }
+        }
+        return userManagerInstance;
     }
 
     public Context getContext() {
         return context;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
     private void initializeFile(String userId) {
         if (!file.exists()) {
-            // Create sample data for the given userId
             Map<String, Account> accounts = new HashMap<>();
             String accountId = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
             accounts.put(accountId, new Account(accountId, "Cash", 0.0));
@@ -63,15 +77,12 @@ public class UserDataManager {
 
             Map<String, Budget> budgets = new HashMap<>();
             Map<String, com.example.vcampusexpenses.model.Transaction> transactions = new HashMap<>();
-
             Data data = new Data(accounts, categories, budgets, transactions);
             userData = new UserData(new User(userId, data));
             saveData();
-        } else {
+        } else if (userData == null || !userData.getUser().getUserId().equals(userId)) {
             loadData();
-            // Ensure the loaded data matches the userId
             if (userData == null || !userData.getUser().getUserId().equals(userId)) {
-                // Reset data for the new userId
                 userData = new UserData(new User(userId, new Data(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>())));
                 saveData();
             }
@@ -79,7 +90,9 @@ public class UserDataManager {
     }
 
     public synchronized void loadData() {
+        Log.d("UserDataManager", "Loading data from: " + Thread.currentThread().getStackTrace()[3].toString());
         if (!file.exists()) {
+            Log.w("UserDataManager", "No data to load");
             DisplayToast.Display(context, "No data to load");
             return;
         }
@@ -88,31 +101,71 @@ public class UserDataManager {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(reader);
             if (!jsonElement.isJsonObject()) {
+                Log.e("UserDataManager", "Invalid JSON format in file");
                 DisplayToast.Display(context, "Invalid JSON format in file");
                 return;
             }
-
             userData = gson.fromJson(jsonElement, UserData.class);
-
+            Log.d("UserDataManager", "Loaded JSON: " + gson.toJson(userData));
             if (userData == null) {
+                Log.e("UserDataManager", "Failed to load data: JSON is invalid");
                 DisplayToast.Display(context, "Failed to load data: JSON is invalid");
             }
         } catch (IOException | com.google.gson.JsonSyntaxException e) {
+            Log.e("UserDataManager", "Load data error: " + e.getMessage(), e);
             DisplayToast.Display(context, "Load data error: " + e.getMessage());
             userData = null;
         }
     }
 
     public synchronized void saveData() {
+        Log.d("UserDataManager", "Attempting to save data from: " + Thread.currentThread().getStackTrace()[3].toString());
         if (userData == null) {
+            Log.w("UserDataManager", "No data to save");
             DisplayToast.Display(context, "No data to save");
             return;
         }
-        try (FileWriter writer = new FileWriter(file)) {
+
+        //quyền ghi file
+        if (!file.exists()) {
+            try {
+                if (!file.createNewFile()) {
+                    Log.e("UserDataManager", "Failed to create new file: " + file.getAbsolutePath());
+                    DisplayToast.Display(context, "Failed to create data file");
+                    return;
+                }
+            } catch (IOException e) {
+                Log.e("UserDataManager", "Error creating file: " + e.getMessage(), e);
+                DisplayToast.Display(context, "Error creating data file: " + e.getMessage());
+                return;
+            }
+        }
+
+        if (!file.canWrite()) {
+            Log.e("UserDataManager", "File is not writable: " + file.getAbsolutePath());
+            DisplayToast.Display(context, "Cannot write to data file");
+            return;
+        }
+
+        try (FileWriter writer = new FileWriter(file, false)) { //ghi đè
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String jsonContent = gson.toJson(userData);
+            Log.d("UserDataManager", "JSON to save: " + jsonContent);
             gson.toJson(userData, writer);
-            writer.flush(); // Ensure data is written
+            writer.flush();
+            Log.d("UserDataManager", "Data saved successfully to: " + file.getAbsolutePath());
+
+            // Kiểm tra nội dung file sau khi ghi
+            try (FileReader reader = new FileReader(file)) {
+                JsonParser parser = new JsonParser();
+                JsonElement jsonElement = parser.parse(reader);
+                Log.d("UserDataManager", "File content after save: " + jsonElement.toString());
+            } catch (IOException e) {
+                Log.e("UserDataManager", "Error reading file after save: " + e.getMessage(), e);
+                DisplayToast.Display(context, "Error verifying saved data: " + e.getMessage());
+            }
         } catch (IOException e) {
+            Log.e("UserDataManager", "Save data error: " + e.getMessage(), e);
             DisplayToast.Display(context, "Save data error: " + e.getMessage());
         }
     }
@@ -122,6 +175,7 @@ public class UserDataManager {
             Gson gson = new Gson();
             return gson.toJsonTree(userData.getUser().getData()).getAsJsonObject();
         }
+        Log.w("UserDataManager", "User data not found for userId: " + userId);
         DisplayToast.Display(context, "User data not found for userId: " + userId);
         return new JsonObject();
     }

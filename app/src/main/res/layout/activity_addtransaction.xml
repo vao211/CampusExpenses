@@ -3,18 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<ImageButton
-    android:layout_width="40dp"
-    android:layout_height="40dp"
-    android:id="@+id/btn_close"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    android:src="@drawable/ic_close"
-    android:background="?attr/selectableItemBackgroundBorderless"
-    android:layout_marginTop="25dp"
-    android:layout_marginStart="15dp"
-    />
+
+    <ImageButton
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/btn_close"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/ic_close"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="15dp" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,8 +25,7 @@
         app:layout_constraintTop_toTopOf="@id/btn_close"
         android:layout_marginStart="20dp"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@id/btn_close"
-        />
+        app:layout_constraintBottom_toBottomOf="@id/btn_close" />
 
     <LinearLayout
         android:id="@+id/ll_income"
@@ -42,15 +43,12 @@
         app:layout_constraintEnd_toStartOf="@id/ll_outcome"
         app:layout_constraintTop_toBottomOf="@id/btn_close"
         android:clickable="true"
-        android:focusable="true"
-
-        >
+        android:focusable="true">
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:src="@drawable/ic_income"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            />
+            android:background="?attr/selectableItemBackgroundBorderless" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -59,6 +57,7 @@
             android:layout_marginStart="8dp"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/ll_outcome"
         android:layout_width="wrap_content"
@@ -75,8 +74,7 @@
         app:layout_constraintEnd_toStartOf="@id/ll_transfer"
         app:layout_constraintTop_toBottomOf="@id/btn_close"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
@@ -90,6 +88,7 @@
             android:layout_marginStart="8dp"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/ll_transfer"
         android:layout_width="wrap_content"
@@ -107,8 +106,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_close"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
@@ -122,6 +120,7 @@
             android:layout_marginStart="8dp"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/ll_datePicker"
         android:layout_width="200dp"
@@ -136,24 +135,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ll_income"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_calendar"
             android:background="?attr/selectableItemBackgroundBorderless"
             tools:ignore="ContentDescription"
-            android:paddingTop="11dp"/>
+            android:paddingTop="11dp" />
         <TextView
             android:id="@+id/txt_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/year_month_day"
             android:paddingTop="10dp"
-            android:textSize="20sp"
-            />
+            android:textSize="20sp" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/ll_enterAmount"
         android:layout_width="200dp"
@@ -170,25 +168,23 @@
         app:layout_constraintTop_toBottomOf="@+id/ll_income"
         app:layout_constraintStart_toEndOf="@+id/ll_datePicker"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:contentDescription="@string/amount_of_money"
-            android:src="@drawable/ic_money"
-            />
+            android:src="@drawable/ic_money" />
         <EditText
             android:id="@+id/edt_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints=""
             android:hint="@string/enter_amount"
-            android:inputType="text"
+            android:inputType="numberDecimal"
             android:textSize="15sp"
-            android:maxLines="1"
-            />
+            android:maxLines="1" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/ll_description"
         android:layout_width="match_parent"
@@ -204,14 +200,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ll_datePicker"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:contentDescription="@string/description"
-            android:src="@drawable/ic_write"
-            />
+            android:src="@drawable/ic_write" />
         <EditText
             android:id="@+id/edt_description"
             android:layout_width="match_parent"
@@ -220,9 +214,9 @@
             android:hint="@string/description"
             android:inputType="text"
             android:textSize="15sp"
-            android:maxLines="1"
-            />
+            android:maxLines="1" />
     </LinearLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -232,8 +226,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_description"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/ll_description" />
+
     <LinearLayout
         android:id="@+id/ll_select_category"
         android:layout_width="match_parent"
@@ -245,33 +239,23 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:layout_margin="5dp"
-        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt_select_category"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:contentDescription="@string/category"
             android:src="@drawable/ic_category"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            />
+            android:background="?attr/selectableItemBackgroundBorderless" />
         <TextView
             android:id="@+id/txt_selected_category"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/select_category"
             android:textSize="17sp"
-            android:layout_marginStart="20dp"
-            />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/category"
-            android:src="@drawable/ic_arrow_right"
-            android:layout_marginStart="200dp"
-            />
+            android:layout_marginStart="20dp" />
     </LinearLayout>
 
     <TextView
@@ -283,8 +267,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_select_category"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/ll_select_category" />
 
     <LinearLayout
         android:id="@+id/ll_select_account"
@@ -297,49 +280,40 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:layout_margin="5dp"
-        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt_select_account"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:contentDescription="@string/category"
+            android:contentDescription="@string/select_account"
             android:src="@drawable/ic_account"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            />
+            android:background="?attr/selectableItemBackgroundBorderless" />
         <TextView
             android:id="@+id/txt_selected_account"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/select_account"
             android:textSize="17sp"
-            android:layout_marginStart="20dp"
-            />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/category"
-            android:src="@drawable/ic_arrow_right"
-            android:layout_marginStart="200dp"
-            />
+            android:layout_marginStart="20dp" />
     </LinearLayout>
+
+    <!-- Thêm TextView và LinearLayout cho tài khoản đích -->
     <TextView
+        android:id="@+id/txt_select_to_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/select_budget"
+        android:text="@string/select_to_account"
         android:textSize="20sp"
-        android:id="@+id/txt_select_budget"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_select_account"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/ll_select_account" />
 
-<!--Ẩn layout này đi nếu chưa chọn account-->
     <LinearLayout
-        android:id="@+id/ll_select_budget"
+        android:id="@+id/ll_select_to_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -349,43 +323,46 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:layout_margin="5dp"
-        app:layout_constraintStart_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_select_budget"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_select_to_account"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:contentDescription="@string/budget"
-            android:src="@drawable/ic_budget"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            />
+            android:contentDescription="@string/to_account"
+            android:src="@drawable/ic_account"
+            android:background="?attr/selectableItemBackgroundBorderless" />
         <TextView
-            android:id="@+id/txt_selected_budget"
+            android:id="@+id/txt_selected_to_account"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/select_budget"
+            android:text="@string/select_to_account"
             android:textSize="17sp"
-            android:layout_marginStart="20dp"
-            />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/budget"
-            android:src="@drawable/ic_arrow_right"
-            android:layout_marginStart="200dp"
-            />
+            android:layout_marginStart="20dp" />
     </LinearLayout>
-<ImageButton
-    android:id="@+id/btn_submit"
-    android:layout_width="60dp"
-    android:layout_height="60dp"
-    android:src="@drawable/ic_check"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintBottom_toBottomOf="parent"
-    android:layout_marginBottom="30dp"
-    android:layout_marginEnd="15dp"
-    android:contentDescription="@string/submit"
-    />
+
+    <TextView
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_budget"
+        android:textSize="20sp"
+        android:id="@+id/txt_select_budget"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_select_to_account" />
+
+    <ImageButton
+        android:id="@+id/btn_submit"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_check"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="15dp"
+        android:contentDescription="@string/submit" />
 </androidx.constraintlayout.widget.ConstraintLayout>

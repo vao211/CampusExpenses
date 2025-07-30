@@ -73,4 +73,7 @@
     <string name="select_account">Select account</string>
     <string name="select_budget">Select budget</string>
     <string name="category_name">Category Name</string>
+    <string name="account_balance">balance</string>
+    <string name="select_to_account">Select To Account</string>
+    <string name="to_account">To Account</string>
 </resources>

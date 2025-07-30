@@ -69,51 +69,5 @@ public class MainActivity extends AppCompatActivity {
     // Hàm Test add, KHÔNG ĐƯỢC CHẠY. Chỉ xem để biết cách dùng.
     private void test() {
         String userId = sessionManager.getUserId();
-
-            AccountService accountService = new AccountService(this, userId);
-            CategoryService categoryService = new CategoryService(this, userId);
-            BudgetService budgetService = new BudgetService(this, userId);
-            TransactionService transactionService = new TransactionService(this, userId);
-
-            Account account1 = new Account("Test1", 1000);
-            accountService.addAccount(account1);
-            Account account2 = new Account("Test2", 1000);
-            accountService.addAccount(account2);
-
-            Category category1 = new Category("Test1");
-            categoryService.addCategory(category1);
-            String categoryUpdate = "testID";
-            String categoryUpdateName = "testName";
-            categoryService.updateCategory(categoryUpdate, categoryUpdateName);
-            String deleteCategoryID = "testDelID";
-            categoryService.deleteCategory(deleteCategoryID);
-
-
-            Budget budget = new Budget("Test budget", 1000, 1000, "2023-01-01", "2023-12-31");
-            budget.addCategoryLimit(categoryService.getCategoryId("Test1"), 500);
-            budget.addAccount(accountService.getAccountId("Test2"));
-            budgetService.addBudget(budget);
-            if(budgetService.getBudgetId("Test budget") == null){
-                DisplayToast.Display(this, "Fail to save Budget");
-            }
-//
-            Transaction transaction1 = new Transaction("OUTCOME", accountService.getAccountId("Test1"),
-                    categoryService.getCategoryId("Test1"), 500, "2023-01-01", "Test Income");
-            transactionService.addTransaction(transaction1);
-
-            Transaction transaction2 = new Transaction("INCOME", accountService.getAccountId("Test2"),
-                    categoryService.getCategoryId("Test1"), 500, "2023-01-01", "Test Outcome");
-            transactionService.addTransaction(transaction2);
-
-            Transaction transaction3 = new Transaction(accountService.getAccountId("Test1"),
-                    accountService.getAccountId("Test2"), 500, "2023-01-01", "Test Transfer");
-            transactionService.addTransaction(transaction3);
-
-            // Hiển thị thông báo hoàn tất
-            DisplayToast.Display(this, "Test completed. Check Logcat and JSON file.");
-
-
-
-
     }
 }

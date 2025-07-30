@@ -2,6 +2,7 @@ package com.example.vcampusexpenses.fragments;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.adapters.CategoryAdapter;
+import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.session.SessionManager;
@@ -22,21 +24,25 @@ import com.example.vcampusexpenses.utils.DisplayToast;
 
 import java.util.List;
 
-public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCategoryClickListener{
+public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCategoryClickListener {
     private RecyclerView recyclerViewCategories;
     private TextView txtEmptyCategories;
     private CategoryService categoryService;
     private ImageButton btnAddCategory;
+    private UserDataManager dataManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_categories, container, false);
         recyclerViewCategories = view.findViewById(R.id.rv_category);
         txtEmptyCategories = view.findViewById(R.id.txt_empty_categories);
+        btnAddCategory = view.findViewById(R.id.btn_add_category);
+
         SessionManager sessionManager = new SessionManager(requireContext());
         String userId = sessionManager.getUserId();
-        categoryService = new CategoryService(requireContext(), userId);
-        btnAddCategory = view.findViewById(R.id.btn_add_category);
+        dataManager = UserDataManager.getInstance(requireContext(), userId);
+        categoryService = new CategoryService(dataManager);
+
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(requireContext()));
         addCategory();
         return view;
@@ -47,55 +53,66 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
         super.onViewCreated(view, savedInstanceState);
         loadCategories();
     }
+
     private void addCategory() {
         btnAddCategory.setOnClickListener(v -> {
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                builder.setTitle("Add Category");
+            Log.d("CategoriesFragment", "Adding new category");
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setTitle("Add Category");
 
-                final EditText input = new EditText(requireContext());
-                input.setHint("Enter Name");
-                builder.setView(input);
+            final EditText input = new EditText(requireContext());
+            input.setHint("Enter Name");
+            builder.setView(input);
 
-                builder.setPositiveButton("Add", (dialog, which) -> {
-                    String categoryName = input.getText().toString().trim();
-                    if (categoryName.isEmpty()) {
-                        DisplayToast.Display(requireContext(), "Name can not be empty");
-                        return;
-                    }
-                    Category newCategory = new Category(categoryName);
-                    categoryService.addCategory(newCategory);
-                    loadCategories(); // Làm mới danh sách sau khi thêm
-                });
+            builder.setPositiveButton("Add", (dialog, which) -> {
+                String categoryName = input.getText().toString().trim();
+                if (categoryName.isEmpty()) {
+                    Log.w("CategoriesFragment", "Category name is empty");
+                    DisplayToast.Display(requireContext(), "Name cannot be empty");
+                    return;
+                }
+                Category newCategory = new Category(null, categoryName);
+                categoryService.addCategory(newCategory);
+                dataManager.saveData();
+                Log.d("CategoriesFragment", "Category added: " + categoryName);
+                loadCategories();
+            });
 
-                // Nút hủy
-                builder.setNegativeButton("Cancel", (dialog, which) -> {
-                    dialog.cancel();
-                });
+            builder.setNegativeButton("Cancel", (dialog, which) -> {
+                Log.d("CategoriesFragment", "Add category cancelled");
+                dialog.cancel();
+            });
 
-                builder.show();
+            builder.show();
         });
     }
+
     private void loadCategories() {
+        Log.d("CategoriesFragment", "Loading categories");
         if (txtEmptyCategories == null || recyclerViewCategories == null) {
+            Log.e("CategoriesFragment", "UI components not initialized");
             return;
         }
 
         List<Category> categoryList = categoryService.getListCategories();
 
         if (categoryList == null || categoryList.isEmpty()) {
+            Log.d("CategoriesFragment", "No categories found");
             txtEmptyCategories.setVisibility(View.VISIBLE);
             recyclerViewCategories.setVisibility(View.GONE);
         } else {
+            Log.d("CategoriesFragment", "Found " + categoryList.size() + " categories");
             txtEmptyCategories.setVisibility(View.GONE);
             recyclerViewCategories.setVisibility(View.VISIBLE);
             CategoryAdapter categoryAdapter = new CategoryAdapter(categoryList, this);
             recyclerViewCategories.setAdapter(categoryAdapter);
         }
     }
+
     @Override
     public void editCategory(String categoryID) {
+        Log.d("CategoriesFragment", "Editing category with ID: " + categoryID);
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        //Làm cảnh báo cho người dùng
         builder.setTitle("Update Category");
         final EditText input = new EditText(requireContext());
         input.setHint("Enter new Category name");
@@ -103,29 +120,41 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
 
         builder.setPositiveButton("Confirm", (dialog, which) -> {
             String newName = input.getText().toString().trim();
-            if (newName.isEmpty()){
+            if (newName.isEmpty()) {
+                Log.w("CategoriesFragment", "New category name is empty");
                 DisplayToast.Display(requireContext(), "Category name can't be empty");
                 return;
             }
             categoryService.updateCategory(categoryID, newName);
+            dataManager.saveData(); //Lưu dữ liệu sau khi cập nhật
+            Log.d("CategoriesFragment", "Category updated: " + newName);
             loadCategories();
         });
 
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            Log.d("CategoriesFragment", "Update category cancelled");
+            dialog.cancel();
+        });
+
         builder.show();
     }
+
     @Override
     public void deleteCategory(String categoryId) {
-        //Làm cảnh báo cho người dùng
+        Log.d("CategoriesFragment", "Deleting category with ID: " + categoryId);
         new AlertDialog.Builder(requireContext())
                 .setTitle("Confirm")
-                .setMessage("Are you sure you want to delete this category ?")
+                .setMessage("Are you sure you want to delete this category?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    //Gọi deleteCategory và làm mới danh sách
                     categoryService.deleteCategory(categoryId);
+                    dataManager.saveData();//Lưu data sau khi xóa danh mục
+                    Log.d("CategoriesFragment", "Category deleted: " + categoryId);
                     loadCategories();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    Log.d("CategoriesFragment", "Delete category cancelled");
+                    dialog.cancel();
+                })
                 .show();
-        }
+    }
 }

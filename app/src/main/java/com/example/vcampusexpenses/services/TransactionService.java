@@ -1,6 +1,7 @@
 package com.example.vcampusexpenses.services;
 
-import android.content.Context;
+import android.util.Log;
+
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.Budget;
@@ -19,15 +20,22 @@ public class TransactionService {
     private final UserDataManager dataFile;
     private final UserData userData;
     private final String userId;
+    private final AccountService accountService;
+    private final BudgetService budgetService;
 
-    public TransactionService(Context context, String userId) {
-        this.dataFile = new UserDataManager(context, userId);
-        this.userData = dataFile.getUserDataObject();
-        this.userId = userId;
+    public TransactionService(UserDataManager dataManager, AccountService accountService, BudgetService budgetService) {
+        this.dataFile = dataManager;
+        this.userData = dataManager.getUserDataObject();
+        this.userId = dataManager.getUserId();
+        this.accountService = accountService;
+        this.budgetService = budgetService;
+        Log.d("TransactionService", "Initialized with userId: " + userId);
     }
 
     protected void saveTransaction(Transaction transaction) {
+        Log.d("TransactionService", "Saving transaction: " + transaction.getDescription());
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            Log.e("TransactionService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
@@ -37,112 +45,119 @@ public class TransactionService {
             userData.getUser().getData().setTransactions(transactions);
         }
         transactions.put(transaction.getTransactionId(), transaction);
-        dataFile.saveData();
+        Log.d("TransactionService", "Transaction saved: " + transaction.getDescription());
     }
 
     private void processIncome(Transaction transaction) {
-        AccountService accountService = new AccountService(dataFile.getContext(), userId);
+        Log.d("TransactionService", "Processing INCOME transaction: " + transaction.getDescription());
         Account account = accountService.getAccount(transaction.getAccountId());
         if (account == null) {
+            Log.e("TransactionService", "Account not found: " + transaction.getAccountId());
             DisplayToast.Display(dataFile.getContext(), "Account not found");
             return;
         }
-        account.updateBalance(transaction.getAmount());
-        accountService.saveAccount(account);
-        BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
+        Log.d("TransactionService", "AccountID: " + account.getAccountId() + ", Amount: " + transaction.getAmount());
+        accountService.updateBalance(account.getAccountId(), transaction.getAmount());
         budgetService.updateBudgetsInTransaction(transaction);
+        saveTransaction(transaction);
     }
 
     private void processOutcome(Transaction transaction) {
-        AccountService accountService = new AccountService(dataFile.getContext(), userId);
-        BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
+        Log.d("TransactionService", "Processing OUTCOME transaction: " + transaction.getDescription());
         Account account = accountService.getAccount(transaction.getAccountId());
         if (account == null) {
+            Log.e("TransactionService", "Account not found: " + transaction.getAccountId());
             DisplayToast.Display(dataFile.getContext(), "Account not found");
             return;
         }
         if (account.getBalance() >= transaction.getAmount()) {
-            account.updateBalance(-transaction.getAmount());
-            accountService.saveAccount(account);
+            accountService.updateBalance(account.getAccountId(), -transaction.getAmount());
             budgetService.updateBudgetsInTransaction(transaction);
+            saveTransaction(transaction);
         } else {
-            DisplayToast.Display(dataFile.getContext(), "not enough balance");
-            return;
+            Log.w("TransactionService", "Not enough balance for account: " + account.getAccountId());
+            DisplayToast.Display(dataFile.getContext(), "Not enough balance");
         }
     }
 
     private void processTransfer(Transaction transaction) {
-        AccountService accountService = new AccountService(dataFile.getContext(), userId);
+        Log.d("TransactionService", "Processing TRANSFER transaction: " + transaction.getDescription());
         Account fromAccount = accountService.getAccount(transaction.getFromAccountId());
         Account toAccount = accountService.getAccount(transaction.getToAccountId());
         if (fromAccount == null || toAccount == null) {
+            Log.e("TransactionService", "Invalid from or to account");
             DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
             return;
         }
         if (fromAccount.getBalance() >= transaction.getAmount()) {
-            fromAccount.updateBalance(-transaction.getAmount());
-            toAccount.updateBalance(transaction.getAmount());
-            accountService.saveAccount(fromAccount);
-            accountService.saveAccount(toAccount);
+            accountService.updateBalance(fromAccount.getAccountId(), -transaction.getAmount());
+            accountService.updateBalance(toAccount.getAccountId(), transaction.getAmount());
+            saveTransaction(transaction);
         } else {
+            Log.w("TransactionService", "Not enough balance to transfer from account: " + fromAccount.getAccountId());
             DisplayToast.Display(dataFile.getContext(), "Not enough balance to transfer");
-            return;
         }
     }
 
     public void addTransaction(Transaction transaction) {
+        Log.d("TransactionService", "Adding transaction: " + transaction.getDescription());
         if (transaction == null || !transaction.isValid()) {
-            DisplayToast.Display(dataFile.getContext(), "InValid Transaction");
+            Log.e("TransactionService", "Invalid Transaction");
+            DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
             return;
         }
-
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            Log.e("TransactionService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
         Map<String, Category> categories = userData.getUser().getData().getCategories();
         if (accounts == null || categories == null) {
+            Log.e("TransactionService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
 
-        //nếu là transfer, kiểm tra tài khoản tồn tại
+        //Nếu là transfer, kiểm tra tài khoản tồn tại
         if (transaction.isTransfer()) {
             if (!accounts.containsKey(transaction.getFromAccountId()) ||
                     !accounts.containsKey(transaction.getToAccountId())) {
+                Log.e("TransactionService", "Invalid Account");
                 DisplayToast.Display(dataFile.getContext(), "Invalid Account");
                 return;
             }
         }
-        //không phải transfer (income/outcome)
+        //Không phải transfer (income/outcome)
         else {
             if (!accounts.containsKey(transaction.getAccountId())) {
+                Log.e("TransactionService", "Account not found: " + transaction.getAccountId());
                 DisplayToast.Display(dataFile.getContext(), "Account not found");
                 return;
             }
-            //kiểm tra danh mục
+            // Kiểm tra danh mục
             if (!categories.containsKey(transaction.getCategoryId())) {
+                Log.e("TransactionService", "Category not found: " + transaction.getCategoryId());
                 DisplayToast.Display(dataFile.getContext(), "Category not found");
                 return;
             }
         }
 
-        //kiem tra budget của outcome
+        //Ktra budget của outcome
         if (transaction.getType().equals("OUTCOME")) {
-            BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
             List<Budget> budgets = budgetService.getListUserBudgets();
             for (Budget budget : budgets) {
                 if (budget.appliesToTransaction(transaction)) {
                     Double categoryLimit = budget.getCategoryLimits().get(transaction.getCategoryId());
                     if (categoryLimit != null && transaction.getAmount() > budget.getRemainingAmount()) {
+                        Log.w("TransactionService", "Transaction exceeds category limit for budget: " + budget.getName());
                         DisplayToast.Display(dataFile.getContext(), "Transaction exceeds category limit");
                         return;
                     }
                 }
             }
         }
-        //sinh transactionId tự động
+
         String transactionId = IdGenerator.generateId(IdGenerator.ModelType.TRANSACTION);
         transaction.setTransactionId(transactionId);
         switch (transaction.getType()) {
@@ -156,67 +171,71 @@ public class TransactionService {
                 processTransfer(transaction);
                 break;
             default:
+                Log.e("TransactionService", "Invalid Transaction Type: " + transaction.getType());
                 DisplayToast.Display(dataFile.getContext(), "Invalid Transaction Type");
                 return;
         }
-        saveTransaction(transaction);
+        Log.d("TransactionService", "Transaction added successfully: " + transaction.getDescription());
         DisplayToast.Display(dataFile.getContext(), "Transaction added successfully");
     }
 
     public void deleteTransaction(String transactionId) {
+        Log.d("TransactionService", "Deleting transactionId: " + transactionId);
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            Log.e("TransactionService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
         Map<String, Transaction> transactions = userData.getUser().getData().getTransactions();
         if (transactions == null || !transactions.containsKey(transactionId)) {
+            Log.e("TransactionService", "Transaction not found: " + transactionId);
             DisplayToast.Display(dataFile.getContext(), "Transaction not found");
             return;
         }
-        //tạo giao dịch để khôi phục số dư
+        //temp transaction để khôi phục số dư
         Transaction transactionTemp = transactions.get(transactionId);
 
         //Đảo ngược giao dịch
-        AccountService accountService = new AccountService(dataFile.getContext(), userId);
         if (transactionTemp.isTransfer()) {
             Account fromAccount = accountService.getAccount(transactionTemp.getFromAccountId());
             Account toAccount = accountService.getAccount(transactionTemp.getToAccountId());
             if (fromAccount == null || toAccount == null) {
+                Log.e("TransactionService", "Invalid from or to account");
                 DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
                 return;
             }
-            fromAccount.updateBalance(transactionTemp.getAmount());
-            toAccount.updateBalance(-transactionTemp.getAmount());
-            accountService.saveAccount(fromAccount);
-            accountService.saveAccount(toAccount);
+            accountService.updateBalance(fromAccount.getAccountId(), transactionTemp.getAmount());
+            accountService.updateBalance(toAccount.getAccountId(), -transactionTemp.getAmount());
         } else {
             Account account = accountService.getAccount(transactionTemp.getAccountId());
             if (account == null) {
+                Log.e("TransactionService", "Account not found: " + transactionTemp.getAccountId());
                 DisplayToast.Display(dataFile.getContext(), "Account not found");
                 return;
             }
             if (transactionTemp.getType().equals("INCOME")) {
-                account.updateBalance(-transactionTemp.getAmount());
+                accountService.updateBalance(account.getAccountId(), -transactionTemp.getAmount());
             } else if (transactionTemp.getType().equals("OUTCOME")) {
-                account.updateBalance(transactionTemp.getAmount());
+                accountService.updateBalance(account.getAccountId(), transactionTemp.getAmount());
             }
-            accountService.saveAccount(account);
-            //đảo ngược tác động lên ngân sách
-            BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
+            //ddảo ngược tác động lên ngân sách
             budgetService.reverseBudgetUpdate(transactionTemp);
         }
-        //xóa temp
+        //Xóa giao dịch
         transactions.remove(transactionId);
-        dataFile.saveData();
+        Log.d("TransactionService", "Transaction deleted successfully: " + transactionId);
         DisplayToast.Display(dataFile.getContext(), "Transaction deleted successfully");
     }
 
     public void updateTransaction(String transactionId, Transaction newTransaction) {
+        Log.d("TransactionService", "Updating transactionId: " + transactionId);
         if (newTransaction == null || !newTransaction.isValid()) {
-            DisplayToast.Display(dataFile.getContext(), "InValid Transaction");
+            Log.e("TransactionService", "Invalid Transaction");
+            DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
             return;
         }
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            Log.e("TransactionService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
@@ -224,10 +243,12 @@ public class TransactionService {
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
         Map<String, Category> categories = userData.getUser().getData().getCategories();
         if (transactions == null || accounts == null || categories == null) {
+            Log.e("TransactionService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
         if (!transactions.containsKey(transactionId)) {
+            Log.e("TransactionService", "Transaction not found: " + transactionId);
             DisplayToast.Display(dataFile.getContext(), "Transaction not found");
             return;
         }
@@ -235,50 +256,50 @@ public class TransactionService {
         if (newTransaction.isTransfer()) {
             if (!accounts.containsKey(newTransaction.getFromAccountId()) ||
                     !accounts.containsKey(newTransaction.getToAccountId())) {
+                Log.e("TransactionService", "Invalid from or to account");
                 DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
                 return;
             }
         } else {
             if (!accounts.containsKey(newTransaction.getAccountId())) {
+                Log.e("TransactionService", "Account not found: " + newTransaction.getAccountId());
                 DisplayToast.Display(dataFile.getContext(), "Account not found");
                 return;
             }
             if (!categories.containsKey(newTransaction.getCategoryId())) {
+                Log.e("TransactionService", "Category not found: " + newTransaction.getCategoryId());
                 DisplayToast.Display(dataFile.getContext(), "Category not found");
                 return;
             }
         }
 
-        //temp transaction để khôi phục số dư
+        //Temp transaction để khôi phục số dư
         Transaction tempTransaction = transactions.get(transactionId);
 
-        //đảo ngược giao dịch
-        AccountService accountService = new AccountService(dataFile.getContext(), userId);
+        //Đảo ngược giao dịch
         if (tempTransaction.isTransfer()) {
             Account fromAccount = accountService.getAccount(tempTransaction.getFromAccountId());
             Account toAccount = accountService.getAccount(tempTransaction.getToAccountId());
             if (fromAccount == null || toAccount == null) {
+                Log.e("TransactionService", "Invalid from or to account");
                 DisplayToast.Display(dataFile.getContext(), "Invalid from or to account");
                 return;
             }
-            fromAccount.updateBalance(tempTransaction.getAmount());
-            toAccount.updateBalance(-tempTransaction.getAmount());
-            accountService.saveAccount(fromAccount);
-            accountService.saveAccount(toAccount);
+            accountService.updateBalance(fromAccount.getAccountId(), tempTransaction.getAmount());
+            accountService.updateBalance(toAccount.getAccountId(), -tempTransaction.getAmount());
         } else {
             Account account = accountService.getAccount(tempTransaction.getAccountId());
             if (account == null) {
+                Log.e("TransactionService", "Account not found: " + tempTransaction.getAccountId());
                 DisplayToast.Display(dataFile.getContext(), "Account not found");
                 return;
             }
             if (tempTransaction.getType().equals("INCOME")) {
-                account.updateBalance(-tempTransaction.getAmount());
+                accountService.updateBalance(account.getAccountId(), -tempTransaction.getAmount());
             } else if (tempTransaction.getType().equals("OUTCOME")) {
-                account.updateBalance(tempTransaction.getAmount());
+                accountService.updateBalance(account.getAccountId(), tempTransaction.getAmount());
             }
-            accountService.saveAccount(account);
-            //đảo ngược tác động lên ngân sách
-            BudgetService budgetService = new BudgetService(dataFile.getContext(), userId);
+            //Đảo ngược tác động lên ngân sách
             budgetService.reverseBudgetUpdate(tempTransaction);
         }
         //transaction mới
@@ -294,21 +315,28 @@ public class TransactionService {
                 processTransfer(newTransaction);
                 break;
             default:
+                Log.e("TransactionService", "Invalid Transaction Type: " + newTransaction.getType());
                 DisplayToast.Display(dataFile.getContext(), "Invalid Transaction Type");
                 return;
         }
-        saveTransaction(newTransaction);
+        Log.d("TransactionService", "Transaction updated successfully: " + transactionId);
         DisplayToast.Display(dataFile.getContext(), "Transaction updated successfully");
     }
+
     public List<Transaction> getListTransactions() {
+        Log.d("TransactionService", "Getting list of transactions");
         List<Transaction> transactions = new ArrayList<>();
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
-            DisplayToast.Display(dataFile.getContext(), "");
+            Log.e("TransactionService", "User data not initialized");
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return transactions;
         }
         Map<String, Transaction> transactionMap = userData.getUser().getData().getTransactions();
         if (transactionMap != null) {
             transactions.addAll(transactionMap.values());
+            Log.d("TransactionService", "Found " + transactions.size() + " transactions");
+        } else {
+            Log.w("TransactionService", "No transactions found");
         }
         return transactions;
     }

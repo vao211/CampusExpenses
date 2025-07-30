@@ -1,13 +1,11 @@
 package com.example.vcampusexpenses.adapters;
 
-import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vcampusexpenses.R;
@@ -36,7 +34,7 @@ public class CategoryRadioAdapter extends RecyclerView.Adapter<CategoryRadioAdap
         public ViewHolder(View itemView) {
             super(itemView);
             radioButton = itemView.findViewById(R.id.radio_button);
-            categoryName = itemView.findViewById(R.id.tv_category_name);
+            categoryName = itemView.findViewById(R.id.txt_category_name);
         }
     }
 
