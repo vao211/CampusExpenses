@@ -24,7 +24,6 @@ public class BudgetService {
     private final UserData userData;
     private final String userId;
 
-    // Sửa constructor để nhận UserDataManager từ bên ngoài
     public BudgetService(UserDataManager dataManager) {
         this.dataFile = dataManager;
         this.userData = dataManager.getUserDataObject();
@@ -89,7 +88,7 @@ public class BudgetService {
             userData.getUser().getData().setBudgets(budgets);
         }
 
-        // Kiểm tra account tồn tại
+        //ktra account tồn tại
         for (String accountId : budget.getAccountIds()) {
             if (!accounts.containsKey(accountId)) {
                 Log.e("BudgetService", "Account not found: " + accountId);
@@ -97,7 +96,7 @@ public class BudgetService {
                 return;
             }
         }
-        // Kiểm tra category tồn tại
+        //ktra category tồn tại
         for (String categoryId : budget.getCategoryLimits().keySet()) {
             if (!categories.containsKey(categoryId)) {
                 Log.e("BudgetService", "Category not found: " + categoryId);
@@ -109,10 +108,10 @@ public class BudgetService {
         String budgetId = IdGenerator.generateId(IdGenerator.ModelType.BUDGET);
         budget.setBudgetId(budgetId);
 
-        // Thêm budget vào budgets
+        //thêm budget vào budgets
         budgets.put(budgetId, budget);
 
-        // Cập nhật danh sách budget của các Account
+        //update list budget của các Account
         for (String accountId : budget.getAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
@@ -125,7 +124,6 @@ public class BudgetService {
             }
         }
 
-        // Không gọi saveData() ở đây
         Log.d("BudgetService", "Budget added: " + budget.getName());
         DisplayToast.Display(dataFile.getContext(), "Budget added successfully");
     }
@@ -152,14 +150,14 @@ public class BudgetService {
             return;
         }
 
-        // Kiểm tra budget tồn tại
+        //kiểm tra budget tồn tại
         if (!budgets.containsKey(budgetId)) {
             Log.e("BudgetService", "Budget not found: " + budgetId);
             DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetId);
             return;
         }
 
-        // Kiểm tra account tồn tại
+        //kiểm tra account tồn tại
         for (String accountId : newBudget.getAccountIds()) {
             if (!accounts.containsKey(accountId)) {
                 Log.e("BudgetService", "Account not found: " + accountId);
@@ -168,7 +166,7 @@ public class BudgetService {
             }
         }
 
-        // Kiểm tra category tồn tại trong categoryLimits
+        //ktra category tồn tại trong categoryLimits
         for (String categoryId : newBudget.getCategoryLimits().keySet()) {
             if (!categories.containsKey(categoryId)) {
                 Log.e("BudgetService", "Category not found: " + categoryId);
@@ -177,7 +175,7 @@ public class BudgetService {
             }
         }
 
-        // Xóa budget khỏi account
+        //xóa budget khỏi account
         Budget oldBudget = budgets.get(budgetId);
         List<String> oldAccountIds = oldBudget.getAccountIds();
         for (String accountId : oldAccountIds) {
@@ -188,11 +186,11 @@ public class BudgetService {
             }
         }
 
-        // Cập nhật budget
+        //update budget
         newBudget.setBudgetId(budgetId);
         budgets.put(budgetId, newBudget);
 
-        // Cập nhật danh sách budget của các Account mới
+        //update danh sách budget của các Account mới
         for (String accountId : newBudget.getAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
@@ -205,7 +203,6 @@ public class BudgetService {
             }
         }
 
-        // Không gọi saveData() ở đây
         Log.d("BudgetService", "Budget updated: " + newBudget.getName());
         DisplayToast.Display(dataFile.getContext(), "Budget updated successfully");
     }
@@ -226,14 +223,14 @@ public class BudgetService {
             return;
         }
 
-        // Kiểm tra budget tồn tại
+        //Ktra budget tồn tại
         if (!budgets.containsKey(budgetId)) {
             Log.e("BudgetService", "Budget not found: " + budgetId);
             DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetId);
             return;
         }
 
-        // Xóa budget khỏi account
+        //xóa budget khỏi account
         Budget budget = budgets.get(budgetId);
         List<String> accountIds = budget.getAccountIds();
         for (String accountId : accountIds) {
@@ -244,9 +241,7 @@ public class BudgetService {
             }
         }
 
-        // Xóa budget
         budgets.remove(budgetId);
-        // Không gọi saveData() ở đây
         Log.d("BudgetService", "Budget deleted: " + budgetId);
         DisplayToast.Display(dataFile.getContext(), "Budget deleted successfully");
     }
