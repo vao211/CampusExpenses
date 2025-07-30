@@ -62,4 +62,15 @@
     <string name="thanks_for_using">Thanks for using!</string>
     <string name="create_transaction">Create Transaction</string>
     <string name="income">Income</string>
+    <string name="year_month_day">Year/Month/Day</string>
+    <string name="transfer">Transfer</string>
+    <string name="outcome">Outcome</string>
+    <string name="enter_amount">Enter amount</string>
+    <string name="description">Enter description</string>
+    <string name="amount_of_money">Amount of money</string>
+    <string name="select_category">Select category</string>
+    <string name="category">Category\n</string>
+    <string name="select_account">Select account</string>
+    <string name="select_budget">Select budget</string>
+    <string name="category_name">Category Name</string>
 </resources>

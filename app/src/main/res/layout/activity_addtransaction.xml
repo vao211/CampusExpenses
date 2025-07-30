@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -26,7 +27,7 @@
         />
 
     <LinearLayout
-        android:id="@+id/btn_income"
+        android:id="@+id/ll_income"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -38,7 +39,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btn_outcome"
+        app:layout_constraintEnd_toStartOf="@id/ll_outcome"
         app:layout_constraintTop_toBottomOf="@id/btn_close"
         android:clickable="true"
         android:focusable="true"
@@ -59,7 +60,7 @@
             android:layout_gravity="center_vertical" />
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/btn_outcome"
+        android:id="@+id/ll_outcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -70,8 +71,8 @@
         android:paddingBottom="5dp"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        app:layout_constraintStart_toEndOf="@id/btn_income"
-        app:layout_constraintEnd_toStartOf="@id/btn_transfer"
+        app:layout_constraintStart_toEndOf="@id/ll_income"
+        app:layout_constraintEnd_toStartOf="@id/ll_transfer"
         app:layout_constraintTop_toBottomOf="@id/btn_close"
         android:clickable="true"
         android:focusable="true"
@@ -84,13 +85,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/income"
+            android:text="@string/outcome"
             android:textSize="12sp"
             android:layout_marginStart="8dp"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/btn_transfer"
+        android:id="@+id/ll_transfer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -102,7 +103,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintStart_toEndOf="@id/btn_outcome"
+        app:layout_constraintStart_toEndOf="@id/ll_outcome"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_close"
         android:clickable="true"
@@ -116,11 +117,275 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/income"
+            android:text="@string/transfer"
             android:textSize="12sp"
             android:layout_marginStart="8dp"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll_datePicker"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:minWidth="200dp"
+        android:orientation="horizontal"
+        android:background="@drawable/border"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_income"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_calendar"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            tools:ignore="ContentDescription"
+            android:paddingTop="11dp"/>
+        <TextView
+            android:id="@+id/txt_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/year_month_day"
+            android:paddingTop="10dp"
+            android:textSize="20sp"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll_enterAmount"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:minWidth="200dp"
+        android:orientation="horizontal"
+        android:background="@drawable/border"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_income"
+        app:layout_constraintStart_toEndOf="@+id/ll_datePicker"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/amount_of_money"
+            android:src="@drawable/ic_money"
+            />
+        <EditText
+            android:id="@+id/edt_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/enter_amount"
+            android:inputType="text"
+            android:textSize="15sp"
+            android:maxLines="1"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/border"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_datePicker"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/description"
+            android:src="@drawable/ic_write"
+            />
+        <EditText
+            android:id="@+id/edt_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/description"
+            android:inputType="text"
+            android:textSize="15sp"
+            android:maxLines="1"
+            />
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_category"
+        android:textSize="20sp"
+        android:id="@+id/txt_select_category"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_description"
+        />
+    <LinearLayout
+        android:id="@+id/ll_select_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/border"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:layout_margin="5dp"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_select_category"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/category"
+            android:src="@drawable/ic_category"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            />
+        <TextView
+            android:id="@+id/txt_selected_category"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/select_category"
+            android:textSize="17sp"
+            android:layout_marginStart="20dp"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/category"
+            android:src="@drawable/ic_arrow_right"
+            android:layout_marginStart="200dp"
+            />
+    </LinearLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_account"
+        android:textSize="20sp"
+        android:id="@+id/txt_select_account"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_select_category"
+        />
 
+    <LinearLayout
+        android:id="@+id/ll_select_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/border"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:layout_margin="5dp"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_select_account"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/category"
+            android:src="@drawable/ic_account"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            />
+        <TextView
+            android:id="@+id/txt_selected_account"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/select_account"
+            android:textSize="17sp"
+            android:layout_marginStart="20dp"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/category"
+            android:src="@drawable/ic_arrow_right"
+            android:layout_marginStart="200dp"
+            />
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_budget"
+        android:textSize="20sp"
+        android:id="@+id/txt_select_budget"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_select_account"
+        />
+
+<!--Ẩn layout này đi nếu chưa chọn account-->
+    <LinearLayout
+        android:id="@+id/ll_select_budget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/border"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:layout_margin="5dp"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_select_budget"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/budget"
+            android:src="@drawable/ic_budget"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            />
+        <TextView
+            android:id="@+id/txt_selected_budget"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/select_budget"
+            android:textSize="17sp"
+            android:layout_marginStart="20dp"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/budget"
+            android:src="@drawable/ic_arrow_right"
+            android:layout_marginStart="200dp"
+            />
+    </LinearLayout>
+<ImageButton
+    android:id="@+id/btn_submit"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:src="@drawable/ic_check"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    android:layout_marginBottom="30dp"
+    android:layout_marginEnd="15dp"
+    android:contentDescription="@string/submit"
+    />
 </androidx.constraintlayout.widget.ConstraintLayout>
