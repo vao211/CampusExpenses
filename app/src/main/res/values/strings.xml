@@ -76,4 +76,5 @@
     <string name="account_balance">balance</string>
     <string name="select_to_account">Select To Account</string>
     <string name="to_account">To Account</string>
+    <string name="add">Add</string>
 </resources>
