@@ -59,4 +59,26 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="60dp"/>
+    <ImageButton
+        android:id="@+id/btn_manage_accounts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:background="@drawable/border"
+        android:src="@drawable/ic_account"
+        android:padding="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_add_budget"
+        android:layout_marginBottom="60dp"/>
+    <ImageButton
+        android:id="@+id/btn_manage_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:background="@drawable/border"
+        android:src="@drawable/ic_account"
+        android:padding="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_manage_accounts"
+        android:layout_marginBottom="60dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
