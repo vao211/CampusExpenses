@@ -1,4 +1,7 @@
 package com.example.vcampusexpenses.model;
+
+import android.util.Log;
+
 public class Transaction {
     private String transactionId;
     private String type;  // "INCOME", "OUTCOME", "TRANSFER"
@@ -39,10 +42,23 @@ public class Transaction {
     public boolean isValid() {
         if (amount <= 0) return false;
         if (type.equals("TRANSFER")) {
-            return fromAccountId != null && toAccountId != null && !fromAccountId.equals(toAccountId);
-        } else {
+            if (fromAccountId == null) {
+                Log.d("Transaction", "fromAccountId is null");
+                return false;
+            }
+            if (toAccountId == null) {
+                Log.d("Transaction", "toAccountId is null");
+                return false;
+            }
+            if (fromAccountId.equals(toAccountId)) {
+                Log.d("Transaction", "fromAccountId equals toAccountId");
+                return false;
+            }
+        }
+        else {
             return accountId != null && categoryId != null && (type.equals("INCOME") || type.equals("OUTCOME"));
         }
+        return true;
     }
 
     public boolean isTransfer() { return "TRANSFER".equals(type); }

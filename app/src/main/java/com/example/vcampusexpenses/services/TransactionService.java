@@ -101,8 +101,13 @@ public class TransactionService {
 
     public void addTransaction(Transaction transaction) {
         Log.d("TransactionService", "Adding transaction: " + transaction.getDescription());
-        if (transaction == null || !transaction.isValid()) {
+        if (!transaction.isValid()) {
             Log.e("TransactionService", "Invalid Transaction");
+            DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
+            return;
+        }
+        if(transaction == null){
+            Log.e("TransactionService", "Null Transaction");
             DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
             return;
         }
