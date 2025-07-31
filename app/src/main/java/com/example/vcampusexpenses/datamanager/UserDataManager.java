@@ -66,10 +66,12 @@ public class UserDataManager {
         if (!file.exists()) {
             Map<String, Account> accounts = new HashMap<>();
             String accountId = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
+            String accountId2 = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
             accounts.put(accountId, new Account(accountId, "Cash", 0.0));
+            accounts.put(accountId2, new Account(accountId2, "Bank", 0.0));
 
             Map<String, Category> categories = new HashMap<>();
-            String[] categoryNames = {"Quần Áo", "Ăn uống", "Giáo dục", "Sức khỏe", "Internet", "Điện thoại", "Tiền điện", "Tiền nước"};
+            String[] categoryNames = {"Ăn uống", "Sức khỏe", "Internet", "Tiền điện", "Tiền nước", "Tiền Lương"};
             for (String name : categoryNames) {
                 String categoryId = IdGenerator.generateId(IdGenerator.ModelType.CATEGORY);
                 categories.put(categoryId, new Category(categoryId, name));
