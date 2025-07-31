@@ -62,7 +62,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         llSelectAccount = findViewById(R.id.ll_select_account);
         llSelectToAccount = findViewById(R.id.ll_select_to_account);
         llDescription = findViewById(R.id.ll_description);
-        txtDate = findViewById(R.id.txt_date);
+        txtDate = findViewById(R.id.txt_budget_date);
         txtSelectedCategory = findViewById(R.id.txt_selected_category);
         txtSelectedAccount = findViewById(R.id.txt_selected_account);
         //Text bên trong khung chọn acccount tới cho transfer

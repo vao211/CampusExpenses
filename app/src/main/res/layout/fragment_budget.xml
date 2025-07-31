@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.BudgetFragment">
+    tools:context=".fragments.BudgetFragment"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/txt_budget"
@@ -16,6 +17,7 @@
         android:text="@string/budget"
         />
     <ImageView
+        android:id="@+id/img_budget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_budget"
@@ -24,4 +26,37 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt_budget"
         />
+    <TextView
+        android:id="@+id/txt_empty_budget"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/no_budgets_available"
+        android:visibility="gone"
+        android:gravity="center"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/img_budget"
+        android:layout_marginTop="8dp" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_budget"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_empty_budget"/>
+    <ImageButton
+        android:id="@+id/btn_add_budget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:src="@drawable/ic_add"
+        android:padding="15dp"
+        android:background="@drawable/border"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="60dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

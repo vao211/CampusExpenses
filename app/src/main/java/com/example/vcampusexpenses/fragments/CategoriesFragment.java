@@ -135,7 +135,6 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
             Log.d("CategoriesFragment", "Update category cancelled");
             dialog.cancel();
         });
-
         builder.show();
     }
 

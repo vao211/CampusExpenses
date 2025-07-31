@@ -33,7 +33,7 @@ public class UserDataManager {
     private final String userId;
 
     //Constructor private (Singleton)
-    private UserDataManager(Context context, String userId) {
+    public UserDataManager(Context context, String userId) {
         this.context = context;
         this.userId = userId;
         this.file = new File(context.getFilesDir(), FILE_NAME);
