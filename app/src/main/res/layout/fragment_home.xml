@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".fragments.HomeFragment">
 
-    <!-- Existing content: Title, Settings, Date Filter -->
+
     <TextView
         android:id="@+id/txt_home_title"
         android:layout_width="wrap_content"
@@ -152,204 +152,60 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Balance Section -->
-    <LinearLayout
-        android:id="@+id/layout_balance"
+    <!-- ACCOUNTS SECTION START -->
+    <TextView
+        android:id="@+id/textViewAccountsLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="16dp"
+        android:text="Accounts"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_summary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toStartOf="@+id/buttonViewAllAccountsHome"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Balance"
-            android:textSize="18sp"
-            android:textColor="?android:attr/textColorPrimary"/>
-
-        <TextView
-            android:id="@+id/txt_current_balance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0.00"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary"/>
-    </LinearLayout>
-
-    <!-- ScrollView for Accounts -->
-    <ScrollView
-        android:id="@+id/scroll_view_accounts"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/layout_balance"
-        app:layout_constraintBottom_toTopOf="@+id/btn_add"
-        app:layout_constraintStart_toStartOf="parent"
+    <Button
+        android:id="@+id/buttonViewAllAccountsHome"
+        style="?attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View All"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toTopOf="@+id/textViewAccountsLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewAccountsLabel"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewHomeAccounts"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_account"
+        tools:itemCount="2"
+        android:clipToPadding="false"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingEnd="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAccountsLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+    <TextView
+        android:id="@+id/textViewNoHomeAccounts"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="No accounts yet. Add one!"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewHomeAccounts"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- General Account Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Accounts"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:textColor="?android:attr/textColorPrimary"/>
-
-            <LinearLayout
-                android:id="@+id/layout_general_account_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#5DAF09"
-                android:padding="12dp"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:id="@+id/txt_general_account_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Cash"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
-                <TextView
-                    android:id="@+id/txt_general_account_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="$0.00"
-                    android:textSize="16sp"/>
-            </LinearLayout>
-            <!-- If using RecyclerView for general accounts, it would go here -->
-
-
-            <!-- Card Account Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cards"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:textColor="?android:attr/textColorPrimary"/>
-
-            <LinearLayout
-                android:id="@+id/layout_card_account_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#03C191"
-                android:padding="12dp"
-                android:layout_marginTop="8dp">
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/txt_card_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="My Credit Card"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_alignParentStart="true"/>
-                    <TextView
-                        android:id="@+id/txt_card_last4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="**** 1234"
-                        android:textSize="14sp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignBaseline="@id/txt_card_name"/>
-                </RelativeLayout>
-                <TextView
-                    android:id="@+id/txt_card_current_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Current Balance: $0.00"
-                    android:textSize="16sp"/>
-                <TextView
-                    android:id="@+id/txt_card_credit_limit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Credit Limit: $5000.00"
-                    android:textSize="14sp"
-                    android:textColor="?android:attr/textColorSecondary"/>
-                <TextView
-                    android:id="@+id/txt_card_available_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Available: $5000.00"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-            <!-- If using RecyclerView for card accounts, it would go here -->
-
-
-            <!-- Bank Account Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bank Accounts"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:textColor="?android:attr/textColorPrimary"/>
-
-            <LinearLayout
-                android:id="@+id/layout_bank_account_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#0BE75C"
-                android:padding="12dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"> <!-- Margin for scroll space -->
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/txt_bank_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="My Bank"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_alignParentStart="true"/>
-                    <TextView
-                        android:id="@+id/txt_bank_account_last4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Acct: **** 5678"
-                        android:textSize="14sp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignBaseline="@id/txt_bank_name"/>
-                </RelativeLayout>
-                <TextView
-                    android:id="@+id/txt_bank_account_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Balance: $0.00"
-                    android:textSize="16sp"/>
-            </LinearLayout>
-            <!-- If using RecyclerView for bank accounts, it would go here -->
-
-        </LinearLayout>
-    </ScrollView>
-
-    <!-- Floating Action Button for adding transactions -->
     <ImageButton
         android:id="@+id/btn_add"
         android:layout_width="60dp"
@@ -363,3 +219,4 @@
         tools:ignore="ContentDescription"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
