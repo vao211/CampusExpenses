@@ -115,36 +115,55 @@ public class AccountService {
         return accounts.get(accountId);
     }
 
-    public void addAccount(Account account) {
+    public boolean addAccount(Account account) {
         Log.d("AccountService", "Adding account: " + account.getName());
         if (account == null || account.getName() == null || account.getName().trim().isEmpty()) {
             Log.e("AccountService", "Invalid account name");
             DisplayToast.Display(dataFile.getContext(), "Invalid account name");
-            return;
+            return false;
         }
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("AccountService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
-            return;
+            return false;
         }
+
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
         if (accounts == null) {
             accounts = new HashMap<>();
             userData.getUser().getData().setAccount(accounts);
         }
 
-        //Ktra trùng tên
+        // Check for duplicate account names (case-insensitive)
         for (Account existingAccount : accounts.values()) {
-            if (existingAccount.getName().equals(account.getName())) {
+            if (existingAccount.getName().equalsIgnoreCase(account.getName())) {
                 Log.w("AccountService", "Account name already exists: " + account.getName());
                 DisplayToast.Display(dataFile.getContext(), "Account name already exists");
-                return;
+                return false;
             }
         }
+
         String accountId = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
         account.setAccountId(accountId);
         saveAccount(account);
         Log.d("AccountService", "Account added: " + account.getName());
+        return true;
+    }
+
+    public boolean isAccountNameExists(String accountName) {
+        if (accountName == null || accountName.trim().isEmpty()) {
+            return false;
+        }
+        List<Account> accounts = getListAccounts();
+        if (accounts != null) {
+            String trimmedNewName = accountName.trim();
+            for (Account account : accounts) {
+                if (account.getName().equalsIgnoreCase(trimmedNewName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void updateAccount(String accountId, String newName, double balance) {

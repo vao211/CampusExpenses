@@ -1,376 +1,455 @@
-package com.example.vcampusexpenses.fragments; // Replace with your actual package name
+package com.example.vcampusexpenses.fragments;
 
-import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ScrollView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.util.Pair;
+import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.content.Intent;
 
 import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.activity.AddTransactionActivity;
+import com.example.vcampusexpenses.activity.SettingActivity;
+import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Transaction;
+import com.example.vcampusexpenses.services.AccountService;
+import com.example.vcampusexpenses.services.CategoryService;
+import com.example.vcampusexpenses.services.TransactionService;
+import com.example.vcampusexpenses.session.SessionManager;
+import com.google.android.material.datepicker.MaterialDatePicker;
+
+import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.activity.ViewAllAccountsActivity;
+import com.example.vcampusexpenses.adapter.AccountAdapter;
 import com.example.vcampusexpenses.model.Account;
-import com.example.vcampusexpenses.model.CardAccount;
-import com.example.vcampusexpenses.model.BankAccount;
+import com.example.vcampusexpenses.services.AccountService;
+import com.example.vcampusexpenses.session.SessionManager;
+import com.example.vcampusexpenses.datamanager.UserDataManager;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import java.text.NumberFormat;
-
-
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-
 
 public class HomeFragment extends Fragment {
-
     private static final String TAG = "HomeFragment";
 
-    private TextView txtHomeTitle, txtDateFilterDisplay;
-    private TextView txtTotalIncome, txtTotalOutcome, txtCurrentBalance;
-    private ImageButton btnSetting, btnCalendar, btnPreviousPeriod, btnNextPeriod, btnAdd;
+    // Views
+    private ImageButton btnSetting, btnAdd, btnCalendar;
+    private ImageButton btnPreviousPeriod, btnNextPeriod;
+    private TextView txtDateFilterDisplay;
 
-    private FirebaseFirestore db;
-    private FirebaseAuth mAuth;
-    private FirebaseUser currentUser;
+    //account
+    private RecyclerView rvAccounts;
+    private AccountAdapter accountAdapter;
+    private AccountService accountService;
+    private SessionManager sessionManager;
+    private Button btnViewAll;
+    private TextView tvNoAccounts;
+    private UserDataManager dataManager;
 
-    // For date filtering
-    private Calendar currentMonthCalendar; // To keep track of the displayed month/period
-    private SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
-    private SimpleDateFormat firestoreDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); // If storing dates as Strings
+    // Date and Filter State
+    private Calendar startDate;
+    private Calendar endDate;
+    private SimpleDateFormat dateFormat; // For "yyyy-MM-dd"
 
-
-    // --- New UI elements for Accounts ---
-    private ScrollView scrollViewAccounts;
-
-    // General Account
-    private LinearLayout layoutGeneralAccountDetails; // To show/hide if no account
-    private TextView txtGeneralAccountName, txtGeneralAccountBalance;
-
-    // Card Account
-    private LinearLayout layoutCardAccountDetails; // To show/hide if no card
-    private TextView txtCardName, txtCardLast4, txtCardCurrentBalance, txtCardCreditLimit, txtCardAvailableBalance;
-
-    // Bank Account
-    private LinearLayout layoutBankAccountDetails; // To show/hide if no bank account
-    private TextView txtBankName, txtBankAccountLast4, txtBankAccountBalance;
-
-    public HomeFragment() {
-        // Required empty public constructor
+    private enum FilterType {
+        THIS_MONTH, LAST_MONTH, LAST_7_DAYS, LAST_30_DAYS, CUSTOM_RANGE
     }
+    private FilterType currentFilterType = FilterType.THIS_MONTH; // Default
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
-        currentMonthCalendar = Calendar.getInstance(); // Initialize to current month
-    }
+    // Keys for saving instance state
+    private static final String START_DATE_KEY = "startDate";
+    private static final String END_DATE_KEY = "endDate";
+    private static final String FILTER_TYPE_KEY = "filterType";
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        // Initialize UI elements
-        txtHomeTitle = view.findViewById(R.id.txt_home_title);
-        txtDateFilterDisplay = view.findViewById(R.id.txt_date_filter_display);
-        btnSetting = view.findViewById(R.id.btnSetting);
-        btnCalendar = view.findViewById(R.id.btn_calendar);
-        btnPreviousPeriod = view.findViewById(R.id.btnPreviousPeriod);
-        btnNextPeriod = view.findViewById(R.id.btnNextPeriod);
+        // Initialize SessionManager and AccountService
+        sessionManager = new SessionManager(requireContext());
+        dataManager = UserDataManager.getInstance(requireContext(), sessionManager.getUserId());
+        accountService = new AccountService(dataManager);
+
+        // Initialize Views
+        rvAccounts = view.findViewById(R.id.recyclerViewHomeAccounts);
+        btnViewAll = view.findViewById(R.id.buttonViewAllAccountsHome);
         btnAdd = view.findViewById(R.id.btn_add);
+        tvNoAccounts = view.findViewById(R.id.textViewNoHomeAccounts);
 
-        // New TextViews for summary
-        txtTotalIncome = view.findViewById(R.id.txt_total_income);
-        txtTotalOutcome = view.findViewById(R.id.txt_total_outcome);
-        txtCurrentBalance = view.findViewById(R.id.txt_current_balance);
+        // Setup RecyclerView
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
+        rvAccounts.setLayoutManager(layoutManager);
+        List<Account> accountList = accountService.getListAccounts();
+        if (accountList == null) {
+            accountList = new ArrayList<>();
+        }
+        // Limit to 2 accounts
+        List<Account> limitedList = accountList.size() > 2 ? accountList.subList(0, 2) : accountList;
+        accountAdapter = new AccountAdapter(requireContext(), limitedList, (account, position) -> {
+            // Handle account click if needed
+        }, true); // Use card view
+        rvAccounts.setAdapter(accountAdapter);
 
-        // --- Initialize New Account UI Elements ---
-        scrollViewAccounts = view.findViewById(R.id.scroll_view_accounts);
+        // Update visibility of no accounts message
+        tvNoAccounts.setVisibility(accountList.isEmpty() ? View.VISIBLE : View.GONE);
+        rvAccounts.setVisibility(accountList.isEmpty() ? View.GONE : View.VISIBLE);
 
+        // View All Button
+        btnViewAll.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), ViewAllAccountsActivity.class);
+            startActivity(intent);
+        });
 
-
-        // General Account
-        layoutGeneralAccountDetails = view.findViewById(R.id.layout_general_account_details);
-        txtGeneralAccountName = view.findViewById(R.id.txt_general_account_name);
-        txtGeneralAccountBalance = view.findViewById(R.id.txt_general_account_balance);
-
-        // Card Account
-        layoutCardAccountDetails = view.findViewById(R.id.layout_card_account_details);
-        txtCardName = view.findViewById(R.id.txt_card_name);
-        txtCardLast4 = view.findViewById(R.id.txt_card_last4);
-        txtCardCurrentBalance = view.findViewById(R.id.txt_card_current_balance);
-        txtCardCreditLimit = view.findViewById(R.id.txt_card_credit_limit);
-        txtCardAvailableBalance = view.findViewById(R.id.txt_card_available_balance);
-
-        // Bank Account
-        layoutBankAccountDetails = view.findViewById(R.id.layout_bank_account_details);
-        txtBankName = view.findViewById(R.id.txt_bank_name);
-        txtBankAccountLast4 = view.findViewById(R.id.txt_bank_account_last4);
-        txtBankAccountBalance = view.findViewById(R.id.txt_bank_account_balance);
-
-
-        setupListeners();
-        updateDateFilterDisplay();
-        loadTransactionSummary();
-        loadAccountsData(); // New method call
+        // Add Account Button
+        btnAdd.setOnClickListener(v -> showAddAccountDialog());
 
         return view;
-
     }
 
-    private void setupListeners() {
-        btnCalendar.setOnClickListener(v -> showDatePickerDialog());
-        btnPreviousPeriod.setOnClickListener(v -> changePeriod(-1));
-        btnNextPeriod.setOnClickListener(v -> changePeriod(1));
-        txtDateFilterDisplay.setOnClickListener(v -> showDatePickerDialog()); // Allow clicking the text too
+    private void showAddAccountDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView = inflater.inflate(R.layout.dialog_add_account, null);
+        builder.setView(dialogView);
+
+        EditText etAccountName = dialogView.findViewById(R.id.et_account_name);
+        EditText etInitialBalance = dialogView.findViewById(R.id.et_initial_balance);
+
+        builder.setTitle("Add Account")
+                .setPositiveButton("Add", (dialog, which) -> {
+                    String name = etAccountName.getText().toString().trim();
+                    String balanceStr = etInitialBalance.getText().toString().trim();
+                    double balance;
+                    try {
+                        balance = balanceStr.isEmpty() ? 0.0 : Double.parseDouble(balanceStr);
+                        if (balance < 0) {
+                            throw new NumberFormatException("Negative balance");
+                        }
+                    } catch (NumberFormatException e) {
+                        // Toast is handled by AccountService
+                        return;
+                    }
+
+                    Account account = new Account(name, balance);
+                    if (accountService.addAccount(account)) {
+                        dataManager.saveData();
+                        refreshAccounts();
+                    }
+                })
+                .setNegativeButton("Cancel", null);
+
+        builder.create().show();
+    }
+
+    private void refreshAccounts() {
+        List<Account> accountList = accountService.getListAccounts();
+        if (accountList == null) {
+            accountList = new ArrayList<>();
+        }
+        List<Account> limitedList = accountList.size() > 2 ? accountList.subList(0, 2) : accountList;
+        accountAdapter.updateAccounts(limitedList);
+        tvNoAccounts.setVisibility(accountList.isEmpty() ? View.VISIBLE : View.GONE);
+        rvAccounts.setVisibility(accountList.isEmpty() ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshAccounts();
+    }
+
+    private void initializeDateFormats() {
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    }
+
+    private void initializeViews(View view) {
+        btnAdd = view.findViewById(R.id.btn_add);
+        btnCalendar = view.findViewById(R.id.btn_calendar);
+        btnAdd = view.findViewById(R.id.btn_add);
+        btnSetting = view.findViewById(R.id.btnSetting);
+        btnPreviousPeriod = view.findViewById(R.id.btnPreviousPeriod);
+        btnNextPeriod = view.findViewById(R.id.btnNextPeriod);
+        txtDateFilterDisplay = view.findViewById(R.id.txt_date_filter_display);
+    }
+
+    private void setupClickListeners() {
+        btnSetting.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SettingActivity.class);
+            startActivity(intent);
+        });
+        btnAdd.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), AddTransactionActivity.class);
+            startActivity(intent);
+        });
+
+        btnCalendar.setOnClickListener(v-> showPeriodSelectionDialog());
+        txtDateFilterDisplay.setOnClickListener(v -> showPeriodSelectionDialog());
+        btnPreviousPeriod.setOnClickListener(v -> navigatePeriod(-1));
+        btnNextPeriod.setOnClickListener(v -> navigatePeriod(1));
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (startDate != null) {
+            outState.putLong(START_DATE_KEY, startDate.getTimeInMillis());
+        }
+        if (endDate != null) {
+            outState.putLong(END_DATE_KEY, endDate.getTimeInMillis());
+        }
+        outState.putSerializable(FILTER_TYPE_KEY, currentFilterType);
+    }
+
+    private void restoreInstanceState(@NonNull Bundle savedInstanceState) {
+        if (savedInstanceState.containsKey(START_DATE_KEY)) {
+            startDate = Calendar.getInstance();
+            startDate.setTimeInMillis(savedInstanceState.getLong(START_DATE_KEY));
+        }
+        if (savedInstanceState.containsKey(END_DATE_KEY)) {
+            endDate = Calendar.getInstance();
+            endDate.setTimeInMillis(savedInstanceState.getLong(END_DATE_KEY));
+        }
+        if (savedInstanceState.containsKey(FILTER_TYPE_KEY)) {
+            currentFilterType = (FilterType) savedInstanceState.getSerializable(FILTER_TYPE_KEY);
+            if (currentFilterType == null) currentFilterType = FilterType.THIS_MONTH;
+        }
+    }
+
+    private void showPeriodSelectionDialog() {
+        final CharSequence[] items = {"This Month", "Last Month", "Last 7 Days", "Last 30 Days", "Custom Range..."};
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Select Time Period");
+        builder.setItems(items, (dialog, item) -> {
+            FilterType selectedType = null;
+            if (items[item].equals("This Month")) selectedType = FilterType.THIS_MONTH;
+            else if (items[item].equals("Last Month")) selectedType = FilterType.LAST_MONTH;
+            else if (items[item].equals("Last 7 Days")) selectedType = FilterType.LAST_7_DAYS;
+            else if (items[item].equals("Last 30 Days")) selectedType = FilterType.LAST_30_DAYS;
+            else if (items[item].equals("Custom Range...")) {
+                showCustomDateRangePicker();
+                return;
+            }
+
+            if (selectedType != null) {
+                applyFilter(selectedType, true);
+            }
+        });
+        builder.show();
+    }
+
+    private void applyFilter(FilterType filterType, boolean loadData) {
+        currentFilterType = filterType;
+        Calendar newStartDate = Calendar.getInstance();
+        Calendar newEndDate = Calendar.getInstance();
+
+        switch (filterType) {
+            case THIS_MONTH:
+                newStartDate.set(Calendar.DAY_OF_MONTH, 1);
+                newEndDate.set(Calendar.DAY_OF_MONTH, newEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                break;
+
+            case LAST_MONTH:
+                newStartDate.add(Calendar.MONTH, -1);
+                newStartDate.set(Calendar.DAY_OF_MONTH, 1);
+                newEndDate.add(Calendar.MONTH, -1);
+                newEndDate.set(Calendar.DAY_OF_MONTH, newEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                break;
+
+            case LAST_7_DAYS:
+                newStartDate.add(Calendar.DAY_OF_YEAR, -6);
+                break;
+
+            case LAST_30_DAYS:
+                newStartDate.add(Calendar.DAY_OF_YEAR, -29);
+                break;
+
+            case CUSTOM_RANGE:
+                if (this.startDate == null || this.endDate == null) {
+                    Log.w(TAG, "Custom range applied but startDate or endDate is null. Defaulting to THIS_MONTH.");
+                    applyFilter(FilterType.THIS_MONTH, loadData);
+                    return;
+                }
+                newStartDate.setTimeInMillis(this.startDate.getTimeInMillis());
+                newEndDate.setTimeInMillis(this.endDate.getTimeInMillis());
+                break;
+        }
+
+        if (filterType != FilterType.CUSTOM_RANGE) {
+            setCalendarToBeginningOfDay(newStartDate);
+            setCalendarToEndOfDay(newEndDate);
+        }
+
+        this.startDate = newStartDate;
+        this.endDate = newEndDate;
+
+        updateDateFilterDisplay();
+
+        if (loadData) {
+            loadDataForCurrentPeriod();
+        }
     }
 
     private void updateDateFilterDisplay() {
-        txtDateFilterDisplay.setText(monthYearFormat.format(currentMonthCalendar.getTime()));
+        if (startDate == null || endDate == null || txtDateFilterDisplay == null) {
+            Log.w(TAG, "Cannot update display, dates or TextView is null.");
+            if (txtDateFilterDisplay != null) txtDateFilterDisplay.setText("Select Period");
+            return;
+        }
+
+        String displayText;
+        if (currentFilterType == FilterType.THIS_MONTH || currentFilterType == FilterType.LAST_MONTH) {
+            // For THIS_MONTH and LAST_MONTH, show only year and month (yyyy-MM)
+            String monthYear = new SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(startDate.getTime());
+            displayText = monthYear;
+        } else if (isSameDay(startDate, endDate)) {
+            // For single-day custom range, show only one date
+            displayText = dateFormat.format(startDate.getTime());
+        } else {
+            // For other cases (LAST_7_DAYS, LAST_30_DAYS, or multi-day CUSTOM_RANGE)
+            displayText = String.format(Locale.getDefault(), "%s - %s",
+                    dateFormat.format(startDate.getTime()),
+                    dateFormat.format(endDate.getTime()));
+        }
+        txtDateFilterDisplay.setText(displayText);
     }
 
-    private void changePeriod(int monthOffset) {
-        currentMonthCalendar.add(Calendar.MONTH, monthOffset);
+    private void showCustomDateRangePicker() {
+        MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
+        builder.setTitleText("Select Date Range");
+
+        long initialStart = startDate != null && currentFilterType == FilterType.CUSTOM_RANGE ?
+                startDate.getTimeInMillis() : MaterialDatePicker.todayInUtcMilliseconds();
+        long initialEnd = endDate != null && currentFilterType == FilterType.CUSTOM_RANGE ?
+                endDate.getTimeInMillis() : MaterialDatePicker.todayInUtcMilliseconds();
+
+        if (initialStart > initialEnd) initialStart = initialEnd;
+
+        builder.setSelection(new Pair<>(initialStart, initialEnd));
+
+        final MaterialDatePicker<Pair<Long, Long>> datePicker = builder.build();
+
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            if (selection.first != null && selection.second != null) {
+                currentFilterType = FilterType.CUSTOM_RANGE;
+
+                this.startDate = Calendar.getInstance();
+                this.startDate.setTimeInMillis(selection.first);
+                setCalendarToBeginningOfDay(this.startDate);
+
+                this.endDate = Calendar.getInstance();
+                this.endDate.setTimeInMillis(selection.second);
+                setCalendarToEndOfDay(this.endDate);
+
+                updateDateFilterDisplay();
+                loadDataForCurrentPeriod();
+            } else {
+                Log.w(TAG, "Date range picker returned null selection.");
+                Toast.makeText(getContext(), "Invalid date range selected.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        datePicker.show(getParentFragmentManager(), "MATERIAL_DATE_RANGE_PICKER");
+    }
+
+    private void navigatePeriod(int direction) {
+        if (startDate == null || endDate == null) {
+            Log.w(TAG, "Cannot navigate period, dates are null.");
+            return;
+        }
+
+        Calendar navStartDate = (Calendar) startDate.clone();
+        Calendar navEndDate = (Calendar) endDate.clone();
+
+        switch (currentFilterType) {
+            case THIS_MONTH:
+            case LAST_MONTH:
+                navStartDate.add(Calendar.MONTH, direction);
+                navStartDate.set(Calendar.DAY_OF_MONTH, 1);
+                navEndDate.setTime(navStartDate.getTime());
+                navEndDate.set(Calendar.DAY_OF_MONTH, navEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                break;
+            case LAST_7_DAYS:
+                navStartDate.add(Calendar.DAY_OF_YEAR, 7 * direction);
+                navEndDate.add(Calendar.DAY_OF_YEAR, 7 * direction);
+                break;
+            case LAST_30_DAYS:
+                navStartDate.add(Calendar.DAY_OF_YEAR, 30 * direction);
+                navEndDate.add(Calendar.DAY_OF_YEAR, 30 * direction);
+                break;
+            case CUSTOM_RANGE:
+                long duration = endDate.getTimeInMillis() - startDate.getTimeInMillis();
+                if (duration <= 0) {
+                    duration = 24 * 60 * 60 * 1000L;
+                }
+                navStartDate.add(Calendar.MILLISECOND, (int) (duration * direction));
+                navEndDate.add(Calendar.MILLISECOND, (int) (duration * direction));
+                break;
+        }
+
+        this.startDate = navStartDate;
+        this.endDate = navEndDate;
+        setCalendarToBeginningOfDay(this.startDate);
+        setCalendarToEndOfDay(this.endDate);
+
         updateDateFilterDisplay();
-        loadTransactionSummary();
+        loadDataForCurrentPeriod();
     }
 
-    private void showDatePickerDialog() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                requireContext(),
-                (view, year, month, dayOfMonth) -> {
-                    currentMonthCalendar.set(Calendar.YEAR, year);
-                    currentMonthCalendar.set(Calendar.MONTH, month);
-                    // We are filtering by month, so day is less relevant here unless you change logic
-                    currentMonthCalendar.set(Calendar.DAY_OF_MONTH, 1); // Set to first day for consistency
-                    updateDateFilterDisplay();
-                    loadTransactionSummary();
-                },
-                currentMonthCalendar.get(Calendar.YEAR),
-                currentMonthCalendar.get(Calendar.MONTH),
-                currentMonthCalendar.get(Calendar.DAY_OF_MONTH)
-        );
-        datePickerDialog.show();
-    }
-
-    private void loadTransactionSummary() {
-        if (currentUser == null) {
-            Toast.makeText(getContext(), "User not logged in.", Toast.LENGTH_SHORT).show();
-            // Optionally, navigate to login screen
-            clearSummary(); // Clear previous data
+    private void loadDataForCurrentPeriod() {
+        if (startDate == null || endDate == null) {
+            Log.e(TAG, "Cannot load data: startDate or endDate is null.");
+            Toast.makeText(getContext(), "Error: Date range not set.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Define the start and end of the current month for querying
-        Calendar startOfMonth = (Calendar) currentMonthCalendar.clone();
-        startOfMonth.set(Calendar.DAY_OF_MONTH, 1);
-        startOfMonth.set(Calendar.HOUR_OF_DAY, 0);
-        startOfMonth.set(Calendar.MINUTE, 0);
-        startOfMonth.set(Calendar.SECOND, 0);
-        startOfMonth.set(Calendar.MILLISECOND, 0);
-        Date startDate = startOfMonth.getTime();
-
-        Calendar endOfMonth = (Calendar) currentMonthCalendar.clone();
-        endOfMonth.set(Calendar.DAY_OF_MONTH, endOfMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
-        endOfMonth.set(Calendar.HOUR_OF_DAY, 23);
-        endOfMonth.set(Calendar.MINUTE, 59);
-        endOfMonth.set(Calendar.SECOND, 59);
-        endOfMonth.set(Calendar.MILLISECOND, 999);
-        Date endDate = endOfMonth.getTime();
-
-        Log.d(TAG, "Fetching transactions for user: " + currentUser.getUid() + " from " + startDate + " to " + endDate);
-
-        // Assumes your "transactions" collection and documents have a "userId" field
-        // and a "date" field of type Timestamp (or a String that can be compared lexicographically if you haven't changed it yet)
-        db.collection("transactions")
-                .whereEqualTo("userId", currentUser.getUid()) // Filter by current user
-                .whereGreaterThanOrEqualTo("date", startDate) // Use the Date objects
-                .whereLessThanOrEqualTo("date", endDate)
-                .orderBy("date", Query.Direction.DESCENDING) // Optional: order by date
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        double totalIncome = 0;
-                        double totalOutcome = 0;
-                        List<Transaction> transactions = new ArrayList<>();
-
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            try {
-                                Transaction transaction = document.toObject(Transaction.class);
-                                // Important: Set the ID from the document if not done in toObject()
-                                transaction.setTransactionId(document.getId());
-                                transactions.add(transaction);
-
-                                if ("INCOME".equalsIgnoreCase(transaction.getType())) {
-                                    totalIncome += transaction.getAmount();
-                                } else if ("OUTCOME".equalsIgnoreCase(transaction.getType())) {
-                                    totalOutcome += transaction.getAmount();
-                                }
-                                // "TRANSFER" transactions affect balance but might not be directly summed as income/outcome
-                                // depending on your accounting. For this summary, we focus on Income/Outcome.
-
-                            } catch (Exception e) {
-                                Log.e(TAG, "Error parsing transaction: " + document.getId(), e);
-                            }
-                        }
-                        updateSummaryUI(totalIncome, totalOutcome);
-                        // TODO: You can pass the 'transactions' list to a RecyclerView adapter here
-                    } else {
-                        Log.w(TAG, "Error getting documents: ", task.getException());
-                        Toast.makeText(getContext(), "Error fetching transactions.", Toast.LENGTH_SHORT).show();
-                        clearSummary();
-                    }
-                });
+        Log.i(TAG, "Loading data for period: " +
+                dateFormat.format(startDate.getTime()) + " to " +
+                dateFormat.format(endDate.getTime()));
+        Toast.makeText(getContext(), "Filtering: " + txtDateFilterDisplay.getText(), Toast.LENGTH_SHORT).show();
     }
 
-    private void updateSummaryUI(double income, double outcome) {
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(); // Uses default locale
-
-        txtTotalIncome.setText(currencyFormat.format(income));
-        txtTotalOutcome.setText(currencyFormat.format(outcome));
-
-        double balance = income - outcome;
-        txtCurrentBalance.setText(currencyFormat.format(balance));
-
-        // Set balance text color based on positive/negative
-        if (balance >= 0) {
-            txtCurrentBalance.setTextColor(getResources().getColor(android.R.color.holo_green_dark)); // Or your theme's positive color
-        } else {
-            txtCurrentBalance.setTextColor(getResources().getColor(android.R.color.holo_red_dark)); // Or your theme's negative color
-        }
+    private void setCalendarToBeginningOfDay(Calendar cal) {
+        if (cal == null) return;
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
     }
 
-    private void clearSummary() {
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
-        txtTotalIncome.setText(currencyFormat.format(0));
-        txtTotalOutcome.setText(currencyFormat.format(0));
-        txtCurrentBalance.setText(currencyFormat.format(0));
-        txtCurrentBalance.setTextColor(getResources().getColor(android.R.color.black)); // Reset color
+    private void setCalendarToEndOfDay(Calendar cal) {
+        if (cal == null) return;
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
     }
 
-
-    private void loadAccountsData() {
-        if (currentUser == null) {
-            // Hide account sections if user is not logged in
-            layoutGeneralAccountDetails.setVisibility(View.GONE);
-            layoutCardAccountDetails.setVisibility(View.GONE);
-            layoutBankAccountDetails.setVisibility(View.GONE);
-            return;
-        }
-        String userId = currentUser.getUid();
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
-
-        // --- Load General Account (Example: fetch first one or a specific one) ---
-        // For simplicity, fetching one document. For multiple, use a collection query.
-        // Assume you have a collection "accounts" and each doc has a "type":"GENERAL" field
-        // or a dedicated collection like "general_accounts"
-        db.collection("accounts") // Or your specific collection for general accounts
-                .whereEqualTo("userId", userId)
-                .whereEqualTo("type", "GENERAL") // Assuming you use a type field
-                .limit(1) // Get the first one for this example
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        Account account = task.getResult().getDocuments().get(0).toObject(Account.class);
-                        if (account != null) {
-                            txtGeneralAccountName.setText(account.getAccountName());
-                            txtGeneralAccountBalance.setText(currencyFormat.format(account.getBalance()));
-                            layoutGeneralAccountDetails.setVisibility(View.VISIBLE);
-                        } else {
-                            layoutGeneralAccountDetails.setVisibility(View.GONE);
-                        }
-                    } else {
-                        layoutGeneralAccountDetails.setVisibility(View.GONE); // Hide if no data or error
-                        if (task.getException() != null) {
-                            Log.w(TAG, "Error getting general account.", task.getException());
-                        }
-                    }
-                });
-
-        // --- Load Card Account (Example: fetch first one) ---
-        db.collection("card_accounts") // Assuming a collection "card_accounts"
-                .whereEqualTo("userId", userId)
-                .limit(1)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        CardAccount card = task.getResult().getDocuments().get(0).toObject(CardAccount.class);
-                        if (card != null) {
-                            txtCardName.setText(card.getCardName());
-                            txtCardLast4.setText("**** " + card.getLast4Digits());
-                            txtCardCurrentBalance.setText("Current Balance: " + currencyFormat.format(card.getCurrentBalance()));
-                            txtCardCreditLimit.setText("Credit Limit: " + currencyFormat.format(card.getCreditLimit()));
-                            txtCardAvailableBalance.setText("Available: " + currencyFormat.format(card.getAvailableBalance()));
-                            layoutCardAccountDetails.setVisibility(View.VISIBLE);
-                        } else {
-                            layoutCardAccountDetails.setVisibility(View.GONE);
-                        }
-                    } else {
-                        layoutCardAccountDetails.setVisibility(View.GONE);
-                        if (task.getException() != null) {
-                            Log.w(TAG, "Error getting card account.", task.getException());
-                        }
-                    }
-                });
-
-
-        // --- Load Bank Account (Example: fetch first one) ---
-        db.collection("bank_accounts") // Assuming a collection "bank_accounts"
-                .whereEqualTo("userId", userId)
-                .limit(1)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        BankAccount bank = task.getResult().getDocuments().get(0).toObject(BankAccount.class);
-                        if (bank != null) {
-                            txtBankName.setText(bank.getBankName());
-                            txtBankAccountLast4.setText("Acct: **** " + bank.getAccountNumberLast4());
-                            txtBankAccountBalance.setText("Balance: " + currencyFormat.format(bank.getBalance()));
-                            layoutBankAccountDetails.setVisibility(View.VISIBLE);
-                        } else {
-                            layoutBankAccountDetails.setVisibility(View.GONE);
-                        }
-                    } else {
-                        layoutBankAccountDetails.setVisibility(View.GONE);
-                        if (task.getException() != null) {
-                            Log.w(TAG, "Error getting bank account.", task.getException());
-                        }
-                    }
-                });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Reload data if the user might have changed or data might be stale
-        // This is a simple approach; for more complex scenarios, consider LiveData or other reactive patterns.
-        currentUser = mAuth.getCurrentUser(); // Refresh current user
-        if (currentUser != null) {
-            loadTransactionSummary();
-        } else {
-            clearSummary();
-            // Optionally, navigate to login
-        }
+    private boolean isSameDay(Calendar cal1, Calendar cal2) {
+        if (cal1 == null || cal2 == null) return false;
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
+                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
     }
 }
