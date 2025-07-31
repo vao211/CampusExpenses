@@ -43,7 +43,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private CategoryService categoryService;
     private TransactionService transactionService;
     private ImageButton btnClose, btnSubmit;
-    private LinearLayout llIncome, llOutcome, llTransfer, llDatePicker, llSelectCategory, llSelectAccount, llSelectToAccount, llDescription;
+    private LinearLayout llIncome, llOutcome, llTransfer, llDatePicker, llSelectCategory, llSelectAccount, llSelectToAccount;
     private TextView txtDate, txtSelectedCategory, txtSelectedAccount, txtSelectedToAccount, txtSelectToAccount;
     private EditText edtAmount, edtDescription;
     private String transactionType;
@@ -63,7 +63,6 @@ public class AddTransactionActivity extends AppCompatActivity {
         llSelectCategory = findViewById(R.id.ll_select_category);
         llSelectAccount = findViewById(R.id.ll_select_account);
         llSelectToAccount = findViewById(R.id.ll_select_to_account);
-        llDescription = findViewById(R.id.ll_description);
         txtDate = findViewById(R.id.txt_date);
         txtSelectedCategory = findViewById(R.id.txt_selected_category);
         txtSelectedAccount = findViewById(R.id.txt_selected_account);

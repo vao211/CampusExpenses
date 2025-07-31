@@ -20,6 +20,11 @@
     <string name="transaction">Transaction</string>
     <string name="analysis">Analysis</string>
     <string name="home">Home</string>
+    <string name="last_month">Last Month</string>
+    <string name="last_7_days">Last 7 Days</string>
+    <string name="last_30_days">Last 30 Days</string>
+    <string name="custom_range">Custom Range</string>
+    <string name="date_range_error">Date range is not selected</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="budget">Budget</string>
@@ -77,4 +82,7 @@
     <string name="select_to_account">Select To Account</string>
     <string name="to_account">To Account</string>
     <string name="add">Add</string>
+    <string name="all">Get all</string>
+    <string name="account">Account</string>
+    <string name="transaction_type">transaction type</string>
 </resources>

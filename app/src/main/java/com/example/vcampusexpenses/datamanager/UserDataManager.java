@@ -62,31 +62,33 @@ public class UserDataManager {
         return userId;
     }
 
+    private void createSampleData(){
+        Map<String, Account> accounts = new HashMap<>();
+        String accountId = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
+        String accountId2 = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
+        accounts.put(accountId, new Account(accountId, "Cash", 0.0));
+        accounts.put(accountId2, new Account(accountId2, "Bank", 0.0));
+
+        Map<String, Category> categories = new HashMap<>();
+        String[] categoryNames = {"Ăn uống", "Sức khỏe", "Internet", "Tiền điện", "Tiền nước", "Tiền Lương"};
+        for (String name : categoryNames) {
+            String categoryId = IdGenerator.generateId(IdGenerator.ModelType.CATEGORY);
+            categories.put(categoryId, new Category(categoryId, name));
+        }
+
+        Map<String, Budget> budgets = new HashMap<>();
+        Map<String, com.example.vcampusexpenses.model.Transaction> transactions = new HashMap<>();
+        Data data = new Data(accounts, categories, budgets, transactions);
+        userData = new UserData(new User(userId, data));
+        saveData();
+    }
     private void initializeFile(String userId) {
         if (!file.exists()) {
-            Map<String, Account> accounts = new HashMap<>();
-            String accountId = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
-            String accountId2 = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
-            accounts.put(accountId, new Account(accountId, "Cash", 0.0));
-            accounts.put(accountId2, new Account(accountId2, "Bank", 0.0));
-
-            Map<String, Category> categories = new HashMap<>();
-            String[] categoryNames = {"Ăn uống", "Sức khỏe", "Internet", "Tiền điện", "Tiền nước", "Tiền Lương"};
-            for (String name : categoryNames) {
-                String categoryId = IdGenerator.generateId(IdGenerator.ModelType.CATEGORY);
-                categories.put(categoryId, new Category(categoryId, name));
-            }
-
-            Map<String, Budget> budgets = new HashMap<>();
-            Map<String, com.example.vcampusexpenses.model.Transaction> transactions = new HashMap<>();
-            Data data = new Data(accounts, categories, budgets, transactions);
-            userData = new UserData(new User(userId, data));
-            saveData();
+            createSampleData();
         } else if (userData == null || !userData.getUser().getUserId().equals(userId)) {
             loadData();
             if (userData == null || !userData.getUser().getUserId().equals(userId)) {
-                userData = new UserData(new User(userId, new Data(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>())));
-                saveData();
+                createSampleData();
             }
         }
     }
