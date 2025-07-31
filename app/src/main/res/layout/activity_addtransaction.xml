@@ -299,7 +299,6 @@
             android:layout_marginStart="20dp" />
     </LinearLayout>
 
-    <!-- Thêm TextView và LinearLayout cho tài khoản đích -->
     <TextView
         android:id="@+id/txt_select_to_account"
         android:layout_width="wrap_content"
