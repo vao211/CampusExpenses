@@ -3,6 +3,7 @@ package com.example.vcampusexpenses.services;
 import android.util.Log;
 
 import com.example.vcampusexpenses.datamanager.UserDataManager;
+import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.model.Budget;
@@ -28,7 +29,21 @@ public class CategoryService {
         this.userId = dataManager.getUserId();
         Log.d("CategoryService", "Initialized with userId: " + userId);
     }
-
+    public Category getCategory(String categoryId) {
+        Log.d("Category Service", "Getting category for categoryId: " + categoryId);
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            Log.e("Category Service", "User data not initialized");
+            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            return null;
+        }
+        Map<String, Category> categories = userData.getUser().getData().getCategories();
+        if (categories == null || !categories.containsKey(categoryId)) {
+            Log.w("Category Service", "Category not found: " + categoryId);
+            DisplayToast.Display(dataFile.getContext(), "Category not found: " + categoryId);
+            return null;
+        }
+        return categories.get(categoryId);
+    }
     public void addCategory(Category category) {
         Log.d("CategoryService", "Adding category: " + (category != null ? category.getName() : "null"));
         if (category == null || category.getName() == null || category.getName().trim().isEmpty()) {
