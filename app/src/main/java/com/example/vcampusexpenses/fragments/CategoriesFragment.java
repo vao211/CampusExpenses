@@ -1,6 +1,7 @@
 package com.example.vcampusexpenses.fragments;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.activity.ChartCategoryActivity;
 import com.example.vcampusexpenses.adapters.CategoryAdapter;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Transaction;
@@ -39,7 +41,7 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
     private RecyclerView recyclerViewCategories;
     private TextView txtEmptyCategories;
     private CategoryService categoryService;
-    private ImageButton btnAddCategory;
+    private ImageButton btnAddCategory, btnChart;
     private UserDataManager dataManager;
 
     @Override
@@ -48,6 +50,7 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
         recyclerViewCategories = view.findViewById(R.id.rv_category);
         txtEmptyCategories = view.findViewById(R.id.txt_empty_categories);
         btnAddCategory = view.findViewById(R.id.btn_add_category);
+        btnChart = view.findViewById(R.id.btn_chart);
 
         SessionManager sessionManager = new SessionManager(requireContext());
         String userId = sessionManager.getUserId();
@@ -56,6 +59,7 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
 
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(requireContext()));
         addCategory();
+        goToChart();
         return view;
     }
 
@@ -63,6 +67,12 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadCategories();
+    }
+    private void goToChart(){
+        btnChart.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), ChartCategoryActivity.class);
+            startActivity(intent);
+        });
     }
     private void addCategory() {
         btnAddCategory.setOnClickListener(v -> {

@@ -87,4 +87,5 @@
     <string name="transaction_type">transaction type</string>
     <string name="no_transactions_found">No transactions found</string>
     <string name="edit_transaction">Edit transaction</string>
+    <string name="chart_for_category">Chart for category</string>
 </resources>
