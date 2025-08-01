@@ -30,7 +30,21 @@ public class BudgetService {
         this.userId = dataManager.getUserId();
         Log.d("BudgetService", "Initialized with userId: " + userId);
     }
-
+    public Budget getBudget(String budgetId) {
+        Log.d("BudgetService", "Getting budget: " + budgetId);
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            Log.e("BudgetService", "User data not initialized");
+            return null;
+        }
+        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        if (budgets == null || !budgets.containsKey(budgetId)) {
+            Log.e("BudgetService", "Budget not found: " + budgetId);
+            return null;
+        }
+        Budget budget = budgets.get(budgetId);
+        Log.d("BudgetService", "Budget found: " + budget.getName());
+        return budget;
+    }
     public String getBudgetId(String budgetName) {
         Log.d("BudgetService", "Getting budgetId for budgetName: " + budgetName);
         if (budgetName == null || budgetName.trim().isEmpty()) {
