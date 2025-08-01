@@ -7,17 +7,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.vcampusexpenses.R;
-import com.example.vcampusexpenses.activity.AddTransactionActivity;
+import com.example.vcampusexpenses.activity.TransactionActivity;
 import com.example.vcampusexpenses.activity.SettingActivity;
 import com.example.vcampusexpenses.utils.DateFilterUtil;
 import com.example.vcampusexpenses.utils.DateFilterView;
-import com.example.vcampusexpenses.utils.DisplayToast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -64,7 +62,7 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
         btnAdd.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AddTransactionActivity.class);
+            Intent intent = new Intent(getActivity(), TransactionActivity.class);
             startActivity(intent);
         });
     }
