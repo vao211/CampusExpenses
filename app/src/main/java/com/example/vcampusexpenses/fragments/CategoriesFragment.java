@@ -17,12 +17,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.adapters.CategoryAdapter;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
+import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.model.Category;
+import com.example.vcampusexpenses.services.TransactionService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCategoryClickListener {
     private RecyclerView recyclerViewCategories;
@@ -53,7 +64,6 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
         super.onViewCreated(view, savedInstanceState);
         loadCategories();
     }
-
     private void addCategory() {
         btnAddCategory.setOnClickListener(v -> {
             Log.d("CategoriesFragment", "Adding new category");
@@ -104,6 +114,7 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
             Log.d("CategoriesFragment", "Found " + categoryList.size() + " categories");
             txtEmptyCategories.setVisibility(View.GONE);
             recyclerViewCategories.setVisibility(View.VISIBLE);
+            //tạo lại adapter để hiển thị danh sách mới
             CategoryAdapter categoryAdapter = new CategoryAdapter(categoryList, this);
             recyclerViewCategories.setAdapter(categoryAdapter);
         }
@@ -149,7 +160,6 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
                     categoryService.deleteCategory(categoryId);
                     dataManager.saveData();//Lưu data sau khi xóa danh mục
                     Log.d("CategoriesFragment", "Category deleted: " + categoryId);
-                    loadCategories();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
                     Log.d("CategoriesFragment", "Delete category cancelled");
