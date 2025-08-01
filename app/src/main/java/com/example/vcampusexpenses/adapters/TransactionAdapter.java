@@ -16,7 +16,9 @@ import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.services.AccountService;
 import com.example.vcampusexpenses.services.CategoryService;
+import com.example.vcampusexpenses.services.SettingService;
 import com.example.vcampusexpenses.services.TransactionService;
+import com.example.vcampusexpenses.session.SessionManager;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -69,9 +71,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     class TransactionViewHolder extends RecyclerView.ViewHolder {
-        TextView txtCategoryName, txtAccountName, txtToAccountName, txtTypeTransaction, txtAmount;
+        TextView txtCategoryName, txtAccountName, txtToAccountName, txtTypeTransaction, txtAmount, txtCurrency;
         ImageButton btnEdit, btnDelete;
-
+        SettingService settingService;
         TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
             txtCategoryName = itemView.findViewById(R.id.txt_category_name);
@@ -79,13 +81,15 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             txtToAccountName = itemView.findViewById(R.id.txt_to_account_name);
             txtTypeTransaction = itemView.findViewById(R.id.txt_type_transaction);
             txtAmount = itemView.findViewById(R.id.txt_amount);
+            txtCurrency = itemView.findViewById(R.id.txt_type_currency);
             btnEdit = itemView.findViewById(R.id.btn_editItemTransaction);
             btnDelete = itemView.findViewById(R.id.btn_deleteItemTransaction);
+            settingService = new SettingService(itemView.getContext());
         }
 
         void bind(Transaction transaction) {
             txtTypeTransaction.setText(transaction.getType());
-
+            txtCurrency.setText(settingService.getCurrency());
             txtAmount.setText(String.valueOf(transaction.getAmount()));
 
             if (transaction.isTransfer()) {

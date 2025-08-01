@@ -90,6 +90,16 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/currency"
+        android:id="@+id/txt_type_currency"
+        app:layout_constraintStart_toEndOf="@id/txt_amount"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_type_transaction"
+        android:layout_marginStart="5dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/txt_amount"
         app:layout_constraintTop_toBottomOf="@id/txt_type_transaction"
         app:layout_constraintBottom_toBottomOf="parent"

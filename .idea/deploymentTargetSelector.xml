@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-07-29T14:04:27.321903792Z">
+        <DropdownSelection timestamp="2025-08-01T08:22:10.045367446Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/vubuntu/.android/avd/Pixel_2.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/ploict/.config/.android/avd/Pixel_2.avd" />
             </handle>
           </Target>
         </DropdownSelection>

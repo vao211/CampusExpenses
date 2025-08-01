@@ -1,7 +1,5 @@
 package com.example.vcampusexpenses.activity;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -27,8 +25,7 @@ import com.example.vcampusexpenses.authentication.FireBaseAuthen;
 import com.example.vcampusexpenses.authentication.GuestAuthen;
 import com.example.vcampusexpenses.services.SettingService;
 import com.example.vcampusexpenses.session.SessionManager;
-
-import java.util.Objects;
+import com.example.vcampusexpenses.utils.DisplayToast;
 
 public class SettingActivity extends AppCompatActivity {
     Button btn_login;
@@ -59,7 +56,8 @@ public class SettingActivity extends AppCompatActivity {
         txt_email = findViewById(R.id.txt_email);
         settingService = new SettingService(this);
 
-       requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+       requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+               isGranted -> {
             if (isGranted) {
                 Log.d("Setting activity", "POST_NOTIFICATIONS permission granted");
                 settingService.setNotification(true);
@@ -75,8 +73,9 @@ public class SettingActivity extends AppCompatActivity {
         loadSetting();
         setNotification();
         setCurrency();
+        feedback();
         about();
-        sendFeedback();
+        feedback();
         goToLogin();
         backToMain();
         LogOut();
@@ -94,9 +93,15 @@ public class SettingActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
-    private void sendFeedback(){
+    private void feedback(){
         btn_feedback.setOnClickListener(v -> {
-
+            String url = "https://forms.gle/VWamV1aJP49A3gWP6";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            try {
+                startActivity(intent);
+            } catch (Exception e) {
+                DisplayToast.Display(this, "No browser found");
+            }
         });
     }
     private void setCurrency(){
