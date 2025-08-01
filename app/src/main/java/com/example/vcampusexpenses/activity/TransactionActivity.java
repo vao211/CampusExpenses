@@ -2,10 +2,12 @@ package com.example.vcampusexpenses.activity;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -34,23 +36,24 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class AddTransactionActivity extends AppCompatActivity {
+public class TransactionActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private UserDataManager dataManager;
     private AccountService accountService;
     private CategoryService categoryService;
     private TransactionService transactionService;
     private ImageButton btnClose, btnSubmit;
-    private LinearLayout llIncome, llOutcome, llTransfer, llDatePicker, llSelectCategory, llSelectAccount, llSelectToAccount, llDescription;
-    private TextView txtDate, txtSelectedCategory, txtSelectedAccount, txtSelectedToAccount, txtSelectToAccount;
+    private LinearLayout llIncome, llOutcome, llTransfer, llDatePicker, llSelectCategory, llSelectAccount, llSelectToAccount;
+    private TextView txtDate, txtSelectedCategory, txtSelectedAccount, txtSelectedToAccount, txtSelectToAccount, txtTitle;
     private EditText edtAmount, edtDescription;
     private String transactionType;
     private boolean categorySelected, accountSelected, toAccountSelected;
+    String transactionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_addtransaction);
+        setContentView(R.layout.activity_transaction);
 
         btnClose = findViewById(R.id.btn_close);
         btnSubmit = findViewById(R.id.btn_submit);
@@ -61,8 +64,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         llSelectCategory = findViewById(R.id.ll_select_category);
         llSelectAccount = findViewById(R.id.ll_select_account);
         llSelectToAccount = findViewById(R.id.ll_select_to_account);
-        llDescription = findViewById(R.id.ll_description);
-        txtDate = findViewById(R.id.txt_budget_date);
+        txtTitle = findViewById(R.id.txt_title);
+        txtDate = findViewById(R.id.txt_date);
         txtSelectedCategory = findViewById(R.id.txt_selected_category);
         txtSelectedAccount = findViewById(R.id.txt_selected_account);
         //Text bên trong khung chọn acccount tới cho transfer
@@ -83,27 +86,80 @@ public class AddTransactionActivity extends AppCompatActivity {
         BudgetService budgetService = new BudgetService(dataManager);
         categoryService = new CategoryService(dataManager);
         transactionService = new TransactionService(dataManager, accountService, budgetService);
-
+        setTransactionTypeSelection();
         loadDate();
+        checkIsCreateOrEdit();
         chooseDate();
-        setCategorySelection();
         showCategoryDialog();
         showAccountDialog();
         showToAccountDialog();
         submitTransaction();
         close();
     }
+    private void checkIsCreateOrEdit() {
+        Log.d("TransactionActivity", "Checking if it's a create or edit ");
+        transactionId = getIntent().getStringExtra("transactionId");
+        if (transactionId != null) {
+            loadTransaction(transactionId);
+            Log.d("TransactionActivity", "Edit ");
+            txtTitle.setText(R.string.edit_transaction);
+        }
+        else{
+            Log.d("TransactionActivity", "Create ");
+        }
+    }
+    private void loadTransaction(String transactionId) {
+        Log.d("TransactionActivity", "Load transaction: " + transactionId);
+        Transaction transaction = transactionService.getTransaction(transactionId);
+        if (transaction == null) {
+            Log.w("TransactionActivity", "Transaction not found: " + transactionId);
+            DisplayToast.Display(this, "Error on load transaction");
+            return;
+        }
+        transactionType = transaction.getType().toLowerCase();
+        Log.d("TransactionActivity", "Transaction type: " + transactionType);
+        setTransactionTypeSelection(transactionType);
+
+        txtDate.setText(transaction.getDate());
+        edtAmount.setText(String.valueOf(transaction.getAmount()));
+        edtDescription.setText(transaction.getDescription());
+
+        if(transactionType.equals("transfer")){
+            Account fromAccount = accountService.getAccount(transaction.getFromAccountId());
+            Account toAccount = accountService.getAccount(transaction.getToAccountId());
+            if (fromAccount == null || toAccount == null) {
+                Log.w("TransactionActivity: loadTransaction", "Invalid account ");
+                return;
+            }
+            txtSelectedAccount.setText(fromAccount.getName());
+            txtSelectedToAccount.setText(toAccount.getName());
+            accountSelected = true;
+            toAccountSelected = true;
+        }
+        else{
+            Account account = accountService.getAccount(transaction.getAccountId());
+            Category category = categoryService.getCategory(transaction.getCategoryId());
+            if (account == null || category == null) {
+                Log.w("TransactionActivity: loadTransaction", "Invalid account or category");
+                return;
+            }
+            txtSelectedAccount.setText(account.getName());
+            txtSelectedCategory.setText(category.getName());
+            accountSelected = true;
+            categorySelected = true;
+        }
+    }
 
     private void submitTransaction() {
         btnSubmit.setOnClickListener(v -> {
-            Log.d("AddTransactionActivity", "Submitting transaction, type: " + transactionType);
+            Log.d("TransactionActivity", "Submitting transaction, type: " + transactionType);
             if (transactionType == null) {
-                Log.w("AddTransactionActivity", "Transaction type not selected");
+                Log.w("TransactionActivity", "Transaction type not selected");
                 DisplayToast.Display(this, "Please select a transaction type.");
                 return;
             }
             if (edtAmount.getText().toString().isEmpty()) {
-                Log.w("AddTransactionActivity", "Amount is empty");
+                Log.w("TransactionActivity", "Amount is empty");
                 DisplayToast.Display(this, "Please enter an amount.");
                 return;
             }
@@ -111,12 +167,12 @@ public class AddTransactionActivity extends AppCompatActivity {
             try {
                 amount = Double.parseDouble(edtAmount.getText().toString());
                 if (amount <= 0) {
-                    Log.w("AddTransactionActivity", "Amount must be greater than zero");
+                    Log.w("TransactionActivity", "Amount must be greater than zero");
                     DisplayToast.Display(this, "Amount must be greater than zero.");
                     return;
                 }
             } catch (NumberFormatException e) {
-                Log.e("AddTransactionActivity", "Invalid amount format: " + edtAmount.getText().toString());
+                Log.e("TransactionActivity", "Invalid amount format: " + edtAmount.getText().toString());
                 DisplayToast.Display(this, "Invalid amount format.");
                 return;
             }
@@ -125,47 +181,68 @@ public class AddTransactionActivity extends AppCompatActivity {
 
             if (transactionType.equals("transfer")) {
                 if (!accountSelected || !toAccountSelected) {
-                    Log.w("AddTransactionActivity", "Account or toAccount not selected for transfer");
+                    Log.w("TransactionActivity", "Account or toAccount not selected for transfer");
                     DisplayToast.Display(this, "Please select from and to accounts.");
                     return;
                 }
                 String fromAccountId = accountService.getAccountId(txtSelectedAccount.getText().toString());
                 String toAccountId = accountService.getAccountId(txtSelectedToAccount.getText().toString());
                 if (fromAccountId == null || toAccountId == null) {
-                    Log.w("AddTransactionActivity", "Invalid account selection");
+                    Log.w("TransactionActivity", "Invalid account selection");
                     DisplayToast.Display(this, "Invalid account selection.");
                     return;
                 }
                 if (fromAccountId.equals(toAccountId)) {
-                    Log.w("AddTransactionActivity", "From and to accounts are the same");
+                    Log.w("TransactionActivity", "From and to accounts are the same");
                     DisplayToast.Display(this, "From and to accounts cannot be the same.");
                     return;
                 }
-                Transaction transaction = new Transaction("TRANSFER", fromAccountId, toAccountId, amount, date, description);
-                transactionService.addTransaction(transaction);
-                dataManager.saveData(); // Lưu dữ liệu sau khi thêm giao dịch
-                Log.d("AddTransactionActivity", "Transfer transaction added: " + description);
-                DisplayToast.Display(this, "Transfer added successfully.");
-                resetForm(); // Đặt lại form thay vì đóng activity
-            } else {
+                Transaction transaction = new Transaction(fromAccountId, toAccountId, amount, date, description);
+                //check có phải update không
+                if(transactionId == null){
+                    transactionService.addTransaction(transaction);
+                    dataManager.saveData();
+                    Log.d("TransactionActivity", "Transfer transaction added: " + description);
+                    DisplayToast.Display(this, "Transfer added successfully.");
+                    resetForm();
+                }
+                else{
+                    transactionService.updateTransaction(transactionId, transaction);
+                    dataManager.saveData();
+                    Log.d("TransactionActivity", "Transfer transaction updated: " + description);
+                    DisplayToast.Display(this, "Transfer updated successfully.");
+                    finish();
+                }
+            }
+            else {
                 if (!categorySelected || !accountSelected) {
-                    Log.w("AddTransactionActivity", "Category or account not selected");
+                    Log.w("TransactionActivity", "Category or account not selected");
                     DisplayToast.Display(this, "Please select a category and account.");
                     return;
                 }
                 String accountId = accountService.getAccountId(txtSelectedAccount.getText().toString());
                 String categoryId = categoryService.getCategoryId(txtSelectedCategory.getText().toString());
                 if (accountId == null || categoryId == null) {
-                    Log.w("AddTransactionActivity", "Invalid account or category selection");
+                    Log.w("TransactionActivity", "Invalid account or category selection");
                     DisplayToast.Display(this, "Invalid account or category selection.");
                     return;
                 }
                 Transaction transaction = new Transaction(transactionType.toUpperCase(), accountId, categoryId, amount, date, description);
-                transactionService.addTransaction(transaction);
-                dataManager.saveData(); // Lưu dữ liệu sau khi thêm giao dịch
-                Log.d("AddTransactionActivity", transactionType + " transaction added: " + description);
-                DisplayToast.Display(this, transactionType + " added successfully.");
-                resetForm(); // Đặt lại form thay vì đóng activity
+                //check có phải update không
+                if(transactionId == null){
+                    transactionService.addTransaction(transaction);
+                    dataManager.saveData();
+                    Log.d("TransactionActivity", transactionType + " transaction added: " + description);
+                    DisplayToast.Display(this, transactionType + " added successfully.");
+                    resetForm();
+                }
+                else{
+                    transactionService.updateTransaction(transactionId, transaction);
+                    dataManager.saveData();
+                    Log.d("TransactionActivity", transactionType + " transaction updated: " + description);
+                    DisplayToast.Display(this, transactionType + " updated successfully.");
+                    finish();
+                }
             }
         });
     }
@@ -176,35 +253,32 @@ public class AddTransactionActivity extends AppCompatActivity {
         txtDate.setText(getString(R.string.year_month_day));
         txtSelectedCategory.setText(getString(R.string.select_category));
         txtSelectedAccount.setText(getString(R.string.select_account));
-        txtSelectedToAccount.setText("Select To Account");
+        txtSelectedToAccount.setText(R.string.select_to_account);
         categorySelected = false;
         accountSelected = false;
         toAccountSelected = false;
-        transactionType = null;
-
-        llIncome.setBackgroundResource(R.drawable.border);
-        llOutcome.setBackgroundResource(R.drawable.border);
-        llTransfer.setBackgroundResource(R.drawable.border);
         llSelectCategory.setVisibility(View.VISIBLE);
         llSelectAccount.setVisibility(View.VISIBLE);
         llSelectToAccount.setVisibility(View.GONE);
         txtSelectToAccount.setVisibility(View.GONE);
-
+        setTransactionTypeSelection(transactionType);
         loadDate();
     }
 
     private void showAccountDialog() {
         llSelectAccount.setOnClickListener(v -> {
-            Log.d("AddTransactionActivity", "Showing account selection dialog");
+            Log.d("TransactionActivity", "Showing account selection dialog");
             List<Account> accounts = accountService.getListAccounts();
             if (accounts == null || accounts.isEmpty()) {
-                Log.w("AddTransactionActivity", "No accounts available");
+                Log.w("TransactionActivity", "No accounts available");
                 DisplayToast.Display(this, "No accounts available.");
                 return;
             }
 
             View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_select_item, null);
             RecyclerView recyclerView = dialogView.findViewById(R.id.rv_item_list);
+            Button btnAdd = dialogView.findViewById(R.id.btn_add);
+            btnAdd.setVisibility(View.GONE);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
             AlertDialog alertDialog = new AlertDialog.Builder(this).setView(dialogView).create();
@@ -213,7 +287,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 txtSelectedAccount.setText(selectedAccount.getName());
                 accountSelected = true;
                 alertDialog.dismiss();
-                Log.d("AddTransactionActivity", "Selected account: " + selectedAccount.getName());
+                Log.d("TransactionActivity", "Selected account: " + selectedAccount.getName());
             });
             recyclerView.setAdapter(adapter);
             alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.white);
@@ -223,16 +297,18 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void showToAccountDialog() {
         llSelectToAccount.setOnClickListener(v -> {
-            Log.d("AddTransactionActivity", "Showing to-account selection dialog");
+            Log.d("TransactionActivity", "Showing to-account selection dialog");
             List<Account> accounts = accountService.getListAccounts();
             if (accounts == null || accounts.isEmpty()) {
-                Log.w("AddTransactionActivity", "No accounts available");
+                Log.w("TransactionActivity", "No accounts available");
                 DisplayToast.Display(this, "No accounts available.");
                 return;
             }
 
             View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_select_item, null);
             RecyclerView recyclerView = dialogView.findViewById(R.id.rv_item_list);
+            Button btnAdd = dialogView.findViewById(R.id.btn_add);
+            btnAdd.setVisibility(View.GONE);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
             AlertDialog alertDialog = new AlertDialog.Builder(this).setView(dialogView).create();
@@ -241,7 +317,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 txtSelectedToAccount.setText(selectedAccount.getName());
                 toAccountSelected = true;
                 alertDialog.dismiss();
-                Log.d("AddTransactionActivity", "Selected to-account: " + selectedAccount.getName());
+                Log.d("TransactionActivity", "Selected to-account: " + selectedAccount.getName());
             });
             recyclerView.setAdapter(adapter);
             alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.white);
@@ -251,41 +327,74 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void showCategoryDialog() {
         llSelectCategory.setOnClickListener(v -> {
-            Log.d("AddTransactionActivity", "Showing category selection dialog");
+            Log.d("TransactionActivity", "Showing category selection dialog");
             List<Category> categories = categoryService.getListCategories();
-            if (categories == null || categories.isEmpty()) {
-                Log.w("AddTransactionActivity", "No categories available");
-                DisplayToast.Display(this, "No categories available.");
-                return;
-            }
 
             View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_select_item, null);
             RecyclerView recyclerView = dialogView.findViewById(R.id.rv_item_list);
+            Button btnAdd = dialogView.findViewById(R.id.btn_add);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-            AlertDialog alertDialog = new AlertDialog.Builder(this).setView(dialogView).create();
+            AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .create();
 
             CategoryRadioAdapter adapter = new CategoryRadioAdapter(categories, selectedCategory -> {
                 txtSelectedCategory.setText(selectedCategory.getName());
                 categorySelected = true;
                 alertDialog.dismiss();
-                Log.d("AddTransactionActivity", "Selected category: " + selectedCategory.getName());
+                Log.d("TransactionActivity", "Selected category: " + selectedCategory.getName());
             });
             recyclerView.setAdapter(adapter);
+
+            if (categories == null || categories.isEmpty()) {
+                Log.w("TransactionActivity", "No categories available");
+                txtSelectedCategory.setText("No categories available");
+                txtSelectedCategory.setTextColor(Color.RED);
+                return;
+            }
+
+            btnAdd.setOnClickListener(v1 -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Add Category");
+
+                final EditText input = new EditText(this);
+                input.setHint("Enter Name");
+                builder.setView(input);
+
+                builder.setPositiveButton("Add", (dialog, which) -> {
+                    String categoryName = input.getText().toString().trim();
+                    if (categoryName.isEmpty()) {
+                        DisplayToast.Display(this, "Name cannot be empty");
+                        return;
+                    }
+                    Category newCategory = new Category(null, categoryName);
+                    categoryService.addCategory(newCategory);
+                    dataManager.saveData();
+                    Log.d("TransactionActivity", "Category added: " + categoryName);
+
+                    //refresh
+                    List<Category> updatedCategories = categoryService.getListCategories();
+                    adapter.updateCategories(updatedCategories);
+                });
+
+                builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+                builder.show();
+            });
+
             alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.white);
             alertDialog.show();
         });
     }
-
-    private void setCategorySelection() {
-        setCategorySelection(null);
-        llIncome.setOnClickListener(v -> setCategorySelection("income"));
-        llOutcome.setOnClickListener(v -> setCategorySelection("outcome"));
-        llTransfer.setOnClickListener(v -> setCategorySelection("transfer"));
+    private void setTransactionTypeSelection() {
+        setTransactionTypeSelection(null);
+        llIncome.setOnClickListener(v -> setTransactionTypeSelection("income"));
+        llOutcome.setOnClickListener(v -> setTransactionTypeSelection("outcome"));
+        llTransfer.setOnClickListener(v -> setTransactionTypeSelection("transfer"));
     }
 
-    private void setCategorySelection(String selected) {
-        Log.d("AddTransactionActivity", "Setting transaction type: " + selected);
+    private void setTransactionTypeSelection(String selected) {
+        Log.d("TransactionActivity", "Setting transaction type: " + selected);
         llIncome.setBackgroundResource(R.drawable.border);
         llOutcome.setBackgroundResource(R.drawable.border);
         llTransfer.setBackgroundResource(R.drawable.border);
@@ -297,12 +406,14 @@ public class AddTransactionActivity extends AppCompatActivity {
             llSelectAccount.setVisibility(View.VISIBLE);
             llSelectToAccount.setVisibility(View.GONE);
             txtSelectToAccount.setVisibility(View.GONE);
-            categorySelected = false;
-            accountSelected = false;
-            toAccountSelected = false;
-            txtSelectedCategory.setText(getString(R.string.select_category));
-            txtSelectedAccount.setText(getString(R.string.select_account));
-            txtSelectedToAccount.setText("Select To Account");
+            if (transactionId == null) {
+                categorySelected = false;
+                accountSelected = false;
+                toAccountSelected = false;
+                txtSelectedCategory.setText(getString(R.string.select_category));
+                txtSelectedAccount.setText(getString(R.string.select_account));
+                txtSelectedToAccount.setText("Select To Account");
+            }
         } else if ("outcome".equals(selected)) {
             llOutcome.setBackgroundResource(R.drawable.bg_selected_outcome);
             transactionType = "outcome";
@@ -310,12 +421,14 @@ public class AddTransactionActivity extends AppCompatActivity {
             llSelectAccount.setVisibility(View.VISIBLE);
             llSelectToAccount.setVisibility(View.GONE);
             txtSelectToAccount.setVisibility(View.GONE);
-            categorySelected = false;
-            accountSelected = false;
-            toAccountSelected = false;
-            txtSelectedCategory.setText(getString(R.string.select_category));
-            txtSelectedAccount.setText(getString(R.string.select_account));
-            txtSelectedToAccount.setText("Select To Account");
+            if (transactionId == null) {
+                categorySelected = false;
+                accountSelected = false;
+                toAccountSelected = false;
+                txtSelectedCategory.setText(getString(R.string.select_category));
+                txtSelectedAccount.setText(getString(R.string.select_account));
+                txtSelectedToAccount.setText("Select To Account");
+            }
         } else if ("transfer".equals(selected)) {
             llTransfer.setBackgroundResource(R.drawable.bg_selected_transfer);
             transactionType = "transfer";
@@ -323,18 +436,19 @@ public class AddTransactionActivity extends AppCompatActivity {
             llSelectAccount.setVisibility(View.VISIBLE);
             llSelectToAccount.setVisibility(View.VISIBLE);
             txtSelectToAccount.setVisibility(View.VISIBLE);
-            categorySelected = false;
-            accountSelected = false;
-            toAccountSelected = false;
-            txtSelectedCategory.setText(getString(R.string.select_category));
-            txtSelectedAccount.setText(getString(R.string.select_account));
-            txtSelectedToAccount.setText("Select To Account");
+            if (transactionId == null) {
+                categorySelected = false;
+                accountSelected = false;
+                toAccountSelected = false;
+                txtSelectedCategory.setText(getString(R.string.select_category));
+                txtSelectedAccount.setText(getString(R.string.select_account));
+                txtSelectedToAccount.setText("Select To Account");
+            }
         }
     }
-
     private void chooseDate() {
         llDatePicker.setOnClickListener(v -> {
-            Log.d("AddTransactionActivity", "Opening date picker");
+            Log.d("TransactionActivity", "Opening date picker");
             Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
@@ -343,10 +457,10 @@ public class AddTransactionActivity extends AppCompatActivity {
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     this,
                     (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
-                        String selectedDate = String.format(Locale.getDefault(), "%04d/%02d/%02d",
+                        String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d",
                                 selectedYear, selectedMonth + 1, selectedDayOfMonth);
                         txtDate.setText(selectedDate);
-                        Log.d("AddTransactionActivity", "Selected date: " + selectedDate);
+                        Log.d("TransactionActivity", "Selected date: " + selectedDate);
                     },
                     year, month, day);
             datePickerDialog.show();
@@ -355,15 +469,15 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void close() {
         btnClose.setOnClickListener(v -> {
-            Log.d("AddTransactionActivity", "Closing activity");
+            Log.d("TransactionActivity", "Closing activity");
             finish();
         });
     }
 
     private void loadDate() {
-        Log.d("AddTransactionActivity", "Loading current date");
+        Log.d("TransactionActivity", "Loading current date");
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String currentDate = sdf.format(calendar.getTime());
         txtDate.setText(currentDate);
     }

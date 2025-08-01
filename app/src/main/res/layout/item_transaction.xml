@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/border"
+    android:layout_margin="5dp"
+    android:padding="5dp">
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/txtCategoryId"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:textSize="14sp"-->
+    <!--        android:textColor="@android:color/darker_gray"-->
+    <!--        android:textStyle="italic" />-->
+
+    <TextView
+        android:id="@+id/txt_category_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+    />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_account_name"
+        android:text="@string/account"
+        android:textSize="12sp"
+        android:textColor="#0A2AC4"
+        app:layout_constraintStart_toStartOf="@id/txt_category_name"
+        app:layout_constraintTop_toBottomOf="@id/txt_category_name"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_to_account_name"
+        android:text="@string/to_account"
+        android:textSize="12sp"
+        android:textColor="#0A2AC4"
+        app:layout_constraintStart_toStartOf="@id/txt_account_name"
+        app:layout_constraintTop_toBottomOf="@id/txt_account_name"
+        />
+
+    <ImageButton
+        android:id="@+id/btn_editItemTransaction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginEnd="5dp"
+        android:layout_weight="1"
+        android:background="@drawable/border"
+        android:padding="3dp"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_deleteItemTransaction"
+        />
+    <ImageButton
+        android:id="@+id/btn_deleteItemTransaction"
+        android:src="@drawable/ic_delete"
+        android:background="@drawable/border"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_gravity="end|center_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="3dp"/>
+
+<!--    income/outcome/transfer-->
+    <TextView
+        android:id="@+id/txt_type_transaction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/transaction_type"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@id/txt_amount"
+        app:layout_constraintEnd_toStartOf="@id/btn_editItemTransaction"
+        app:layout_constraintStart_toEndOf="@+id/txt_category_name"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/currency"
+        android:id="@+id/txt_type_currency"
+        app:layout_constraintStart_toEndOf="@id/txt_amount"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_type_transaction"
+        android:layout_marginStart="5dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_amount"
+        app:layout_constraintTop_toBottomOf="@id/txt_type_transaction"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/txt_account_name"
+        app:layout_constraintEnd_toEndOf="@id/btn_editItemTransaction"
+        android:text="0"
+        android:textSize="15sp"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

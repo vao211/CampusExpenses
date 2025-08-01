@@ -25,16 +25,16 @@
                 android:text="@string/categories"
                 android:textSize="25sp"/>
 
-        <!-- GHI CHÚ: Hình ảnh danh mục -->
-        <ImageView
-            android:id="@+id/img_category"
+        <ImageButton
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/ic_category"
-            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/btn_chart"
+            android:src="@drawable/png_piechart"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_add_category"
-            android:layout_marginTop="8dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_add_category"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            />
 
         <!-- GHI CHÚ: Văn bản hiển thị khi không có danh mục -->
         <TextView
@@ -47,7 +47,7 @@
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/img_category"
+            app:layout_constraintTop_toBottomOf="@id/btn_chart"
             android:layout_marginTop="8dp" />
 
         <!-- GHI CHÚ: RecyclerView để hiển thị danh sách danh mục, chiếm phần còn lại của màn hình -->
@@ -56,7 +56,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="60dp"
+            android:layout_marginBottom="80dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -29,62 +29,12 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <ImageButton
-        android:id="@+id/btn_calendar"
-        android:layout_width="wrap_content"
+    <com.example.vcampusexpenses.utils.DateFilterView
+        android:id="@+id/date_filter_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_calendar"
-        app:layout_constraintEnd_toStartOf="@+id/btnPreviousPeriod"
         app:layout_constraintTop_toBottomOf="@id/txt_home_title"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="16dp"/>
-
-    <ImageButton
-        android:id="@+id/btnPreviousPeriod"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_back"
-        android:contentDescription="@string/previous_period"
-        android:padding="8dp"
-        app:layout_constraintStart_toEndOf="@+id/btn_calendar"
-        app:layout_constraintTop_toBottomOf="@id/txt_home_title"
-        android:layout_marginTop="16dp"/>
-
-    <TextView
-        android:id="@+id/txt_date_filter_display"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/this_month"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:padding="12dp"
-        android:minWidth="150dp"
-        android:ellipsize="end"
-        android:singleLine="true"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toEndOf="@+id/btnPreviousPeriod"
-        app:layout_constraintEnd_toStartOf="@+id/btnNextPeriod"
-        app:layout_constraintTop_toBottomOf="@id/txt_home_title"
-        android:layout_marginTop="16dp"/>
-
-    <ImageButton
-        android:id="@+id/btnNextPeriod"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_next"
-        android:contentDescription="@string/next_period"
-        android:padding="8dp"
-        app:layout_constraintStart_toEndOf="@+id/txt_date_filter_display"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_home_title"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginTop="20dp"/>
 
     <ImageButton
         android:id="@+id/btn_add"

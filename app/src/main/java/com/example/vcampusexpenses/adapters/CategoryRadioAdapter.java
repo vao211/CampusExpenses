@@ -15,7 +15,7 @@ import java.util.List;
 
 public class CategoryRadioAdapter extends RecyclerView.Adapter<CategoryRadioAdapter.ViewHolder> {
 
-    private final List<Category> categoryList;
+    private  List<Category> categoryList;
     private int selectedPosition = -1;
     private final OnCategorySelectedListener listener;
 
@@ -62,6 +62,10 @@ public class CategoryRadioAdapter extends RecyclerView.Adapter<CategoryRadioAdap
             notifyDataSetChanged();
             listener.onCategorySelected(category);
         });
+    }
+    public void updateCategories(List<Category> newCategoryList) {
+        this.categoryList = newCategoryList;
+        notifyDataSetChanged();
     }
     @Override
     public int getItemCount() {

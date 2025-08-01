@@ -32,6 +32,21 @@ public class TransactionService {
         Log.d("TransactionService", "Initialized with userId: " + userId);
     }
 
+    public Transaction getTransaction(String transactionId) {
+        Log.d("TransactionService", "Getting transaction: " + transactionId);
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            Log.e("TransactionService", "User data not initialized");
+            return null;
+        }
+        Map<String, Transaction> transactions = userData.getUser().getData().getTransactions();
+        if (transactions == null || !transactions.containsKey(transactionId)) {
+            Log.e("TransactionService", "Transaction not found: " + transactionId);
+            return null;
+        }
+        Transaction transaction = transactions.get(transactionId);
+        Log.d("TransactionService", "Transaction found: " + transaction.getDescription());
+        return transaction;
+    }
     protected void saveTransaction(Transaction transaction) {
         Log.d("TransactionService", "Saving transaction: " + transaction.getDescription());
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
@@ -101,8 +116,13 @@ public class TransactionService {
 
     public void addTransaction(Transaction transaction) {
         Log.d("TransactionService", "Adding transaction: " + transaction.getDescription());
-        if (transaction == null || !transaction.isValid()) {
+        if (!transaction.isValid()) {
             Log.e("TransactionService", "Invalid Transaction");
+            DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
+            return;
+        }
+        if(transaction == null){
+            Log.e("TransactionService", "Null Transaction");
             DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
             return;
         }

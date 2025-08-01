@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.mpandroidchart)
     implementation(libs.core)
     implementation(libs.gson)
     implementation(libs.material.v150)

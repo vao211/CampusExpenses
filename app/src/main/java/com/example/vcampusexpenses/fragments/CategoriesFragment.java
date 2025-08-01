@@ -1,6 +1,7 @@
 package com.example.vcampusexpenses.fragments;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,20 +16,32 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.activity.ChartCategoryActivity;
 import com.example.vcampusexpenses.adapters.CategoryAdapter;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
+import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.model.Category;
+import com.example.vcampusexpenses.services.TransactionService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCategoryClickListener {
     private RecyclerView recyclerViewCategories;
     private TextView txtEmptyCategories;
     private CategoryService categoryService;
-    private ImageButton btnAddCategory;
+    private ImageButton btnAddCategory, btnChart;
     private UserDataManager dataManager;
 
     @Override
@@ -37,6 +50,7 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
         recyclerViewCategories = view.findViewById(R.id.rv_category);
         txtEmptyCategories = view.findViewById(R.id.txt_empty_categories);
         btnAddCategory = view.findViewById(R.id.btn_add_category);
+        btnChart = view.findViewById(R.id.btn_chart);
 
         SessionManager sessionManager = new SessionManager(requireContext());
         String userId = sessionManager.getUserId();
@@ -45,6 +59,7 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
 
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(requireContext()));
         addCategory();
+        goToChart();
         return view;
     }
 
@@ -53,7 +68,12 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
         super.onViewCreated(view, savedInstanceState);
         loadCategories();
     }
-
+    private void goToChart(){
+        btnChart.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), ChartCategoryActivity.class);
+            startActivity(intent);
+        });
+    }
     private void addCategory() {
         btnAddCategory.setOnClickListener(v -> {
             Log.d("CategoriesFragment", "Adding new category");
@@ -104,6 +124,7 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
             Log.d("CategoriesFragment", "Found " + categoryList.size() + " categories");
             txtEmptyCategories.setVisibility(View.GONE);
             recyclerViewCategories.setVisibility(View.VISIBLE);
+            //tạo lại adapter để hiển thị danh sách mới
             CategoryAdapter categoryAdapter = new CategoryAdapter(categoryList, this);
             recyclerViewCategories.setAdapter(categoryAdapter);
         }
@@ -148,7 +169,6 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
                     categoryService.deleteCategory(categoryId);
                     dataManager.saveData();//Lưu data sau khi xóa danh mục
                     Log.d("CategoriesFragment", "Category deleted: " + categoryId);
-                    loadCategories();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
                     Log.d("CategoriesFragment", "Delete category cancelled");
