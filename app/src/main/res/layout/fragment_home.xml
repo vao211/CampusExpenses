@@ -176,7 +176,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewHomeAccounts"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="150dp"
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_account_card"

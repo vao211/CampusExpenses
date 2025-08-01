@@ -11,38 +11,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.util.Pair;
-import androidx.fragment.app.Fragment;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import android.content.Intent;
 
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.activity.AddTransactionActivity;
 import com.example.vcampusexpenses.activity.SettingActivity;
-import com.example.vcampusexpenses.model.Category;
-import com.example.vcampusexpenses.model.Transaction;
-import com.example.vcampusexpenses.services.AccountService;
-import com.example.vcampusexpenses.services.CategoryService;
-import com.example.vcampusexpenses.services.TransactionService;
-import com.example.vcampusexpenses.session.SessionManager;
-import com.google.android.material.datepicker.MaterialDatePicker;
-
-import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.activity.ViewAllAccountsActivity;
 import com.example.vcampusexpenses.adapter.AccountAdapter;
 import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.services.AccountService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
+import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,7 +45,7 @@ public class HomeFragment extends Fragment {
     private ImageButton btnPreviousPeriod, btnNextPeriod;
     private TextView txtDateFilterDisplay;
 
-    //account
+    // Account
     private RecyclerView rvAccounts;
     private AccountAdapter accountAdapter;
     private AccountService accountService;
@@ -93,12 +80,14 @@ public class HomeFragment extends Fragment {
         accountService = new AccountService(dataManager);
 
         // Initialize Views
-        rvAccounts = view.findViewById(R.id.recyclerViewHomeAccounts);
-        btnViewAll = view.findViewById(R.id.buttonViewAllAccountsHome);
-        btnAdd = view.findViewById(R.id.btn_add);
-        tvNoAccounts = view.findViewById(R.id.textViewNoHomeAccounts);
+        initializeViews(view);
+        setupClickListeners();
 
         // Setup RecyclerView
+        rvAccounts = view.findViewById(R.id.recyclerViewHomeAccounts);
+        btnViewAll = view.findViewById(R.id.buttonViewAllAccountsHome);
+        tvNoAccounts = view.findViewById(R.id.textViewNoHomeAccounts);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         rvAccounts.setLayoutManager(layoutManager);
         List<Account> accountList = accountService.getListAccounts();
@@ -122,8 +111,23 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        // Add Account Button
-        btnAdd.setOnClickListener(v -> showAddAccountDialog());
+        // Add Button (for transaction, not account)
+        if (btnAdd != null) {
+            btnAdd.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), AddTransactionActivity.class);
+                startActivity(intent);
+            });
+        } else {
+            Log.e(TAG, "btnAdd is null, check fragment_home.xml");
+        }
+
+        // Restore instance state if available
+        if (savedInstanceState != null) {
+            restoreInstanceState(savedInstanceState);
+        } else {
+            initializeDateFormats();
+            applyFilter(FilterType.THIS_MONTH, false); // Initialize with default filter
+        }
 
         return view;
     }
@@ -187,27 +191,44 @@ public class HomeFragment extends Fragment {
     private void initializeViews(View view) {
         btnAdd = view.findViewById(R.id.btn_add);
         btnCalendar = view.findViewById(R.id.btn_calendar);
-        btnAdd = view.findViewById(R.id.btn_add);
         btnSetting = view.findViewById(R.id.btnSetting);
         btnPreviousPeriod = view.findViewById(R.id.btnPreviousPeriod);
         btnNextPeriod = view.findViewById(R.id.btnNextPeriod);
         txtDateFilterDisplay = view.findViewById(R.id.txt_date_filter_display);
+
+        // Log if any view is null
+        if (btnCalendar == null) Log.e(TAG, "btnCalendar not found in fragment_home.xml");
+        if (btnSetting == null) Log.e(TAG, "btnSetting not found in fragment_home.xml");
+        if (btnPreviousPeriod == null) Log.e(TAG, "btnPreviousPeriod not found in fragment_home.xml");
+        if (btnNextPeriod == null) Log.e(TAG, "btnNextPeriod not found in fragment_home.xml");
+        if (txtDateFilterDisplay == null) Log.e(TAG, "txtDateFilterDisplay not found in fragment_home.xml");
     }
 
     private void setupClickListeners() {
-        btnSetting.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), SettingActivity.class);
-            startActivity(intent);
-        });
-        btnAdd.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AddTransactionActivity.class);
-            startActivity(intent);
-        });
-
-        btnCalendar.setOnClickListener(v-> showPeriodSelectionDialog());
-        txtDateFilterDisplay.setOnClickListener(v -> showPeriodSelectionDialog());
-        btnPreviousPeriod.setOnClickListener(v -> navigatePeriod(-1));
-        btnNextPeriod.setOnClickListener(v -> navigatePeriod(1));
+        if (btnSetting != null) {
+            btnSetting.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), SettingActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (btnAdd != null) {
+            btnAdd.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), AddTransactionActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (btnCalendar != null) {
+            btnCalendar.setOnClickListener(v -> showPeriodSelectionDialog());
+        }
+        if (txtDateFilterDisplay != null) {
+            txtDateFilterDisplay.setOnClickListener(v -> showPeriodSelectionDialog());
+        }
+        if (btnPreviousPeriod != null) {
+            btnPreviousPeriod.setOnClickListener(v -> navigatePeriod(-1));
+        }
+        if (btnNextPeriod != null) {
+            btnNextPeriod.setOnClickListener(v -> navigatePeriod(1));
+        }
     }
 
     @Override
@@ -235,6 +256,8 @@ public class HomeFragment extends Fragment {
             currentFilterType = (FilterType) savedInstanceState.getSerializable(FILTER_TYPE_KEY);
             if (currentFilterType == null) currentFilterType = FilterType.THIS_MONTH;
         }
+        initializeDateFormats();
+        applyFilter(currentFilterType, false); // Apply restored filter
     }
 
     private void showPeriodSelectionDialog() {
