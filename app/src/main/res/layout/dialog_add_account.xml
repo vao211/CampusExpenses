@@ -17,7 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Initial Balance"
-        android:inputType="numberDecimal"
-        android:layout_marginTop="8dp" />
+        android:inputType="numberDecimal" />
 
 </LinearLayout>

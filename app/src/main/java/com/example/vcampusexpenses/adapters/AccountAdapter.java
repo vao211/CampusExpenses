@@ -1,6 +1,7 @@
 package com.example.vcampusexpenses.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
     @NonNull
     @Override
     public AccountViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int layoutId = isCardView ? R.layout.item_account_card : R.layout.item_account_card;
+        int layoutId = isCardView ? R.layout.item_account_card : R.layout.item_account;
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         return new AccountViewHolder(view, isCardView);
     }
@@ -47,15 +48,18 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
     @Override
     public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
         Account account = accountList.get(position);
-        holder.accountName.setText(account.getName());
-
-        // Set account icon based on name (customize logic as needed)
-        if ("Cash".equalsIgnoreCase(account.getName())) {
-            holder.accountIcon.setImageResource(R.drawable.ic_cash);
-        } else if ("Bank".equalsIgnoreCase(account.getName())) {
-            holder.accountIcon.setImageResource(R.drawable.ic_card);
+        if (isCardView) {
+            holder.accountName.setText(account.getName());
+            // Set account icon based on name (customize logic as needed)
+            if ("Cash".equalsIgnoreCase(account.getName())) {
+                holder.accountIcon.setImageResource(R.drawable.ic_cash);
+            } else if ("Bank".equalsIgnoreCase(account.getName())) {
+                holder.accountIcon.setImageResource(R.drawable.ic_card);
+            } else {
+                holder.accountIcon.setImageResource(R.drawable.ic_default); // Fallback icon
+            }
         } else {
-            holder.accountIcon.setImageResource(R.drawable.ic_default); // Fallback icon
+            holder.accountName.setText(account.getName());
         }
 
         // Get currency symbol from SettingManager
@@ -103,6 +107,9 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
             } else {
                 accountName = itemView.findViewById(R.id.textViewAccountName);
                 accountBalance = itemView.findViewById(R.id.textViewAccountBalance);
+            }
+            if (accountName == null || accountBalance == null) {
+                Log.e("AccountAdapter", "TextView initialization failed for isCardView: " + isCardView);
             }
         }
     }
