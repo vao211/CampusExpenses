@@ -88,4 +88,9 @@
     <string name="no_transactions_found">No transactions found</string>
     <string name="edit_transaction">Edit transaction</string>
     <string name="chart_for_category">Chart for category</string>
+    <string name="account_name">Account name</string>
+    <string name="view_all">View All</string>
+    <string name="no_accounts_yet_add_one">No accounts yet. Add one!</string>
+    <string name="accounts">Accounts</string>
+    <string name="initial_balance">Initial Balance</string>
 </resources>
