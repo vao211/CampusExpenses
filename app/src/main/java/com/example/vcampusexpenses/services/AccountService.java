@@ -1,6 +1,5 @@
 package com.example.vcampusexpenses.services;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.example.vcampusexpenses.datamanager.UserDataManager;
@@ -19,12 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 public class AccountService {
-    private final UserDataManager dataFile;
+    private final UserDataManager userDataManager;
     private final UserData userData;
     private final String userId;
 
     public AccountService(UserDataManager dataManager) {
-        this.dataFile = dataManager;
+        this.userDataManager = dataManager;
         this.userData = dataManager.getUserDataObject();
         this.userId = dataManager.getUserId();
         Log.d("AccountService", "Initialized with userId: " + userId);
@@ -34,13 +33,13 @@ public class AccountService {
         Log.d("AccountService", "Attempting to update balance for accountId: " + accountId + " with amount: " + amount);
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("AccountService", "User data not initialized in updateBalance.");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            DisplayToast.Display(userDataManager.getContext(), "User data not initialized");
             return;
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
         if (accounts == null || !accounts.containsKey(accountId)) {
             Log.e("AccountService", "Account not found in updateBalance for accountId: " + accountId);
-            DisplayToast.Display(dataFile.getContext(), "Account not found for balance update");
+            DisplayToast.Display(userDataManager.getContext(), "Account not found for balance update");
             return;
         }
 
@@ -55,19 +54,19 @@ public class AccountService {
         Log.d("AccountService", "Getting accountId for accountName: " + accountName);
         if (accountName == null || accountName.trim().isEmpty()) {
             Log.e("AccountService", "Invalid account name");
-            DisplayToast.Display(dataFile.getContext(), "Invalid account name");
+            DisplayToast.Display(userDataManager.getContext(), "Invalid account name");
             return null;
         }
-        JsonObject jsonData = dataFile.getUserData(userId);
+        JsonObject jsonData = userDataManager.getUserData(userId);
         if (jsonData == null) {
             Log.e("AccountService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            DisplayToast.Display(userDataManager.getContext(), "User data not initialized");
             return null;
         }
         JsonObject accounts = jsonData.getAsJsonObject("accounts");
         if (accounts == null) {
             Log.e("AccountService", "No accounts found");
-            DisplayToast.Display(dataFile.getContext(), "No accounts found");
+            DisplayToast.Display(userDataManager.getContext(), "No accounts found");
             return null;
         }
         for (Map.Entry<String, JsonElement> entry : accounts.entrySet()) {
@@ -79,7 +78,7 @@ public class AccountService {
             }
         }
         Log.w("AccountService", "Account not found: " + accountName);
-        DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountName);
+        DisplayToast.Display(userDataManager.getContext(), "Account not found: " + accountName);
         return null;
     }
 
@@ -87,7 +86,7 @@ public class AccountService {
         Log.d("AccountService", "Saving account: " + account.getName());
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("AccountService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            DisplayToast.Display(userDataManager.getContext(), "User data not initialized");
             return;
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
@@ -103,72 +102,91 @@ public class AccountService {
         Log.d("AccountService", "Getting account for accountId: " + accountId);
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("AccountService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            DisplayToast.Display(userDataManager.getContext(), "User data not initialized");
             return null;
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
         if (accounts == null || !accounts.containsKey(accountId)) {
             Log.w("AccountService", "Account not found: " + accountId);
-            DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountId);
+            DisplayToast.Display(userDataManager.getContext(), "Account not found: " + accountId);
             return null;
         }
         return accounts.get(accountId);
     }
 
-    public void addAccount(Account account) {
+    public boolean addAccount(Account account) {
         Log.d("AccountService", "Adding account: " + account.getName());
         if (account == null || account.getName() == null || account.getName().trim().isEmpty()) {
             Log.e("AccountService", "Invalid account name");
-            DisplayToast.Display(dataFile.getContext(), "Invalid account name");
-            return;
+            DisplayToast.Display(userDataManager.getContext(), "Invalid account name");
+            return false;
         }
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("AccountService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
-            return;
+            DisplayToast.Display(userDataManager.getContext(), "User data not initialized");
+            return false;
         }
+
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
         if (accounts == null) {
             accounts = new HashMap<>();
             userData.getUser().getData().setAccount(accounts);
         }
 
-        //Ktra trùng tên
+        // Check for duplicate account names (case-insensitive)
         for (Account existingAccount : accounts.values()) {
-            if (existingAccount.getName().equals(account.getName())) {
+            if (existingAccount.getName().equalsIgnoreCase(account.getName())) {
                 Log.w("AccountService", "Account name already exists: " + account.getName());
-                DisplayToast.Display(dataFile.getContext(), "Account name already exists");
-                return;
+                DisplayToast.Display(userDataManager.getContext(), "Account name already exists");
+                return false;
             }
         }
+
         String accountId = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
         account.setAccountId(accountId);
         saveAccount(account);
         Log.d("AccountService", "Account added: " + account.getName());
+        return true;
+    }
+
+    public boolean isAccountNameExists(String accountName) {
+        if (accountName == null || accountName.trim().isEmpty()) {
+            return false;
+        }
+        List<Account> accounts = getListAccounts();
+        if (accounts != null) {
+            String trimmedNewName = accountName.trim();
+            for (Account account : accounts) {
+                if (account.getName().equalsIgnoreCase(trimmedNewName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void updateAccount(String accountId, String newName, double balance) {
         Log.d("AccountService", "Updating accountId: " + accountId + " with newName: " + newName + ", balance: " + balance);
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("AccountService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            DisplayToast.Display(userDataManager.getContext(), "User data not initialized");
             return;
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
         if (accounts == null || !accounts.containsKey(accountId)) {
             Log.e("AccountService", "Account not found: " + accountId);
-            DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountId);
+            DisplayToast.Display(userDataManager.getContext(), "Account not found: " + accountId);
             return;
         }
         if (newName == null || newName.trim().isEmpty()) {
             Log.e("AccountService", "Invalid account name");
-            DisplayToast.Display(dataFile.getContext(), "Invalid account name");
+            DisplayToast.Display(userDataManager.getContext(), "Invalid account name");
             return;
         }
         for (Account existingAccount : accounts.values()) {
             if (existingAccount.getName().equals(newName) && !existingAccount.getAccountId().equals(accountId)) {
                 Log.w("AccountService", "Account name already exists: " + newName);
-                DisplayToast.Display(dataFile.getContext(), "Account name already exists");
+                DisplayToast.Display(userDataManager.getContext(), "Account name already exists");
                 return;
             }
         }
@@ -177,14 +195,14 @@ public class AccountService {
         account.setBalance(balance);
         Log.d("AccountService", "Account updated: " + account.getName() + ", balance: " + account.getBalance());
 
-        DisplayToast.Display(dataFile.getContext(), "Account updated successfully");
+        DisplayToast.Display(userDataManager.getContext(), "Account updated successfully");
     }
 
     public void deleteAccount(String accountId) {
         Log.d("AccountService", "Deleting accountId: " + accountId);
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("AccountService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            DisplayToast.Display(userDataManager.getContext(), "User data not initialized");
             return;
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
@@ -192,14 +210,14 @@ public class AccountService {
         Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
         if (accounts == null || !accounts.containsKey(accountId)) {
             Log.e("AccountService", "Account not found: " + accountId);
-            DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountId);
+            DisplayToast.Display(userDataManager.getContext(), "Account not found: " + accountId);
             return;
         }
         if (transactions != null) {
             for (Transaction transaction : transactions.values()) {
                 if (!transaction.isTransfer() && transaction.getAccountId().equals(accountId)) {
                     Log.w("AccountService", "Cannot delete account because it is used in transaction");
-                    DisplayToast.Display(dataFile.getContext(), "Cannot delete account because it is used in transaction");
+                    DisplayToast.Display(userDataManager.getContext(), "Cannot delete account because it is used in transaction");
                     return;
                 }
             }
@@ -208,14 +226,14 @@ public class AccountService {
             for (Budget budget : budgets.values()) {
                 if (budget.getListAccountIds() != null && budget.getListAccountIds().contains(accountId)) {
                     Log.w("AccountService", "Cannot delete account because it is used in budget");
-                    DisplayToast.Display(dataFile.getContext(), "Cannot delete account because it is used in budget");
+                    DisplayToast.Display(userDataManager.getContext(), "Cannot delete account because it is used in budget");
                     return;
                 }
             }
         }
         accounts.remove(accountId);
         Log.d("AccountService", "Account deleted: " + accountId);
-        DisplayToast.Display(dataFile.getContext(), "Account deleted successfully");
+        DisplayToast.Display(userDataManager.getContext(), "Account deleted successfully");
     }
 
     public List<Account> getListAccounts() {
@@ -223,7 +241,7 @@ public class AccountService {
         List<Account> accountList = new ArrayList<>();
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("AccountService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
+            DisplayToast.Display(userDataManager.getContext(), "User data not initialized");
             return accountList;
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();

@@ -51,6 +51,15 @@ public class Account {
         this.balance = balance;
     }
 
+    @Override
+    public String toString() {
+        return "Account{" +
+                "accountId='" + accountId + '\'' +
+                ", name='" + name + '\'' +
+                ", balance=" + balance +
+                '}';
+    }
+
     public List<String> getBudgetIds() {
         return budgets;
     }
