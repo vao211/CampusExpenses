@@ -32,7 +32,8 @@
         <activity android:name=".activity.TransactionActivity" />
         <activity android:name=".activity.ChartCategoryActivity" />
         <activity android:name=".activity.AccountActivity"/>
-        <activity android:name=".activity.BudgetActivity"/>
+        <activity android:name=".activity.BudgetAccountActivity"/>
+        <activity android:name=".activity.BudgetCategoryActivity"/>
         <activity
             android:name=".activity.WelcomeActivity"
             android:exported="true">
