@@ -135,16 +135,6 @@ public class CategoryService {
             }
         }
 
-        if (budgets != null) {
-            for (Budget budget : budgets.values()) {
-                if (budget.getCategoryLimits() != null && budget.getCategoryLimits().containsKey(categoryId)) {
-                    Log.w("CategoryService", "Category is used in budget: " + categoryId);
-                    DisplayToast.Display(dataFile.getContext(), "Category is used in budget");
-                    return;
-                }
-            }
-        }
-
         categories.remove(categoryId);
         Log.d("CategoryService", "Category deleted: " + categoryId);
         DisplayToast.Display(dataFile.getContext(), "Category deleted successfully");

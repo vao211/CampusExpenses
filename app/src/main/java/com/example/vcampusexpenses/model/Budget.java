@@ -4,9 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Budget {
     private String budgetId;
@@ -16,9 +14,8 @@ public class Budget {
     private String startDate;
     private String endDate;
     private List<String> listAccountIds = new ArrayList<>();
-    private Map<String, Double> categoryLimits = new HashMap<>(); // categoryId -> limit
 
-    //Constructor cho getListUserBudgets
+    // Constructor for getListUserBudgets
     public Budget(String budgetId, String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
         this.budgetId = budgetId;
         this.name = name;
@@ -27,7 +24,6 @@ public class Budget {
         this.startDate = startDate;
         this.endDate = endDate;
         this.listAccountIds = new ArrayList<>();
-        this.categoryLimits = new HashMap<>();
     }
 
     public Budget(String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
@@ -37,14 +33,13 @@ public class Budget {
         this.startDate = startDate;
         this.endDate = endDate;
         this.listAccountIds = new ArrayList<>();
-        this.categoryLimits = new HashMap<>();
     }
 
-    //kiem tra transaction co thuoc ve Budget
+    // Check if transaction belongs to Budget
     public boolean appliesToTransaction(Transaction transaction) {
         if (transaction.isTransfer()) return false;
 
-        // Kiểm tra thời gian ngân sách
+        // Check budget time period
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date transactionDate = sdf.parse(transaction.getDate());
@@ -55,11 +50,10 @@ public class Budget {
                 return false;
             }
         } catch (ParseException e) {
-            return false; //Nếu ngày không hợp lệ, bỏ qua ngân sách
+            return false; // If date is invalid, skip budget
         }
 
-        return listAccountIds.contains(transaction.getAccountId()) &&
-                categoryLimits.containsKey(transaction.getCategoryId());
+        return listAccountIds.contains(transaction.getAccountId());
     }
 
     public void updateRemaining(Transaction transaction) {
@@ -70,16 +64,11 @@ public class Budget {
         }
     }
 
-    //them account va budget
+    // Add account to budget
     public void addAccount(String accountId) {
         if (!listAccountIds.contains(accountId)) {
             listAccountIds.add(accountId);
         }
-    }
-
-    //them category va budget
-    public void addCategoryLimit(String categoryId, double limit) {
-        categoryLimits.put(categoryId, limit);
     }
 
     public String getBudgetId() {
@@ -88,14 +77,6 @@ public class Budget {
 
     public void setBudgetId(String budgetId) {
         this.budgetId = budgetId;
-    }
-
-    public Map<String, Double> getCategoryLimits() {
-        return categoryLimits;
-    }
-
-    public void setCategoryLimits(Map<String, Double> categoryLimits) {
-        this.categoryLimits = categoryLimits != null ? new HashMap<>(categoryLimits) : new HashMap<>();
     }
 
     public List<String> getListAccountIds() {
