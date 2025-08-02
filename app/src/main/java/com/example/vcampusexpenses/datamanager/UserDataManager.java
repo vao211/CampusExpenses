@@ -187,4 +187,8 @@ public class UserDataManager {
     public UserData getUserDataObject() {
         return userData;
     }
+    public void setUserDataObject(UserData userData) {
+        this.userData = userData;
+        saveData();
+    }
 }

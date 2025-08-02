@@ -9,10 +9,13 @@ import java.util.Arrays;
 public class SettingService {
     private final SettingDataManager settingFile;
     private final Setting setting;
+    private boolean GuestSyncRequest;
 
     public SettingService(Context context) {
         this.settingFile = new SettingDataManager(context);
         this.setting = settingFile.getSetting();
+        this.GuestSyncRequest = false;
+
     }
 
     public String getDisplayName() {
@@ -27,6 +30,13 @@ public class SettingService {
         return setting.getNotification();
     }
 
+    //Guest sync request (from setting activity)
+    public void setGuestSyncRequest(boolean request){
+        this.GuestSyncRequest = request;
+    }
+    public boolean getGuestSyncRequest(){
+        return this.GuestSyncRequest;
+    }
     public void setDisplayName(String displayName) {
         if (displayName == null || displayName.trim().isEmpty()) {
             DisplayToast.Display(settingFile.getContext(), "Invalid real name");

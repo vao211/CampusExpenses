@@ -6,9 +6,13 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.vcampusexpenses.activity.GoogleLoginActivity;
+import com.example.vcampusexpenses.datamanager.ApiCallBack;
+import com.example.vcampusexpenses.datamanager.SyncDataManager;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.services.AccountService;
+import com.example.vcampusexpenses.services.SettingService;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.activity.LoginActivity;
 import com.example.vcampusexpenses.activity.RegistrationPageActivity;
@@ -25,8 +29,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class FireBaseAuthen {
-
     public static void LogIn(Context context, String email, String password) {
+        SettingService settingService = new SettingService(context);
+
         Log.d("FireBaseAuthen", "Attempting login for email: " + email);
         SessionManager sessionManager = new SessionManager(context);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -55,10 +60,26 @@ public class FireBaseAuthen {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
+                            //Authen ok
                             if (user != null) {
                                 sessionManager.saveLoginSession(user.getEmail(), user.getUid());
-                                Log.d("FireBaseAuthen", "Login successful for userId: " + user.getUid());
+                                if(settingService.getGuestSyncRequest()){
+                                    UserDataManager userDataManager = UserDataManager.getInstance(context, sessionManager.getUserId());
+                                    SyncDataManager syncDataManager = new SyncDataManager(context, userDataManager);
+                                    syncDataManager.fetchData(sessionManager.getUserId(), new ApiCallBack(){
+                                        @Override
+                                        public void onSuccess(String responseData) {
+                                            Log.d("GoogleLoginActivity", "Sync successfully: "+ responseData);
+                                            settingService.setGuestSyncRequest(false);
+                                        }
+                                        @Override
+                                        public void onFailure(String errorMessage) {
+                                            Log.d("FireBaseAuthen", "Sync failed: "+ errorMessage);
+                                        }
+                                    });
+                                }
 
+                                Log.d("FireBaseAuthen", "Login successful for userId: " + user.getUid());
 
                                 Intent intent = new Intent(context, RegistrationPageActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
