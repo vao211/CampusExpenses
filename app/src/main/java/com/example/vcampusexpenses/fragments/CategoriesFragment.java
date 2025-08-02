@@ -16,26 +16,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vcampusexpenses.R;
+import com.example.vcampusexpenses.activity.BudgetCategoryActivity;
 import com.example.vcampusexpenses.activity.ChartCategoryActivity;
 import com.example.vcampusexpenses.adapters.CategoryAdapter;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
-import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.model.Category;
-import com.example.vcampusexpenses.services.TransactionService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCategoryClickListener {
     private RecyclerView recyclerViewCategories;
@@ -175,5 +165,13 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
                     dialog.cancel();
                 })
                 .show();
+    }
+
+    @Override
+    public void addCategoryBudget(String categoryId) {
+        Log.d("CategoriesFragment", "Adding account budget to category with ID: " + categoryId);
+        Intent intent = new Intent(requireContext(), BudgetCategoryActivity.class);
+        intent.putExtra("categoryId", categoryId);
+        startActivity(intent);
     }
 }

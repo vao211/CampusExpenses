@@ -18,6 +18,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     public interface OnCategoryClickListener{
         void editCategory(String categoryID);
         void deleteCategory(String categoryId);
+        void addCategoryBudget(String categoryId);
     }
     public CategoryAdapter(List<Category> categoryList, OnCategoryClickListener listenter) {
         this.categoryList = categoryList;
@@ -43,6 +44,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         holder.btnDeleteItemCategory.setOnClickListener(view -> {
             listenter.deleteCategory(category.getCategoryId());
         });
+        holder.btnAddCategoryBudget.setOnClickListener(view -> {
+            listenter.addCategoryBudget(category.getCategoryId());
+        });
     }
 
     @Override
@@ -52,13 +56,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     static class CategoryViewHolder extends RecyclerView.ViewHolder {
         TextView tvCategoryName;
-        ImageButton btnEditItemCategory, btnDeleteItemCategory;
+        ImageButton btnEditItemCategory, btnDeleteItemCategory, btnAddCategoryBudget;
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCategoryName = itemView.findViewById(R.id.txt_categoryName);
             btnEditItemCategory = itemView.findViewById(R.id.btn_editItemCategory);
             btnDeleteItemCategory = itemView.findViewById(R.id.btn_deleteItemCategory);
+            btnAddCategoryBudget = itemView.findViewById(R.id.btn_add_account_budget);
         }
     }
 }

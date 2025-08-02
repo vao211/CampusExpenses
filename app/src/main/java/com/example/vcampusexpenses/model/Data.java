@@ -5,11 +5,11 @@ import java.util.Map;
 public class Data {
     private Map<String, Account> accounts;
     private Map<String, Category> categories;
-    private Map<String, Budget> budgets;
+    private Map<String, AccountBudget> budgets;
     private Map<String, Transaction> transactions;
 
     public Data(Map<String, Account> account, Map<String, Category> categories,
-                Map<String, Budget> budgets, Map<String, Transaction> transactions) {
+                Map<String, AccountBudget> budgets, Map<String, Transaction> transactions) {
         this.accounts = account;
         this.categories = categories;
         this.budgets = budgets;
@@ -32,11 +32,11 @@ public class Data {
         this.categories = categories;
     }
 
-    public Map<String, Budget> getBudgets() {
+    public Map<String, AccountBudget> getBudgets() {
         return budgets;
     }
 
-    public void setBudgets(Map<String, Budget> budgets) {
+    public void setBudgets(Map<String, AccountBudget> budgets) {
         this.budgets = budgets;
     }
 
