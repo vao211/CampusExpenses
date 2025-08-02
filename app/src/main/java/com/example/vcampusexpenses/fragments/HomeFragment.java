@@ -49,7 +49,6 @@ public class HomeFragment extends Fragment {
     private DateFilterView dateFilterView;
     private DateFilterUtil dateFilterUtil;
 
-    // Services and Adapters
     private HomeAccountAdapter accountAdapter;
     private AccountService accountService;
     private TransactionService transactionService;
@@ -168,7 +167,7 @@ public class HomeFragment extends Fragment {
 
         //lọc income và outcome
         double totalIncome = transactionService.getTotalIncome(startDate.getTimeInMillis(), endDate.getTimeInMillis());
-        double totalOutcome = transactionService.getTotalOutcome(endDate.getTimeInMillis(), endDate.getTimeInMillis());
+        double totalOutcome = transactionService.getTotalOutcome(startDate.getTimeInMillis(), endDate.getTimeInMillis());
 
         txtTotalIncome.setText(String.format(Locale.getDefault(), "%.2f", totalIncome));
         txtTotalOutcome.setText(String.format(Locale.getDefault(), "%.2f", totalOutcome));
