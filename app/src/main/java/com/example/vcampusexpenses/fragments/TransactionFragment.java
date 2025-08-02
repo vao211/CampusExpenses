@@ -21,7 +21,7 @@ import com.example.vcampusexpenses.adapters.TransactionAdapter;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.services.AccountService;
-import com.example.vcampusexpenses.services.BudgetService;
+import com.example.vcampusexpenses.services.AccountBudgetService;
 import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.services.TransactionService;
 import com.example.vcampusexpenses.session.SessionManager;
@@ -44,7 +44,7 @@ public class TransactionFragment extends Fragment implements TransactionAdapter.
     private UserDataManager dataManager;
     private AccountService accountService;
     private CategoryService categoryService;
-    private BudgetService budgetService;
+    private AccountBudgetService accountBudgetService;
     private TransactionService transactionService;
     private String transactionType = "all";
     private RecyclerView rvTransactions;
@@ -61,8 +61,8 @@ public class TransactionFragment extends Fragment implements TransactionAdapter.
 
         accountService = new AccountService(dataManager);
         categoryService = new CategoryService(dataManager);
-        budgetService = new BudgetService(dataManager);
-        transactionService = new TransactionService(dataManager, accountService, budgetService);
+        accountBudgetService = new AccountBudgetService(dataManager);
+        transactionService = new TransactionService(dataManager, accountService, accountBudgetService);
 
         btnAdd = view.findViewById(R.id.btn_add);
         llIncome = view.findViewById(R.id.ll_income);
@@ -118,7 +118,7 @@ public class TransactionFragment extends Fragment implements TransactionAdapter.
             loadTransactions(dateFilterUtil.getStartDate(), dateFilterUtil.getEndDate(), dateFilterUtil.getCurrentFilterType());
         });
     }
-
+    //lọc loại giao dịch
     private void setTransactionTypeSelection(String selected) {
         llIncome.setBackgroundResource(R.drawable.border);
         llOutcome.setBackgroundResource(R.drawable.border);

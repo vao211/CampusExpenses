@@ -7,11 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Account;
-import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.AccountBudget;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Transaction;
+import com.example.vcampusexpenses.services.AccountBudgetService;
 import com.example.vcampusexpenses.services.AccountService;
-import com.example.vcampusexpenses.services.BudgetService;
 import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.services.TransactionService;
 import com.example.vcampusexpenses.session.SessionManager;
@@ -110,7 +110,7 @@ public class Example extends AppCompatActivity {
     }
     private void budgetMethods() {
         // Khởi tạo các service
-        BudgetService budgetService = new BudgetService(userDataManager);
+        AccountBudgetService accountBudgetService = new AccountBudgetService(userDataManager);
         AccountService accountService = new AccountService(userDataManager);
         CategoryService categoryService = new CategoryService(userDataManager);
 
@@ -120,86 +120,86 @@ public class Example extends AppCompatActivity {
         String categoryId1 = addCategoryForBudget("Example category", categoryService);
         String categoryId2 = addCategoryForBudget("Food category", categoryService);
 
-        // Add Budget
-        String budgetName = "Example budget";
+        // Add AccountBudget
+        String budgetName = "Example accountBudget";
         double totalAmount = 200;
         double remainingAmount = 200;
         String startDate = "2025-07-01";
         String endDate = "2025-07-31";
-        Budget budget = new Budget(budgetName, totalAmount, remainingAmount, startDate, endDate);
+        AccountBudget accountBudget = new AccountBudget(budgetName, totalAmount, remainingAmount, startDate, endDate);
         // Thêm account và category limit vào ngân sách
         if (accountId1 != null) {
-            budget.addAccount(accountId1);
+            accountBudget.addAccount(accountId1);
         }
-        budgetService.addBudget(budget);
+        accountBudgetService.addBudget(accountBudget);
         userDataManager.saveData();
 
-        // Update Budget (bảo toàn categoryLimits và accountIds)
-        String budgetId = budgetService.getBudgetId(budgetName);
+        // Update AccountBudget (bảo toàn categoryLimits và accountIds)
+        String budgetId = accountBudgetService.getBudgetId(budgetName);
         if (budgetId != null) {
-            String newBudgetName = "Updated Example budget";
+            String newBudgetName = "Updated Example accountBudget";
             double newTotalAmount = 300;
             double newRemainingAmount = 300;
             String newStartDate = "2025-08-01";
             String newEndDate = "2025-08-31";
-            Budget newBudget = new Budget(budgetId, newBudgetName, newTotalAmount, newRemainingAmount, newStartDate, newEndDate);
+            AccountBudget newAccountBudget = new AccountBudget(budgetId, newBudgetName, newTotalAmount, newRemainingAmount, newStartDate, newEndDate);
             // Không thêm categoryLimits hoặc accountIds, chọn override = false để bảo toàn
-            budgetService.updateBudget(budgetId, newBudget, false);
+            accountBudgetService.updateBudget(budgetId, newAccountBudget, false);
             userDataManager.saveData();
         }
 
-        // Update Budget (ghi đè categoryLimits và accountIds)
+        // Update AccountBudget (ghi đè categoryLimits và accountIds)
         if (budgetId != null) {
-            String newBudgetName = "Overridden Example budget";
+            String newBudgetName = "Overridden Example accountBudget";
             double newTotalAmount = 400;
             double newRemainingAmount = 400;
             String newStartDate = "2025-09-01";
             String newEndDate = "2025-09-30";
-            Budget newBudget = new Budget(budgetId, newBudgetName, newTotalAmount, newRemainingAmount, newStartDate, newEndDate);
+            AccountBudget newAccountBudget = new AccountBudget(budgetId, newBudgetName, newTotalAmount, newRemainingAmount, newStartDate, newEndDate);
             if (accountId2 != null) {
-                newBudget.addAccount(accountId2);
+                newAccountBudget.addAccount(accountId2);
             }
 
             // Chọn override = true để ghi đè danh sách
-            budgetService.updateBudget(budgetId, newBudget, true);
+            accountBudgetService.updateBudget(budgetId, newAccountBudget, true);
             userDataManager.saveData();
         }
 
-        // Add Account to Budget
+        // Add Account to AccountBudget
         if (budgetId != null && accountId1 != null) {
-            budgetService.addAccountToBudget(budgetId, accountId1);
+            accountBudgetService.addAccountToBudget(budgetId, accountId1);
             userDataManager.saveData();
         }
 
-        // Update Account in Budget
+        // Update Account in AccountBudget
         if (budgetId != null && accountId1 != null && accountId2 != null) {
-            budgetService.updateAccountInBudget(budgetId, accountId1, accountId2);
+            accountBudgetService.updateAccountInBudget(budgetId, accountId1, accountId2);
             userDataManager.saveData();
         }
 
-        // Delete Account from Budget
+        // Delete Account from AccountBudget
         if (budgetId != null && accountId2 != null) {
-            budgetService.deleteAccountFromBudget(budgetId, accountId2);
+            accountBudgetService.deleteAccountFromBudget(budgetId, accountId2);
             userDataManager.saveData();
         }
 
-        // Delete Budget
+        // Delete AccountBudget
         if (budgetId != null) {
-            budgetService.deleteBudget(budgetId);
+            accountBudgetService.deleteBudget(budgetId);
             userDataManager.saveData();
         }
 
         // Get List of Budgets
-        List<Budget> listBudgets = budgetService.getListUserBudgets();
+        List<AccountBudget> listAccountBudgets = accountBudgetService.getListUserBudgets();
     }
 
 
     private void transactionMethods() {
         // Khởi tạo các service
-        BudgetService budgetService = new BudgetService(userDataManager);
+        AccountBudgetService accountBudgetService = new AccountBudgetService(userDataManager);
         AccountService accountService = new AccountService(userDataManager);
         CategoryService categoryService = new CategoryService(userDataManager);
-        TransactionService transactionService = new TransactionService(userDataManager, accountService, budgetService);
+        TransactionService transactionService = new TransactionService(userDataManager, accountService, accountBudgetService);
 
         // Tạo tài khoản và danh mục để sử dụng trong giao dịch
         String accountId1 = addAccountForBudget("Example account", accountService);
@@ -208,17 +208,17 @@ public class Example extends AppCompatActivity {
         String categoryId2 = addCategoryForBudget("Food category", categoryService);
 
         // Tạo ngân sách để kiểm tra giới hạn cho giao dịch OUTCOME
-        String budgetName = "Example budget";
+        String budgetName = "Example accountBudget";
         double totalAmount = 200;
         double remainingAmount = 200;
         String startDate = "2025-07-01";
         String endDate = "2025-07-31";
-        Budget budget = new Budget(budgetName, totalAmount, remainingAmount, startDate, endDate);
+        AccountBudget accountBudget = new AccountBudget(budgetName, totalAmount, remainingAmount, startDate, endDate);
         if (accountId1 != null) {
-            budget.addAccount(accountId1);
+            accountBudget.addAccount(accountId1);
         }
 
-        budgetService.addBudget(budget);
+        accountBudgetService.addBudget(accountBudget);
         userDataManager.saveData();
 
         // Add Transaction (INCOME)

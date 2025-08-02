@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.vcampusexpenses.model.Account;
-import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.AccountBudget;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Data;
 import com.example.vcampusexpenses.model.User;
@@ -26,13 +26,12 @@ import java.util.Map;
 
 public class UserDataManager {
     private static final String FILE_NAME = "expense_data.json";
-    private static volatile UserDataManager userManagerInstance; //volatile để thread-safe
+    private static volatile UserDataManager userManagerInstance;
     private final Context context;
     private final File file;
     private UserData userData;
     private final String userId;
 
-    //Constructor private (Singleton)
     public UserDataManager(Context context, String userId) {
         this.context = context;
         this.userId = userId;
@@ -42,7 +41,6 @@ public class UserDataManager {
         initializeFile(userId);
     }
 
-    //Singleton
     public static synchronized UserDataManager getInstance(Context context, String userId) {
         if (userManagerInstance == null || !userManagerInstance.getUserId().equals(userId)) {
             synchronized (UserDataManager.class) {
@@ -62,7 +60,7 @@ public class UserDataManager {
         return userId;
     }
 
-    private void createSampleData(){
+    private void createSampleData() {
         Map<String, Account> accounts = new HashMap<>();
         String accountId = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
         String accountId2 = IdGenerator.generateId(IdGenerator.ModelType.ACCOUNT);
@@ -73,15 +71,18 @@ public class UserDataManager {
         String[] categoryNames = {"Ăn uống", "Sức khỏe", "Internet", "Tiền điện", "Tiền nước", "Tiền Lương"};
         for (String name : categoryNames) {
             String categoryId = IdGenerator.generateId(IdGenerator.ModelType.CATEGORY);
-            categories.put(categoryId, new Category(categoryId, name));
+            Category category = new Category(categoryId, name);
+            category.setBudgetForAccount(accountId, Integer.MAX_VALUE);
+            categories.put(categoryId, category);
         }
 
-        Map<String, Budget> budgets = new HashMap<>();
+        Map<String, AccountBudget> budgets = new HashMap<>();
         Map<String, com.example.vcampusexpenses.model.Transaction> transactions = new HashMap<>();
         Data data = new Data(accounts, categories, budgets, transactions);
         userData = new UserData(new User(userId, data));
         saveData();
     }
+
     private void initializeFile(String userId) {
         if (!file.exists()) {
             createSampleData();
@@ -101,7 +102,7 @@ public class UserDataManager {
             return;
         }
         try (FileReader reader = new FileReader(file)) {
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().create();
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(reader);
             if (!jsonElement.isJsonObject()) {
@@ -130,7 +131,6 @@ public class UserDataManager {
             return;
         }
 
-        //quyền ghi file
         if (!file.exists()) {
             try {
                 if (!file.createNewFile()) {
@@ -151,7 +151,7 @@ public class UserDataManager {
             return;
         }
 
-        try (FileWriter writer = new FileWriter(file, false)) { //ghi đè
+        try (FileWriter writer = new FileWriter(file, false)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String jsonContent = gson.toJson(userData);
             Log.d("UserDataManager", "JSON to save: " + jsonContent);
@@ -159,7 +159,6 @@ public class UserDataManager {
             writer.flush();
             Log.d("UserDataManager", "Data saved successfully to: " + file.getAbsolutePath());
 
-            // Kiểm tra nội dung file sau khi ghi
             try (FileReader reader = new FileReader(file)) {
                 JsonParser parser = new JsonParser();
                 JsonElement jsonElement = parser.parse(reader);

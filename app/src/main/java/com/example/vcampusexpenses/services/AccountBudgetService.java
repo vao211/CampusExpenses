@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Account;
-import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.AccountBudget;
 import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.model.UserData;
 import com.example.vcampusexpenses.utils.DisplayToast;
@@ -17,29 +17,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BudgetService {
+public class AccountBudgetService {
     private final UserDataManager dataFile;
     private final UserData userData;
     private final String userId;
+    private final CategoryBudgetService categoryBudgetService;
 
-    public BudgetService(UserDataManager dataManager) {
+    public AccountBudgetService(UserDataManager dataManager) {
         this.dataFile = dataManager;
         this.userData = dataManager.getUserDataObject();
         this.userId = dataManager.getUserId();
+        this.categoryBudgetService = new CategoryBudgetService(dataManager);
         Log.d("BudgetService", "Initialized with userId: " + userId);
     }
-    public Budget getBudget(String budgetId) {
+
+    public AccountBudget getBudget(String budgetId) {
         Log.d("BudgetService", "Getting budget: " + budgetId);
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("BudgetService", "User data not initialized");
             return null;
         }
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, AccountBudget> budgets = userData.getUser().getData().getBudgets();
         if (budgets == null || !budgets.containsKey(budgetId)) {
             Log.e("BudgetService", "Budget not found: " + budgetId);
             return null;
         }
-        Budget budget = budgets.get(budgetId);
+        AccountBudget budget = budgets.get(budgetId);
         Log.d("BudgetService", "Budget found: " + budget.getName());
         return budget;
     }
@@ -76,7 +79,7 @@ public class BudgetService {
         return null;
     }
 
-    public void addBudget(Budget budget) {
+    public void addBudget(AccountBudget budget) {
         Log.d("BudgetService", "Adding budget: " + (budget != null ? budget.getName() : "null"));
         if (budget == null || budget.getName() == null || budget.getTotalAmount() <= 0) {
             Log.e("BudgetService", "Budget info is invalid");
@@ -89,7 +92,7 @@ public class BudgetService {
             return;
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, AccountBudget> budgets = userData.getUser().getData().getBudgets();
 
         if (accounts == null) {
             accounts = new HashMap<>();
@@ -101,7 +104,6 @@ public class BudgetService {
         userData.getUser().getData().setAccount(accounts);
         userData.getUser().getData().setBudgets(budgets);
 
-        //ktra account tồn tại
         for (String accountId : budget.getListAccountIds()) {
             if (!accounts.containsKey(accountId)) {
                 Log.e("BudgetService", "Account not found: " + accountId);
@@ -113,10 +115,8 @@ public class BudgetService {
         String budgetId = IdGenerator.generateId(IdGenerator.ModelType.BUDGET);
         budget.setBudgetId(budgetId);
 
-        //thêm budget vào budgets
         budgets.put(budgetId, budget);
 
-        //update list budget của các Account
         for (String accountId : budget.getListAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
@@ -129,46 +129,41 @@ public class BudgetService {
             }
         }
 
+
         Log.d("BudgetService", "Budget added: " + budget.getName());
         DisplayToast.Display(dataFile.getContext(), "Budget added successfully");
     }
-    //Kiểm tra có ghi đè các list account
-    public void updateBudget(String budgetId, Budget newBudget, boolean override) {
+
+    public void updateBudget(String budgetId, AccountBudget newBudget, boolean override) {
         Log.d("BudgetService", "Updating budgetId: " + budgetId + ", override: " + override);
 
-        // Kiểm tra tính hợp lệ của newBudget
         if (newBudget == null || newBudget.getName() == null || newBudget.getTotalAmount() <= 0) {
             Log.e("BudgetService", "Budget info is invalid");
             DisplayToast.Display(dataFile.getContext(), "Budget info is invalid");
             return;
         }
 
-        // Kiểm tra userData có được khởi tạo đúng không
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("BudgetService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
 
-        // Lấy dữ liệu từ userData
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, AccountBudget> budgets = userData.getUser().getData().getBudgets();
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
 
-        // Kiểm tra budgets, accounts có tồn tại không
         if (budgets == null || accounts == null) {
             Log.e("BudgetService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
 
-        // Kiểm tra ngân sách có tồn tại không
         if (!budgets.containsKey(budgetId)) {
             Log.e("BudgetService", "Budget not found: " + budgetId);
             DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetId);
             return;
         }
 
-        // Kiểm tra xem các tài khoản trong newBudget có tồn tại không
         for (String accountId : newBudget.getListAccountIds()) {
             if (!accounts.containsKey(accountId)) {
                 Log.e("BudgetService", "Account not found: " + accountId);
@@ -177,10 +172,8 @@ public class BudgetService {
             }
         }
 
-        // Lấy ngân sách cũ
-        Budget oldBudget = budgets.get(budgetId);
+        AccountBudget oldBudget = budgets.get(budgetId);
 
-        // Xóa budgetId khỏi danh sách budgetIds của các tài khoản cũ
         for (String accountId : oldBudget.getListAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
@@ -189,8 +182,7 @@ public class BudgetService {
             }
         }
 
-        // Tạo ngân sách mới để cập nhật
-        Budget updatedBudget = new Budget(
+        AccountBudget updatedBudget = new AccountBudget(
                 budgetId,
                 newBudget.getName(),
                 newBudget.getTotalAmount(),
@@ -199,19 +191,14 @@ public class BudgetService {
                 newBudget.getEndDate()
         );
 
-        // Xử lý accountIds
         if (override || newBudget.getListAccountIds().isEmpty()) {
-            // Nếu override = true hoặc newBudget không cung cấp accountIds, sử dụng accountIds từ newBudget
             updatedBudget.setListAccountIds(new ArrayList<>(newBudget.getListAccountIds()));
         } else {
-            // Nếu override = false và newBudget có accountIds, giữ nguyên accountIds từ oldBudget
             updatedBudget.setListAccountIds(new ArrayList<>(oldBudget.getListAccountIds()));
         }
 
-        // Cập nhật ngân sách trong danh sách budgets
         budgets.put(budgetId, updatedBudget);
 
-        // Cập nhật budgetIds cho các tài khoản mới
         for (String accountId : updatedBudget.getListAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
@@ -224,6 +211,7 @@ public class BudgetService {
             }
         }
 
+
         Log.d("BudgetService", "Budget updated: " + updatedBudget.getName());
         DisplayToast.Display(dataFile.getContext(), "Budget updated successfully");
     }
@@ -235,7 +223,7 @@ public class BudgetService {
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, AccountBudget> budgets = userData.getUser().getData().getBudgets();
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
 
         if (budgets == null || accounts == null) {
@@ -244,15 +232,13 @@ public class BudgetService {
             return;
         }
 
-        //Ktra budget tồn tại
         if (!budgets.containsKey(budgetId)) {
             Log.e("BudgetService", "Budget not found: " + budgetId);
             DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetId);
             return;
         }
 
-        //xóa budget khỏi account
-        Budget budget = budgets.get(budgetId);
+        AccountBudget budget = budgets.get(budgetId);
         List<String> accountIds = budget.getListAccountIds();
         for (String accountId : accountIds) {
             Account account = accounts.get(accountId);
@@ -263,19 +249,20 @@ public class BudgetService {
         }
 
         budgets.remove(budgetId);
+
         Log.d("BudgetService", "Budget deleted: " + budgetId);
         DisplayToast.Display(dataFile.getContext(), "Budget deleted successfully");
     }
 
-    public List<Budget> getListUserBudgets() {
+    public List<AccountBudget> getListUserBudgets() {
         Log.d("BudgetService", "Getting list of budgets");
-        List<Budget> listBudgets = new ArrayList<>();
+        List<AccountBudget> listBudgets = new ArrayList<>();
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
             Log.e("BudgetService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return listBudgets;
         }
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, AccountBudget> budgets = userData.getUser().getData().getBudgets();
         if (budgets != null) {
             listBudgets.addAll(budgets.values());
             Log.d("BudgetService", "Found " + listBudgets.size() + " budgets");
@@ -285,31 +272,32 @@ public class BudgetService {
         return listBudgets;
     }
 
-    protected void updateBudgetsInTransaction(Transaction transaction) {
+    public void updateBudgetsInTransaction(Transaction transaction) {
         Log.d("BudgetService", "Updating budgets for transaction: " + transaction.getDescription());
         if (transaction.isTransfer()) {
             Log.d("BudgetService", "Transaction is a transfer, skipping budget update");
             return;
         }
 
-        List<Budget> budgets = getListUserBudgets();
-        for (Budget budget : budgets) {
+        List<AccountBudget> budgets = getListUserBudgets();
+        for (AccountBudget budget : budgets) {
             if (budget.appliesToTransaction(transaction)) {
                 budget.updateRemaining(transaction);
                 Log.d("BudgetService", "Updated budget: " + budget.getName() + ", remaining: " + budget.getRemainingAmount());
             }
         }
-        // Không gọi saveData() ở đây
+        categoryBudgetService.updateCategoryBudgetsInTransaction(transaction);
+
     }
 
-    protected void reverseBudgetUpdate(Transaction transaction) {
+    public void reverseBudgetUpdate(Transaction transaction) {
         Log.d("BudgetService", "Reversing budget update for transaction: " + transaction.getDescription());
         if (transaction.isTransfer()) {
             Log.d("BudgetService", "Transaction is a transfer, skipping reverse budget update");
             return;
         }
-        List<Budget> budgets = getListUserBudgets();
-        for (Budget budget : budgets) {
+        List<AccountBudget> budgets = getListUserBudgets();
+        for (AccountBudget budget : budgets) {
             if (budget.appliesToTransaction(transaction)) {
                 if (transaction.getType().equals("INCOME")) {
                     budget.setRemainingAmount(budget.getRemainingAmount() - transaction.getAmount());
@@ -319,9 +307,10 @@ public class BudgetService {
                 Log.d("BudgetService", "Reversed budget: " + budget.getName() + ", remaining: " + budget.getRemainingAmount());
             }
         }
+        categoryBudgetService.reverseCategoryBudgetUpdate(transaction);
+
     }
 
-    // --- Quản lý accounts áp dụng ---
     public void addAccountToBudget(String budgetId, String accountId) {
         Log.d("BudgetService", "Adding account: accountId=" + accountId + " to budgetId=" + budgetId);
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
@@ -329,7 +318,7 @@ public class BudgetService {
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, AccountBudget> budgets = userData.getUser().getData().getBudgets();
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
 
         if (budgets == null || !budgets.containsKey(budgetId)) {
@@ -343,7 +332,7 @@ public class BudgetService {
             return;
         }
 
-        Budget budget = budgets.get(budgetId);
+        AccountBudget budget = budgets.get(budgetId);
         List<String> accountIds = budget.getListAccountIds();
         if (accountIds.contains(accountId)) {
             Log.w("BudgetService", "Account already applied to budget: " + accountId);
@@ -362,6 +351,7 @@ public class BudgetService {
             budgetIds.add(budgetId);
         }
 
+
         Log.d("BudgetService", "Added account: accountId=" + accountId + " to budget " + budget.getName());
         DisplayToast.Display(dataFile.getContext(), "Account added to budget successfully");
     }
@@ -373,7 +363,7 @@ public class BudgetService {
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, AccountBudget> budgets = userData.getUser().getData().getBudgets();
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
 
         if (budgets == null || !budgets.containsKey(budgetId)) {
@@ -387,7 +377,7 @@ public class BudgetService {
             return;
         }
 
-        Budget budget = budgets.get(budgetId);
+        AccountBudget budget = budgets.get(budgetId);
         List<String> accountIds = budget.getListAccountIds();
         if (!accountIds.contains(oldAccountId)) {
             Log.e("BudgetService", "Old account not found in budget: " + oldAccountId);
@@ -419,6 +409,7 @@ public class BudgetService {
             newBudgetIds.add(budgetId);
         }
 
+
         Log.d("BudgetService", "Updated account: oldAccountId=" + oldAccountId + " to newAccountId=" + newAccountId + " in budget " + budget.getName());
         DisplayToast.Display(dataFile.getContext(), "Account updated in budget successfully");
     }
@@ -430,7 +421,7 @@ public class BudgetService {
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
         }
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, AccountBudget> budgets = userData.getUser().getData().getBudgets();
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
 
         if (budgets == null || !budgets.containsKey(budgetId)) {
@@ -444,7 +435,7 @@ public class BudgetService {
             return;
         }
 
-        Budget budget = budgets.get(budgetId);
+        AccountBudget budget = budgets.get(budgetId);
         List<String> accountIds = budget.getListAccountIds();
         if (!accountIds.contains(accountId)) {
             Log.e("BudgetService", "Account not found in budget: " + accountId);
@@ -458,6 +449,7 @@ public class BudgetService {
         if (budgetIds != null) {
             budgetIds.remove(budgetId);
         }
+
 
         Log.d("BudgetService", "Deleted account: accountId=" + accountId + " from budget " + budget.getName());
         DisplayToast.Display(dataFile.getContext(), "Account removed from budget successfully");

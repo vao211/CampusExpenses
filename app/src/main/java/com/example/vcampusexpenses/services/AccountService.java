@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Account;
-import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.AccountBudget;
 import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.model.UserData;
 import com.example.vcampusexpenses.utils.DisplayToast;
@@ -207,7 +207,7 @@ public class AccountService {
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
         Map<String, Transaction> transactions = userData.getUser().getData().getTransactions();
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
+        Map<String, AccountBudget> budgets = userData.getUser().getData().getBudgets();
         if (accounts == null || !accounts.containsKey(accountId)) {
             Log.e("AccountService", "Account not found: " + accountId);
             DisplayToast.Display(userDataManager.getContext(), "Account not found: " + accountId);
@@ -223,10 +223,10 @@ public class AccountService {
             }
         }
         if (budgets != null) {
-            for (Budget budget : budgets.values()) {
-                if (budget.getListAccountIds() != null && budget.getListAccountIds().contains(accountId)) {
-                    Log.w("AccountService", "Cannot delete account because it is used in budget");
-                    DisplayToast.Display(userDataManager.getContext(), "Cannot delete account because it is used in budget");
+            for (AccountBudget accountBudget : budgets.values()) {
+                if (accountBudget.getListAccountIds() != null && accountBudget.getListAccountIds().contains(accountId)) {
+                    Log.w("AccountService", "Cannot delete account because it is used in accountBudget");
+                    DisplayToast.Display(userDataManager.getContext(), "Cannot delete account because it is used in accountBudget");
                     return;
                 }
             }

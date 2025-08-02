@@ -7,10 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,14 +18,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vcampusexpenses.R;
-import com.example.vcampusexpenses.activity.BudgetActivity;
+import com.example.vcampusexpenses.activity.BudgetAccountActivity;
 import com.example.vcampusexpenses.adapters.BudgetAdapter;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
-import com.example.vcampusexpenses.model.Account;
-import com.example.vcampusexpenses.model.Budget;
-import com.example.vcampusexpenses.model.Category;
+import com.example.vcampusexpenses.model.AccountBudget;
+import com.example.vcampusexpenses.services.AccountBudgetService;
 import com.example.vcampusexpenses.services.AccountService;
-import com.example.vcampusexpenses.services.BudgetService;
 import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
@@ -37,17 +32,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class BudgetFragment extends Fragment implements BudgetAdapter.OnBudgetClickListener {
+public class AccountBudgetFragment extends Fragment implements BudgetAdapter.OnBudgetClickListener {
     private RecyclerView recyclerViewBudgets;
     private TextView txtEmptyBudgets;
-    private BudgetService budgetService;
+    private AccountBudgetService accountBudgetService;
     private AccountService accountService;
     private CategoryService categoryService;
     private ImageButton btnAddBudget, btnManageAccounts, btnManageCategories;
-    private String accountId1;
-    private String accountId2; // Added for example
-    private String categoryId1;
-    private String categoryId2; // Added for example
     private UserDataManager userDataManager;
 
     @Override
@@ -62,11 +53,10 @@ public class BudgetFragment extends Fragment implements BudgetAdapter.OnBudgetCl
         String userId = sessionManager.getUserId();
 
         userDataManager = new UserDataManager(requireContext(), userId);
-        budgetService = new BudgetService(userDataManager);
+        accountBudgetService = new AccountBudgetService(userDataManager);
         accountService = new AccountService(userDataManager);
         categoryService = new CategoryService(userDataManager);
 
-        // Tạo tài khoản và danh mục mặc định, tương tự ví dụ
 
         // Thiết lập RecyclerView
         recyclerViewBudgets.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -84,7 +74,7 @@ public class BudgetFragment extends Fragment implements BudgetAdapter.OnBudgetCl
 
     private void addBudget() {
         btnAddBudget.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), BudgetActivity.class);
+            Intent intent = new Intent(requireContext(), BudgetAccountActivity.class);
             startActivity(intent);
         });
     }
@@ -98,29 +88,29 @@ public class BudgetFragment extends Fragment implements BudgetAdapter.OnBudgetCl
     }
 
     private void loadBudget() {
-        Log.d("BudgetFragment", "Loading budgets");
+        Log.d("AccountBudgetFragment", "Loading budgets");
         if (txtEmptyBudgets == null || recyclerViewBudgets == null) {
-            Log.e("BudgetFragment", "UI components not initialized");
+            Log.e("AccountBudgetFragment", "UI components not initialized");
             return;
         }
 
-        List<Budget> budgetList = budgetService.getListUserBudgets();
-        if (budgetList == null || budgetList.isEmpty()) {
-            Log.d("BudgetFragment", "No budgets found");
+        List<AccountBudget> accountBudgetList = accountBudgetService.getListUserBudgets();
+        if (accountBudgetList == null || accountBudgetList.isEmpty()) {
+            Log.d("AccountBudgetFragment", "No budgets found");
             txtEmptyBudgets.setVisibility(View.VISIBLE);
             recyclerViewBudgets.setVisibility(View.GONE);
         } else {
-            Log.d("BudgetFragment", "Found " + budgetList.size() + " budgets");
+            Log.d("AccountBudgetFragment", "Found " + accountBudgetList.size() + " budgets");
             txtEmptyBudgets.setVisibility(View.GONE);
             recyclerViewBudgets.setVisibility(View.VISIBLE);
-            BudgetAdapter budgetAdapter = new BudgetAdapter(budgetList, budgetService, this);
+            BudgetAdapter budgetAdapter = new BudgetAdapter(accountBudgetList, accountBudgetService, accountService,this);
             recyclerViewBudgets.setAdapter(budgetAdapter);
         }
     }
 
     @Override
     public void onEditBudgetClick(String budgetId) {
-        Intent intent = new Intent(requireContext(), BudgetActivity.class);
+        Intent intent = new Intent(requireContext(), BudgetAccountActivity.class);
         intent.putExtra("budgetId", budgetId);
         startActivity(intent);
     }
@@ -131,10 +121,10 @@ public class BudgetFragment extends Fragment implements BudgetAdapter.OnBudgetCl
                 .setTitle("Confirm Delete")
                 .setMessage("Are you sure you want to delete this budget?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    budgetService.deleteBudget(budgetId);
+                    accountBudgetService.deleteBudget(budgetId);
                     userDataManager.saveData();
                     loadBudget();
-                    DisplayToast.Display(requireContext(), "Budget deleted");
+                    DisplayToast.Display(requireContext(), "AccountBudget deleted");
                 })
                 .setNegativeButton("Cancel", null)
                 .show();

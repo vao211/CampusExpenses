@@ -92,7 +92,7 @@ public class HomeFragment extends Fragment {
         sessionManager = new SessionManager(requireContext());
         dataManager = UserDataManager.getInstance(requireContext(), sessionManager.getUserId());
         accountService = new AccountService(dataManager);
-        transactionService = new TransactionService(dataManager, accountService, null); // Giả sử BudgetService là null nếu chưa triển khai
+        transactionService = new TransactionService(dataManager, accountService, null); // Giả sử AccountBudgetService là null nếu chưa triển khai
     }
 
     private void initializeViews(View view) {

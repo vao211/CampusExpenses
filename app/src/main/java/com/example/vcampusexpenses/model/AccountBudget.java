@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Budget {
+public class AccountBudget {
     private String budgetId;
     private String name;
     private double totalAmount;
@@ -16,7 +16,7 @@ public class Budget {
     private List<String> listAccountIds = new ArrayList<>();
 
     // Constructor for getListUserBudgets
-    public Budget(String budgetId, String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
+    public AccountBudget(String budgetId, String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
         this.budgetId = budgetId;
         this.name = name;
         this.totalAmount = totalAmount;
@@ -26,7 +26,7 @@ public class Budget {
         this.listAccountIds = new ArrayList<>();
     }
 
-    public Budget(String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
+    public AccountBudget(String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
         this.name = name;
         this.totalAmount = totalAmount;
         this.remainingAmount = remainingAmount;
@@ -35,7 +35,7 @@ public class Budget {
         this.listAccountIds = new ArrayList<>();
     }
 
-    // Check if transaction belongs to Budget
+    // Check if transaction belongs to AccountBudget
     public boolean appliesToTransaction(Transaction transaction) {
         if (transaction.isTransfer()) return false;
 

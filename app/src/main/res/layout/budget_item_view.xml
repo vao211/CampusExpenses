@@ -17,7 +17,7 @@
             android:id="@+id/txtNameBudget"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/budget"
+            android:text="@string/accountBudget"
             android:textSize="30sp"
             android:layout_toEndOf="@+id/img_budget"/>
         <TextView

@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Account;
-import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.AccountBudget;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.model.UserData;
@@ -24,15 +24,15 @@ public class TransactionService {
     private final UserData userData;
     private final String userId;
     private final AccountService accountService;
-    private final BudgetService budgetService;
+    private final AccountBudgetService accountBudgetService;
     private final SimpleDateFormat dateFormat;
 
-    public TransactionService(UserDataManager dataManager, AccountService accountService, BudgetService budgetService) {
+    public TransactionService(UserDataManager dataManager, AccountService accountService, AccountBudgetService accountBudgetService) {
         this.dataFile = dataManager;
         this.userData = dataManager.getUserDataObject();
         this.userId = dataManager.getUserId();
         this.accountService = accountService;
-        this.budgetService = budgetService;
+        this.accountBudgetService = accountBudgetService;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Log.d("TransactionService", "Initialized with userId: " + userId);
     }
@@ -79,7 +79,7 @@ public class TransactionService {
         }
         Log.d("TransactionService", "AccountID: " + account.getAccountId() + ", Amount: " + transaction.getAmount());
         accountService.updateBalance(account.getAccountId(), transaction.getAmount());
-        budgetService.updateBudgetsInTransaction(transaction);
+        accountBudgetService.updateBudgetsInTransaction(transaction);
         saveTransaction(transaction);
     }
 
@@ -93,7 +93,7 @@ public class TransactionService {
         }
         if (account.getBalance() >= transaction.getAmount()) {
             accountService.updateBalance(account.getAccountId(), -transaction.getAmount());
-            budgetService.updateBudgetsInTransaction(transaction);
+            accountBudgetService.updateBudgetsInTransaction(transaction);
             saveTransaction(transaction);
         } else {
             Log.w("TransactionService", "Not enough balance for account: " + account.getAccountId());
@@ -171,12 +171,12 @@ public class TransactionService {
 
         //Ktra budget của outcome
         if (transaction.getType().equals("OUTCOME")) {
-            List<Budget> budgets = budgetService.getListUserBudgets();
-            for (Budget budget : budgets) {
-                if (budget.appliesToTransaction(transaction)) {
-                    if (transaction.getAmount() > budget.getRemainingAmount()) {
-                        Log.w("TransactionService", "Transaction exceeds budget: " + budget.getName());
-                        DisplayToast.Display(dataFile.getContext(), "Transaction exceeds budget");
+            List<AccountBudget> accountBudgets = accountBudgetService.getListUserBudgets();
+            for (AccountBudget accountBudget : accountBudgets) {
+                if (accountBudget.appliesToTransaction(transaction)) {
+                    if (transaction.getAmount() > accountBudget.getRemainingAmount()) {
+                        Log.w("TransactionService", "Transaction exceeds accountBudget: " + accountBudget.getName());
+                        DisplayToast.Display(dataFile.getContext(), "Transaction exceeds accountBudget");
                         return;
                     }
                 }
@@ -244,7 +244,7 @@ public class TransactionService {
                 accountService.updateBalance(account.getAccountId(), transactionTemp.getAmount());
             }
             //Đảo ngược tác động lên ngân sách
-            budgetService.reverseBudgetUpdate(transactionTemp);
+            accountBudgetService.reverseBudgetUpdate(transactionTemp);
         }
         //Xóa giao dịch
         transactions.remove(transactionId);
@@ -325,7 +325,7 @@ public class TransactionService {
                 accountService.updateBalance(account.getAccountId(), tempTransaction.getAmount());
             }
             //Đảo ngược tác động lên ngân sách
-            budgetService.reverseBudgetUpdate(tempTransaction);
+            accountBudgetService.reverseBudgetUpdate(tempTransaction);
         }
         //transaction mới
         newTransaction.setTransactionId(transactionId);

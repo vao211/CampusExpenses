@@ -24,11 +24,11 @@
         android:id="@+id/txt_budget_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:textSize="12sp"
+        android:layout_marginBottom="3dp"
         android:textColor="@android:color/darker_gray"
-        android:text="@string/start_date"
+        android:text="@string/start_date_end_date"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_budget_name"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
@@ -40,7 +40,6 @@
         android:text="@string/account"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
@@ -48,10 +47,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="14sp"
+        android:layout_marginBottom="3dp"
         android:textColor="@android:color/black"
         android:text="@string/amount_of_money"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/txt_account_name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
     <ImageButton

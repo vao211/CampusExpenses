@@ -120,6 +120,7 @@
         android:layout_height="wrap_content"
         android:text="@string/enter_remain_amount"
         android:textSize="20sp"
+        android:visibility="gone"
         android:id="@+id/txt_enter_remain"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
@@ -127,6 +128,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ll_totalAmount"/>
 
     <LinearLayout
+        android:visibility="gone"
         android:id="@+id/ll_remainAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
