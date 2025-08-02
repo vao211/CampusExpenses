@@ -15,7 +15,7 @@ public class Budget {
     private double remainingAmount;
     private String startDate;
     private String endDate;
-    private List<String> accountIds = new ArrayList<>();
+    private List<String> listAccountIds = new ArrayList<>();
     private Map<String, Double> categoryLimits = new HashMap<>(); // categoryId -> limit
 
     //Constructor cho getListUserBudgets
@@ -26,7 +26,7 @@ public class Budget {
         this.remainingAmount = remainingAmount;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.accountIds = new ArrayList<>();
+        this.listAccountIds = new ArrayList<>();
         this.categoryLimits = new HashMap<>();
     }
 
@@ -36,7 +36,7 @@ public class Budget {
         this.remainingAmount = remainingAmount;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.accountIds = new ArrayList<>();
+        this.listAccountIds = new ArrayList<>();
         this.categoryLimits = new HashMap<>();
     }
 
@@ -58,7 +58,7 @@ public class Budget {
             return false; //Nếu ngày không hợp lệ, bỏ qua ngân sách
         }
 
-        return accountIds.contains(transaction.getAccountId()) &&
+        return listAccountIds.contains(transaction.getAccountId()) &&
                 categoryLimits.containsKey(transaction.getCategoryId());
     }
 
@@ -72,8 +72,8 @@ public class Budget {
 
     //them account va budget
     public void addAccount(String accountId) {
-        if (!accountIds.contains(accountId)) {
-            accountIds.add(accountId);
+        if (!listAccountIds.contains(accountId)) {
+            listAccountIds.add(accountId);
         }
     }
 
@@ -98,12 +98,12 @@ public class Budget {
         this.categoryLimits = categoryLimits != null ? new HashMap<>(categoryLimits) : new HashMap<>();
     }
 
-    public List<String> getAccountIds() {
-        return accountIds;
+    public List<String> getListAccountIds() {
+        return listAccountIds;
     }
 
-    public void setAccountIds(List<String> accountIds) {
-        this.accountIds = accountIds != null ? new ArrayList<>(accountIds) : new ArrayList<>();
+    public void setListAccountIds(List<String> listAccountIds) {
+        this.listAccountIds = listAccountIds != null ? new ArrayList<>(listAccountIds) : new ArrayList<>();
     }
 
     public String getEndDate() {

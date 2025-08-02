@@ -108,7 +108,7 @@ public class BudgetService {
         userData.getUser().getData().setBudgets(budgets);
 
         //ktra account tồn tại
-        for (String accountId : budget.getAccountIds()) {
+        for (String accountId : budget.getListAccountIds()) {
             if (!accounts.containsKey(accountId)) {
                 Log.e("BudgetService", "Account not found: " + accountId);
                 DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountId);
@@ -131,7 +131,7 @@ public class BudgetService {
         budgets.put(budgetId, budget);
 
         //update list budget của các Account
-        for (String accountId : budget.getAccountIds()) {
+        for (String accountId : budget.getListAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
             if (budgetsArray == null) {
@@ -184,7 +184,7 @@ public class BudgetService {
         }
 
         // Kiểm tra xem các tài khoản trong newBudget có tồn tại không
-        for (String accountId : newBudget.getAccountIds()) {
+        for (String accountId : newBudget.getListAccountIds()) {
             if (!accounts.containsKey(accountId)) {
                 Log.e("BudgetService", "Account not found: " + accountId);
                 DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountId);
@@ -205,7 +205,7 @@ public class BudgetService {
         Budget oldBudget = budgets.get(budgetId);
 
         // Xóa budgetId khỏi danh sách budgetIds của các tài khoản cũ
-        for (String accountId : oldBudget.getAccountIds()) {
+        for (String accountId : oldBudget.getListAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
             if (budgetsArray != null) {
@@ -224,12 +224,12 @@ public class BudgetService {
         );
 
         // Xử lý accountIds
-        if (override || newBudget.getAccountIds().isEmpty()) {
+        if (override || newBudget.getListAccountIds().isEmpty()) {
             // Nếu override = true hoặc newBudget không cung cấp accountIds, sử dụng accountIds từ newBudget
-            updatedBudget.setAccountIds(new ArrayList<>(newBudget.getAccountIds()));
+            updatedBudget.setListAccountIds(new ArrayList<>(newBudget.getListAccountIds()));
         } else {
             // Nếu override = false và newBudget có accountIds, giữ nguyên accountIds từ oldBudget
-            updatedBudget.setAccountIds(new ArrayList<>(oldBudget.getAccountIds()));
+            updatedBudget.setListAccountIds(new ArrayList<>(oldBudget.getListAccountIds()));
         }
 
         // Xử lý categoryLimits
@@ -245,7 +245,7 @@ public class BudgetService {
         budgets.put(budgetId, updatedBudget);
 
         // Cập nhật budgetIds cho các tài khoản mới
-        for (String accountId : updatedBudget.getAccountIds()) {
+        for (String accountId : updatedBudget.getListAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
             if (budgetsArray == null) {
@@ -286,7 +286,7 @@ public class BudgetService {
 
         //xóa budget khỏi account
         Budget budget = budgets.get(budgetId);
-        List<String> accountIds = budget.getAccountIds();
+        List<String> accountIds = budget.getListAccountIds();
         for (String accountId : accountIds) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
@@ -499,7 +499,7 @@ public class BudgetService {
         }
 
         Budget budget = budgets.get(budgetId);
-        List<String> accountIds = budget.getAccountIds();
+        List<String> accountIds = budget.getListAccountIds();
         if (accountIds.contains(accountId)) {
             Log.w("BudgetService", "Account already applied to budget: " + accountId);
             DisplayToast.Display(dataFile.getContext(), "Account already applied to budget");
@@ -543,7 +543,7 @@ public class BudgetService {
         }
 
         Budget budget = budgets.get(budgetId);
-        List<String> accountIds = budget.getAccountIds();
+        List<String> accountIds = budget.getListAccountIds();
         if (!accountIds.contains(oldAccountId)) {
             Log.e("BudgetService", "Old account not found in budget: " + oldAccountId);
             DisplayToast.Display(dataFile.getContext(), "Old account not found in budget");
@@ -600,7 +600,7 @@ public class BudgetService {
         }
 
         Budget budget = budgets.get(budgetId);
-        List<String> accountIds = budget.getAccountIds();
+        List<String> accountIds = budget.getListAccountIds();
         if (!accountIds.contains(accountId)) {
             Log.e("BudgetService", "Account not found in budget: " + accountId);
             DisplayToast.Display(dataFile.getContext(), "Account not found in budget");
