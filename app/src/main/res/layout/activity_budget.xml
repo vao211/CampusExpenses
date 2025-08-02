@@ -6,6 +6,7 @@
     android:background="@drawable/background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <ImageButton
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -21,16 +22,36 @@
         android:id="@+id/txt_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/create_transaction"
+        android:text="@string/create_budget"
         app:layout_constraintStart_toEndOf="@+id/btn_close"
         app:layout_constraintTop_toTopOf="@id/btn_close"
         android:layout_marginStart="20dp"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@id/btn_close" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start_date"
+        android:textSize="20sp"
+        android:id="@+id/txt_start_date_name"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/txt_title"
+        app:layout_constraintStart_toStartOf="parent"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/end_date"
+        android:textSize="20sp"
+        android:id="@+id/txt_end_date_name"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/txt_title"
+        app:layout_constraintStart_toEndOf="@+id/ll_StartDatePicker"/>
 
     <LinearLayout
-        android:id="@+id/ll_datePicker"
+        android:id="@+id/ll_StartDatePicker"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:minWidth="200dp"
@@ -40,9 +61,9 @@
         android:paddingEnd="12dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="5dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_income"
+        app:layout_constraintTop_toBottomOf="@+id/txt_start_date_name"
         android:clickable="true"
         android:focusable="true">
         <ImageView
@@ -62,7 +83,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_enterAmount"
+        android:id="@+id/ll_EndDatePicker"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:minWidth="200dp"
@@ -72,10 +93,10 @@
         android:paddingEnd="12dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_income"
-        app:layout_constraintStart_toEndOf="@+id/ll_datePicker"
+        app:layout_constraintStart_toEndOf="@+id/ll_StartDatePicker"
+        app:layout_constraintTop_toBottomOf="@+id/txt_end_date_name"
+
         android:clickable="true"
         android:focusable="true">
         <ImageView
@@ -94,8 +115,19 @@
             android:textSize="20sp" />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_remain_amount"
+        android:textSize="20sp"
+        android:id="@+id/txt_enter_remain"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_totalAmount"/>
+
     <LinearLayout
-        android:id="@+id/ll_description"
+        android:id="@+id/ll_remainAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -104,10 +136,10 @@
         android:paddingEnd="12dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:layout_marginTop="16dp"
+        android:layout_margin="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_datePicker"
+        app:layout_constraintTop_toBottomOf="@+id/txt_enter_remain"
         android:clickable="true"
         android:focusable="true">
         <ImageView
@@ -116,55 +148,14 @@
             android:contentDescription="@string/description"
             android:src="@drawable/ic_write" />
         <EditText
-            android:id="@+id/edt_amount"
+            android:id="@+id/edt_remain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints=""
-            android:hint="@string/description"
+            android:hint="@string/amount_of_money"
             android:inputType="text"
             android:textSize="15sp"
             android:maxLines="1" />
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/select_category"
-        android:textSize="20sp"
-        android:id="@+id/txt_select_category"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_description" />
-
-    <LinearLayout
-        android:id="@+id/ll_select_category"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/border"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:layout_margin="5dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_select_category"
-        android:clickable="true"
-        android:focusable="true">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/category"
-            android:src="@drawable/ic_category"
-            android:background="?attr/selectableItemBackgroundBorderless" />
-        <TextView
-            android:id="@+id/txt_selected_category"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/select_category"
-            android:textSize="17sp"
-            android:layout_marginStart="20dp" />
     </LinearLayout>
 
     <TextView
@@ -176,7 +167,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_select_category" />
+        app:layout_constraintTop_toBottomOf="@+id/ll_StartDatePicker" />
 
     <LinearLayout
         android:id="@+id/ll_select_account"
@@ -249,6 +240,49 @@
             android:text="@string/select_to_account"
             android:textSize="17sp"
             android:layout_marginStart="20dp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_total_amount"
+        android:textSize="20sp"
+        android:id="@+id/txt_enter_amount"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_select_account"/>
+
+    <LinearLayout
+        android:id="@+id/ll_totalAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/border"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_margin="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_enter_amount"
+        android:clickable="true"
+        android:focusable="true">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/description"
+            android:src="@drawable/ic_write" />
+        <EditText
+            android:id="@+id/edt_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/amount_of_money"
+            android:inputType="text"
+            android:textSize="15sp"
+            android:maxLines="1" />
     </LinearLayout>
 
     <TextView

@@ -85,6 +85,7 @@ public class BudgetFragment extends Fragment implements BudgetAdapter.OnBudgetCl
     private void addBudget() {
         btnAddBudget.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), BudgetActivity.class);
+            startActivity(intent);
         });
     }
     private boolean isValidDate(String date) {
