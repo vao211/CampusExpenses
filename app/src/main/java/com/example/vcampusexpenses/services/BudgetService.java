@@ -5,12 +5,10 @@ import android.util.Log;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.Budget;
-import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.model.UserData;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -45,6 +43,7 @@ public class BudgetService {
         Log.d("BudgetService", "Budget found: " + budget.getName());
         return budget;
     }
+
     public String getBudgetId(String budgetName) {
         Log.d("BudgetService", "Getting budgetId for budgetName: " + budgetName);
         if (budgetName == null || budgetName.trim().isEmpty()) {
@@ -90,36 +89,23 @@ public class BudgetService {
             return;
         }
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
-        Map<String, Category> categories = userData.getUser().getData().getCategories();
         Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
 
         if (accounts == null) {
             accounts = new HashMap<>();
-        }
-        if (categories == null) {
-            categories = new HashMap<>();
         }
         if (budgets == null) {
             budgets = new HashMap<>();
         }
 
         userData.getUser().getData().setAccount(accounts);
-        userData.getUser().getData().setCategories(categories);
         userData.getUser().getData().setBudgets(budgets);
 
         //ktra account tồn tại
-        for (String accountId : budget.getAccountIds()) {
+        for (String accountId : budget.getListAccountIds()) {
             if (!accounts.containsKey(accountId)) {
                 Log.e("BudgetService", "Account not found: " + accountId);
                 DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountId);
-                return;
-            }
-        }
-        //ktra category tồn tại
-        for (String categoryId : budget.getCategoryLimits().keySet()) {
-            if (!categories.containsKey(categoryId)) {
-                Log.e("BudgetService", "Category not found: " + categoryId);
-                DisplayToast.Display(dataFile.getContext(), "Category not found: " + categoryId);
                 return;
             }
         }
@@ -131,7 +117,7 @@ public class BudgetService {
         budgets.put(budgetId, budget);
 
         //update list budget của các Account
-        for (String accountId : budget.getAccountIds()) {
+        for (String accountId : budget.getListAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
             if (budgetsArray == null) {
@@ -146,7 +132,7 @@ public class BudgetService {
         Log.d("BudgetService", "Budget added: " + budget.getName());
         DisplayToast.Display(dataFile.getContext(), "Budget added successfully");
     }
-    //Kiểm tra có  ghi đè các list account và category
+    //Kiểm tra có ghi đè các list account
     public void updateBudget(String budgetId, Budget newBudget, boolean override) {
         Log.d("BudgetService", "Updating budgetId: " + budgetId + ", override: " + override);
 
@@ -167,10 +153,9 @@ public class BudgetService {
         // Lấy dữ liệu từ userData
         Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
         Map<String, Account> accounts = userData.getUser().getData().getAccount();
-        Map<String, Category> categories = userData.getUser().getData().getCategories();
 
-        // Kiểm tra budgets, accounts, categories có tồn tại không
-        if (budgets == null || accounts == null || categories == null) {
+        // Kiểm tra budgets, accounts có tồn tại không
+        if (budgets == null || accounts == null) {
             Log.e("BudgetService", "User data not initialized");
             DisplayToast.Display(dataFile.getContext(), "User data not initialized");
             return;
@@ -184,19 +169,10 @@ public class BudgetService {
         }
 
         // Kiểm tra xem các tài khoản trong newBudget có tồn tại không
-        for (String accountId : newBudget.getAccountIds()) {
+        for (String accountId : newBudget.getListAccountIds()) {
             if (!accounts.containsKey(accountId)) {
                 Log.e("BudgetService", "Account not found: " + accountId);
                 DisplayToast.Display(dataFile.getContext(), "Account not found: " + accountId);
-                return;
-            }
-        }
-
-        // Kiểm tra xem các danh mục trong newBudget có tồn tại không
-        for (String categoryId : newBudget.getCategoryLimits().keySet()) {
-            if (!categories.containsKey(categoryId)) {
-                Log.e("BudgetService", "Category not found: " + categoryId);
-                DisplayToast.Display(dataFile.getContext(), "Category not found: " + categoryId);
                 return;
             }
         }
@@ -205,7 +181,7 @@ public class BudgetService {
         Budget oldBudget = budgets.get(budgetId);
 
         // Xóa budgetId khỏi danh sách budgetIds của các tài khoản cũ
-        for (String accountId : oldBudget.getAccountIds()) {
+        for (String accountId : oldBudget.getListAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
             if (budgetsArray != null) {
@@ -224,28 +200,19 @@ public class BudgetService {
         );
 
         // Xử lý accountIds
-        if (override || newBudget.getAccountIds().isEmpty()) {
+        if (override || newBudget.getListAccountIds().isEmpty()) {
             // Nếu override = true hoặc newBudget không cung cấp accountIds, sử dụng accountIds từ newBudget
-            updatedBudget.setAccountIds(new ArrayList<>(newBudget.getAccountIds()));
+            updatedBudget.setListAccountIds(new ArrayList<>(newBudget.getListAccountIds()));
         } else {
             // Nếu override = false và newBudget có accountIds, giữ nguyên accountIds từ oldBudget
-            updatedBudget.setAccountIds(new ArrayList<>(oldBudget.getAccountIds()));
-        }
-
-        // Xử lý categoryLimits
-        if (override || newBudget.getCategoryLimits().isEmpty()) {
-            // Nếu override = true hoặc newBudget không cung cấp categoryLimits, sử dụng categoryLimits từ newBudget
-            updatedBudget.setCategoryLimits(new HashMap<>(newBudget.getCategoryLimits()));
-        } else {
-            // Nếu override = false và newBudget có categoryLimits, giữ nguyên categoryLimits từ oldBudget
-            updatedBudget.setCategoryLimits(new HashMap<>(oldBudget.getCategoryLimits()));
+            updatedBudget.setListAccountIds(new ArrayList<>(oldBudget.getListAccountIds()));
         }
 
         // Cập nhật ngân sách trong danh sách budgets
         budgets.put(budgetId, updatedBudget);
 
         // Cập nhật budgetIds cho các tài khoản mới
-        for (String accountId : updatedBudget.getAccountIds()) {
+        for (String accountId : updatedBudget.getListAccountIds()) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
             if (budgetsArray == null) {
@@ -286,7 +253,7 @@ public class BudgetService {
 
         //xóa budget khỏi account
         Budget budget = budgets.get(budgetId);
-        List<String> accountIds = budget.getAccountIds();
+        List<String> accountIds = budget.getListAccountIds();
         for (String accountId : accountIds) {
             Account account = accounts.get(accountId);
             List<String> budgetsArray = account.getBudgetIds();
@@ -316,15 +283,6 @@ public class BudgetService {
             Log.w("BudgetService", "No budgets found");
         }
         return listBudgets;
-    }
-
-    private boolean checkContainsInJsonArray(JsonArray array, String value) {
-        for (JsonElement element : array) {
-            if (element.getAsString().equals(value)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     protected void updateBudgetsInTransaction(Transaction transaction) {
@@ -362,119 +320,6 @@ public class BudgetService {
             }
         }
     }
-    // --- Quản lý category limits ---
-
-    public void addCategoryLimit(String budgetId, String categoryId, double limit) {
-        Log.d("BudgetService", "Adding category limit: categoryId=" + categoryId + ", limit=" + limit + " to budgetId=" + budgetId);
-        if (limit <= 0) {
-            Log.e("BudgetService", "Invalid category limit: " + limit);
-            DisplayToast.Display(dataFile.getContext(), "Invalid category limit");
-            return;
-        }
-        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
-            Log.e("BudgetService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
-            return;
-        }
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
-        Map<String, Category> categories = userData.getUser().getData().getCategories();
-
-        if (budgets == null || !budgets.containsKey(budgetId)) {
-            Log.e("BudgetService", "Budget not found: " + budgetId);
-            DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetId);
-            return;
-        }
-        if (categories == null || !categories.containsKey(categoryId)) {
-            Log.e("BudgetService", "Category not found: " + categoryId);
-            DisplayToast.Display(dataFile.getContext(), "Category not found: " + categoryId);
-            return;
-        }
-
-        Budget budget = budgets.get(budgetId);
-        Map<String, Double> categoryLimits = budget.getCategoryLimits();
-        if (categoryLimits.containsKey(categoryId)) {
-            Log.w("BudgetService", "Category limit already exists for categoryId: " + categoryId);
-            DisplayToast.Display(dataFile.getContext(), "Category limit already exists");
-            return;
-        }
-
-        budget.addCategoryLimit(categoryId, limit);
-        Log.d("BudgetService", "Added category limit: categoryId=" + categoryId + ", limit=" + limit + " to budget " + budget.getName());
-        DisplayToast.Display(dataFile.getContext(), "Category limit added successfully");
-    }
-
-    public void updateCategoryLimit(String budgetId, String categoryId, double newLimit) {
-        Log.d("BudgetService", "Updating category limit: categoryId=" + categoryId + ", newLimit=" + newLimit + " for budgetId=" + budgetId);
-        if (newLimit <= 0) {
-            Log.e("BudgetService", "Invalid category limit: " + newLimit);
-            DisplayToast.Display(dataFile.getContext(), "Invalid category limit");
-            return;
-        }
-        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
-            Log.e("BudgetService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
-            return;
-        }
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
-        Map<String, Category> categories = userData.getUser().getData().getCategories();
-
-        if (budgets == null || !budgets.containsKey(budgetId)) {
-            Log.e("BudgetService", "Budget not found: " + budgetId);
-            DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetId);
-            return;
-        }
-        if (categories == null || !categories.containsKey(categoryId)) {
-            Log.e("BudgetService", "Category not found: " + categoryId);
-            DisplayToast.Display(dataFile.getContext(), "Category not found: " + categoryId);
-            return;
-        }
-
-        Budget budget = budgets.get(budgetId);
-        Map<String, Double> categoryLimits = budget.getCategoryLimits();
-        if (!categoryLimits.containsKey(categoryId)) {
-            Log.e("BudgetService", "Category limit not found for categoryId: " + categoryId);
-            DisplayToast.Display(dataFile.getContext(), "Category limit not found");
-            return;
-        }
-
-        budget.addCategoryLimit(categoryId, newLimit); // Sử dụng addCategoryLimit để cập nhật giá trị
-        Log.d("BudgetService", "Updated category limit: categoryId=" + categoryId + ", newLimit=" + newLimit + " for budget " + budget.getName());
-        DisplayToast.Display(dataFile.getContext(), "Category limit updated successfully");
-    }
-
-    public void deleteCategoryLimit(String budgetId, String categoryId) {
-        Log.d("BudgetService", "Deleting category limit: categoryId=" + categoryId + " from budgetId=" + budgetId);
-        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
-            Log.e("BudgetService", "User data not initialized");
-            DisplayToast.Display(dataFile.getContext(), "User data not initialized");
-            return;
-        }
-        Map<String, Budget> budgets = userData.getUser().getData().getBudgets();
-        Map<String, Category> categories = userData.getUser().getData().getCategories();
-
-        if (budgets == null || !budgets.containsKey(budgetId)) {
-            Log.e("BudgetService", "Budget not found: " + budgetId);
-            DisplayToast.Display(dataFile.getContext(), "Budget not found: " + budgetId);
-            return;
-        }
-        if (categories == null || !categories.containsKey(categoryId)) {
-            Log.e("BudgetService", "Category not found: " + categoryId);
-            DisplayToast.Display(dataFile.getContext(), "Category not found: " + categoryId);
-            return;
-        }
-
-        Budget budget = budgets.get(budgetId);
-        Map<String, Double> categoryLimits = budget.getCategoryLimits();
-        if (!categoryLimits.containsKey(categoryId)) {
-            Log.e("BudgetService", "Category limit not found for categoryId: " + categoryId);
-            DisplayToast.Display(dataFile.getContext(), "Category limit not found");
-            return;
-        }
-
-        categoryLimits.remove(categoryId);
-        Log.d("BudgetService", "Deleted category limit: categoryId=" + categoryId + " from budget " + budget.getName());
-        DisplayToast.Display(dataFile.getContext(), "Category limit deleted successfully");
-    }
 
     // --- Quản lý accounts áp dụng ---
     public void addAccountToBudget(String budgetId, String accountId) {
@@ -499,7 +344,7 @@ public class BudgetService {
         }
 
         Budget budget = budgets.get(budgetId);
-        List<String> accountIds = budget.getAccountIds();
+        List<String> accountIds = budget.getListAccountIds();
         if (accountIds.contains(accountId)) {
             Log.w("BudgetService", "Account already applied to budget: " + accountId);
             DisplayToast.Display(dataFile.getContext(), "Account already applied to budget");
@@ -543,7 +388,7 @@ public class BudgetService {
         }
 
         Budget budget = budgets.get(budgetId);
-        List<String> accountIds = budget.getAccountIds();
+        List<String> accountIds = budget.getListAccountIds();
         if (!accountIds.contains(oldAccountId)) {
             Log.e("BudgetService", "Old account not found in budget: " + oldAccountId);
             DisplayToast.Display(dataFile.getContext(), "Old account not found in budget");
@@ -600,7 +445,7 @@ public class BudgetService {
         }
 
         Budget budget = budgets.get(budgetId);
-        List<String> accountIds = budget.getAccountIds();
+        List<String> accountIds = budget.getListAccountIds();
         if (!accountIds.contains(accountId)) {
             Log.e("BudgetService", "Account not found in budget: " + accountId);
             DisplayToast.Display(dataFile.getContext(), "Account not found in budget");

@@ -4,9 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Budget {
     private String budgetId;
@@ -15,10 +13,9 @@ public class Budget {
     private double remainingAmount;
     private String startDate;
     private String endDate;
-    private List<String> accountIds = new ArrayList<>();
-    private Map<String, Double> categoryLimits = new HashMap<>(); // categoryId -> limit
+    private List<String> listAccountIds = new ArrayList<>();
 
-    //Constructor cho getListUserBudgets
+    // Constructor for getListUserBudgets
     public Budget(String budgetId, String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
         this.budgetId = budgetId;
         this.name = name;
@@ -26,8 +23,7 @@ public class Budget {
         this.remainingAmount = remainingAmount;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.accountIds = new ArrayList<>();
-        this.categoryLimits = new HashMap<>();
+        this.listAccountIds = new ArrayList<>();
     }
 
     public Budget(String name, double totalAmount, double remainingAmount, String startDate, String endDate) {
@@ -36,15 +32,14 @@ public class Budget {
         this.remainingAmount = remainingAmount;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.accountIds = new ArrayList<>();
-        this.categoryLimits = new HashMap<>();
+        this.listAccountIds = new ArrayList<>();
     }
 
-    //kiem tra transaction co thuoc ve Budget
+    // Check if transaction belongs to Budget
     public boolean appliesToTransaction(Transaction transaction) {
         if (transaction.isTransfer()) return false;
 
-        // Kiểm tra thời gian ngân sách
+        // Check budget time period
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date transactionDate = sdf.parse(transaction.getDate());
@@ -55,11 +50,10 @@ public class Budget {
                 return false;
             }
         } catch (ParseException e) {
-            return false; //Nếu ngày không hợp lệ, bỏ qua ngân sách
+            return false; // If date is invalid, skip budget
         }
 
-        return accountIds.contains(transaction.getAccountId()) &&
-                categoryLimits.containsKey(transaction.getCategoryId());
+        return listAccountIds.contains(transaction.getAccountId());
     }
 
     public void updateRemaining(Transaction transaction) {
@@ -70,16 +64,11 @@ public class Budget {
         }
     }
 
-    //them account va budget
+    // Add account to budget
     public void addAccount(String accountId) {
-        if (!accountIds.contains(accountId)) {
-            accountIds.add(accountId);
+        if (!listAccountIds.contains(accountId)) {
+            listAccountIds.add(accountId);
         }
-    }
-
-    //them category va budget
-    public void addCategoryLimit(String categoryId, double limit) {
-        categoryLimits.put(categoryId, limit);
     }
 
     public String getBudgetId() {
@@ -90,20 +79,12 @@ public class Budget {
         this.budgetId = budgetId;
     }
 
-    public Map<String, Double> getCategoryLimits() {
-        return categoryLimits;
+    public List<String> getListAccountIds() {
+        return listAccountIds;
     }
 
-    public void setCategoryLimits(Map<String, Double> categoryLimits) {
-        this.categoryLimits = categoryLimits != null ? new HashMap<>(categoryLimits) : new HashMap<>();
-    }
-
-    public List<String> getAccountIds() {
-        return accountIds;
-    }
-
-    public void setAccountIds(List<String> accountIds) {
-        this.accountIds = accountIds != null ? new ArrayList<>(accountIds) : new ArrayList<>();
+    public void setListAccountIds(List<String> listAccountIds) {
+        this.listAccountIds = listAccountIds != null ? new ArrayList<>(listAccountIds) : new ArrayList<>();
     }
 
     public String getEndDate() {

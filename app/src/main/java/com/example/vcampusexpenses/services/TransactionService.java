@@ -47,6 +47,7 @@ public class TransactionService {
         Log.d("TransactionService", "Transaction found: " + transaction.getDescription());
         return transaction;
     }
+
     protected void saveTransaction(Transaction transaction) {
         Log.d("TransactionService", "Saving transaction: " + transaction.getDescription());
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
@@ -121,7 +122,7 @@ public class TransactionService {
             DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
             return;
         }
-        if(transaction == null){
+        if (transaction == null) {
             Log.e("TransactionService", "Null Transaction");
             DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
             return;
@@ -168,10 +169,9 @@ public class TransactionService {
             List<Budget> budgets = budgetService.getListUserBudgets();
             for (Budget budget : budgets) {
                 if (budget.appliesToTransaction(transaction)) {
-                    Double categoryLimit = budget.getCategoryLimits().get(transaction.getCategoryId());
-                    if (categoryLimit != null && transaction.getAmount() > budget.getRemainingAmount()) {
-                        Log.w("TransactionService", "Transaction exceeds category limit for budget: " + budget.getName());
-                        DisplayToast.Display(dataFile.getContext(), "Transaction exceeds category limit");
+                    if (transaction.getAmount() > budget.getRemainingAmount()) {
+                        Log.w("TransactionService", "Transaction exceeds budget: " + budget.getName());
+                        DisplayToast.Display(dataFile.getContext(), "Transaction exceeds budget");
                         return;
                     }
                 }
@@ -238,7 +238,7 @@ public class TransactionService {
             } else if (transactionTemp.getType().equals("OUTCOME")) {
                 accountService.updateBalance(account.getAccountId(), transactionTemp.getAmount());
             }
-            //ddảo ngược tác động lên ngân sách
+            //Đảo ngược tác động lên ngân sách
             budgetService.reverseBudgetUpdate(transactionTemp);
         }
         //Xóa giao dịch
