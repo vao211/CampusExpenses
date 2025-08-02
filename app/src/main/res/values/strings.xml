@@ -32,7 +32,7 @@
     <string name="budget_amount">Budget Amount</string>
     <string name="budget_description">Description</string>
     <string name="no_categories_available">No categories available</string>
-    <string name="no_budgets_available">No accountBudgets available</string>
+    <string name="no_budgets_available">No Account Budgets available</string>
     <string name="settings">Settings</string>
     <string name="currency">Currency</string>
     <string name="injson">__inJson__</string>
