@@ -11,25 +11,25 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.model.Account;
-import com.example.vcampusexpenses.model.Budget;
+import com.example.vcampusexpenses.model.AccountBudget;
+import com.example.vcampusexpenses.services.AccountBudgetService;
 import com.example.vcampusexpenses.services.AccountService;
-import com.example.vcampusexpenses.services.BudgetService;
 
 import java.util.List;
 
 public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetViewHolder>{
-    private List<Budget> budgetList;
-    private BudgetService budgetService;
+    private List<AccountBudget> accountBudgetList;
+    private AccountBudgetService accountBudgetService;
     private OnBudgetClickListener listener;
     private AccountService accountService;
-    private Budget budget;
+    private AccountBudget accountBudget;
     public interface OnBudgetClickListener {
         void onEditBudgetClick(String budgetId);
         void onDeleteBudgetClick(String budgetId);
     }
-    public BudgetAdapter(List<Budget> budgetList, BudgetService budgetService, OnBudgetClickListener listener){
-        this.budgetList = budgetList;
-        this.budgetService = budgetService;
+    public BudgetAdapter(List<AccountBudget> accountBudgetList, AccountBudgetService accountBudgetService, AccountService accountService, OnBudgetClickListener listener){
+        this.accountBudgetList = accountBudgetList;
+        this.accountBudgetService = accountBudgetService;
         this.accountService = accountService;
         this.listener = listener;
     }
@@ -43,9 +43,8 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
 
     @Override
     public void onBindViewHolder(@NonNull BudgetViewHolder holder, int position) {
-
-        budget = budgetList.get(position);
-        List<String> budgetListAccounts = budget.getListAccountIds();
+        accountBudget = accountBudgetList.get(position);
+        List<String> budgetListAccounts = accountBudget.getListAccountIds();
         StringBuilder accountNames = new StringBuilder();
 
         if (budgetListAccounts != null) {
@@ -60,21 +59,21 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
                 accountNames.setLength(accountNames.length() - 2);
             }
         }
-        holder.txtBudgetName.setText(budget.getName());
-        holder.txtBudgetDate.setText(budget.getStartDate() + " to " + budget.getEndDate());
+        holder.txtBudgetName.setText(accountBudget.getName());
+        holder.txtBudgetDate.setText(accountBudget.getStartDate() + " - " + accountBudget.getEndDate());
         holder.txtAccountNames.setText(accountNames.toString());
-        holder.txtTotalAmount.setText(String.valueOf(budget.getTotalAmount()));
-        holder.btnEditBudget.setOnClickListener(v -> listener.onEditBudgetClick(budget.getBudgetId()));
-        holder.btnDeleteBudget.setOnClickListener(v -> listener.onDeleteBudgetClick(budget.getBudgetId()));
+        holder.txtTotalAmount.setText(String.valueOf(accountBudget.getTotalAmount()));
+        holder.btnEditBudget.setOnClickListener(v -> listener.onEditBudgetClick(accountBudget.getBudgetId()));
+        holder.btnDeleteBudget.setOnClickListener(v -> listener.onDeleteBudgetClick(accountBudget.getBudgetId()));
     }
 
 
     @Override
     public int getItemCount() {
-        return budgetList != null ? budgetList.size() : 0;
+        return accountBudgetList != null ? accountBudgetList.size() : 0;
     }
-    public void updateData(List<Budget> newBudgetList) {
-        this.budgetList = newBudgetList;
+    public void updateData(List<AccountBudget> newAccountBudgetList) {
+        this.accountBudgetList = newAccountBudgetList;
         notifyDataSetChanged();
     }
     static class BudgetViewHolder extends RecyclerView.ViewHolder{
