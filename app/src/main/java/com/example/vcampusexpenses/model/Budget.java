@@ -98,7 +98,7 @@ public class Budget {
         this.categoryLimits = categoryLimits != null ? new HashMap<>(categoryLimits) : new HashMap<>();
     }
 
-    public List<String> getAccountIds() {
+    public List<String> getListAccountIds() {
         return accountIds;
     }
 

@@ -89,4 +89,7 @@
     <string name="no_transactions_found">No transactions found</string>
     <string name="edit_transaction">Edit transaction</string>
     <string name="chart_for_category">Chart for category</string>
+    <string name="start_date">Start date</string>
+    <string name="end_date">End date</string>
+
 </resources>

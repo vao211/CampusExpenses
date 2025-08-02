@@ -1,6 +1,5 @@
 package com.example.vcampusexpenses.services;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.example.vcampusexpenses.datamanager.UserDataManager;
@@ -206,7 +205,7 @@ public class AccountService {
         }
         if (budgets != null) {
             for (Budget budget : budgets.values()) {
-                if (budget.getAccountIds() != null && budget.getAccountIds().contains(accountId)) {
+                if (budget.getListAccountIds() != null && budget.getListAccountIds().contains(accountId)) {
                     Log.w("AccountService", "Cannot delete account because it is used in budget");
                     DisplayToast.Display(dataFile.getContext(), "Cannot delete account because it is used in budget");
                     return;

@@ -28,99 +28,6 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@id/btn_close" />
 
-    <LinearLayout
-        android:id="@+id/ll_income"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/border"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/ll_outcome"
-        app:layout_constraintTop_toBottomOf="@id/btn_close"
-        android:clickable="true"
-        android:focusable="true">
-        <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:src="@drawable/ic_income"
-            android:background="?attr/selectableItemBackgroundBorderless" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/income"
-            android:textSize="15sp"
-            android:layout_marginStart="8dp"
-            android:layout_gravity="center_vertical" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_outcome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/border"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toEndOf="@id/ll_income"
-        app:layout_constraintEnd_toStartOf="@id/ll_transfer"
-        app:layout_constraintTop_toBottomOf="@id/btn_close"
-        android:clickable="true"
-        android:focusable="true">
-        <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:src="@drawable/ic_outcome"
-            android:background="?attr/selectableItemBackgroundBorderless" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/outcome"
-            android:textSize="15sp"
-            android:layout_marginStart="8dp"
-            android:layout_gravity="center_vertical" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_transfer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/border"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintStart_toEndOf="@id/ll_outcome"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_close"
-        android:clickable="true"
-        android:focusable="true">
-        <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:src="@drawable/ic_transfer"
-            android:background="?attr/selectableItemBackgroundBorderless" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/transfer"
-            android:textSize="15sp"
-            android:layout_marginStart="8dp"
-            android:layout_gravity="center_vertical" />
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_datePicker"
@@ -129,10 +36,11 @@
         android:minWidth="200dp"
         android:orientation="horizontal"
         android:background="@drawable/border"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:layout_marginTop="16dp"
-        android:layout_marginStart="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ll_income"
         android:clickable="true"
@@ -145,10 +53,10 @@
             tools:ignore="ContentDescription"
             android:paddingTop="11dp" />
         <TextView
-            android:id="@+id/txt_date"
+            android:id="@+id/txt_start_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/year_month_day"
+            android:text="@string/start_date"
             android:paddingTop="10dp"
             android:textSize="20sp" />
     </LinearLayout>
@@ -172,18 +80,18 @@
         android:focusable="true">
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/amount_of_money"
-            android:src="@drawable/ic_money" />
-        <EditText
-            android:id="@+id/edt_amount"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_calendar"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            tools:ignore="ContentDescription"
+            android:paddingTop="11dp" />
+        <TextView
+            android:id="@+id/txt_end_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:hint="@string/enter_amount"
-            android:inputType="numberDecimal"
-            android:textSize="15sp"
-            android:maxLines="1" />
+            android:text="@string/end_date"
+            android:paddingTop="10dp"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -208,7 +116,7 @@
             android:contentDescription="@string/description"
             android:src="@drawable/ic_write" />
         <EditText
-            android:id="@+id/edt_description"
+            android:id="@+id/edt_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints=""

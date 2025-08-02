@@ -6,7 +6,7 @@
     android:layout_margin="8dp"
     android:background="@drawable/border"
     android:elevation="2dp"
-    android:padding="16dp">
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/txt_budget_name"
@@ -14,10 +14,10 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textColor="@android:color/black"
+        android:text="@string/budget_s_name"
         android:fontFamily="sans-serif-medium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btn_edit_budget"
         app:layout_constraintWidth_max="wrap" />
 
     <TextView
@@ -26,34 +26,59 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="@android:color/darker_gray"
+        android:text="@string/start_date"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txt_budget_name"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <TextView
+        android:id="@+id/txt_account_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:text="@string/account"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/txt_total_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:text="@string/amount_of_money"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/txt_account_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
     <ImageButton
         android:id="@+id/btn_edit_budget"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@drawable/border"
         android:src="@drawable/ic_edit"
         android:padding="8dp"
         android:scaleType="center"
-        app:layout_constraintEnd_toStartOf="@id/btn_delete_budget"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
     <ImageButton
         android:id="@+id/btn_delete_budget"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="68dp"
         android:background="@drawable/border"
-        android:src="@drawable/ic_delete"
         android:padding="8dp"
         android:scaleType="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:src="@drawable/ic_delete"
+        app:layout_constraintTop_toBottomOf="@+id/btn_edit_budget"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
