@@ -19,7 +19,7 @@
         android:layout_marginTop="3dp"/>
 
     <ImageButton
-        android:id="@+id/btnSetting"
+        android:id="@+id/btn_setting"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="12dp"
@@ -37,118 +37,137 @@
         android:layout_marginTop="20dp"/>
 
     <LinearLayout
-        android:id="@+id/layout_summary"
+        android:id="@+id/ll_layout_summary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/txt_date_filter_display"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/date_filter_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:baselineAligned="false">
 
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="8dp">
+            app:cardElevation="8dp"
+            android:layout_margin="10dp"
+            app:cardBackgroundColor="@android:color/white"
+            android:layout_marginEnd="4dp"
+            app:cardCornerRadius="8dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Income"
-                android:textSize="16sp"
-                android:textColor="?android:attr/textColorSecondary"/>
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:padding="14dp">
 
-            <TextView
-                android:id="@+id/txt_total_income"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0.00"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/holo_green_dark"/>
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/income"
+                    android:textSize="16sp"
+                    android:textColor="?android:attr/textColorSecondary"/>
 
-        <LinearLayout
+                <TextView
+                    android:id="@+id/txt_total_income"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/holo_green_dark"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="8dp">
+            app:cardElevation="8dp"
+            android:layout_margin="10dp"
+            app:cardBackgroundColor="@android:color/white"
+            android:layout_marginStart="4dp"
+            app:cardCornerRadius="8dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Outcome"
-                android:textSize="16sp"
-                android:textColor="?android:attr/textColorSecondary"/>
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:padding="14dp">
 
-            <TextView
-                android:id="@+id/txt_total_outcome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0.00"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/holo_red_dark"/>
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/outcome"
+                    android:textSize="16sp"
+                    android:textColor="?android:attr/textColorSecondary"/>
+
+                <TextView
+                    android:id="@+id/txt_total_outcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/holo_red_dark"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 
     <TextView
-        android:id="@+id/textViewAccountsLabel"
+        android:id="@+id/txt_accounts_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Accounts"
+        android:text="@string/accounts"
         android:textAppearance="?attr/textAppearanceHeadline6"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_summary"
-        app:layout_constraintEnd_toStartOf="@+id/buttonViewAllAccountsHome"/>
+        app:layout_constraintTop_toBottomOf="@+id/ll_layout_summary"
+        app:layout_constraintEnd_toStartOf="@+id/btn_view_all"/>
 
     <Button
-        android:id="@+id/buttonViewAllAccountsHome"
+        android:id="@+id/btn_view_all"
         style="?attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="View All"
+        android:text="@string/view_all"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textViewAccountsLabel"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewAccountsLabel"/>
+        app:layout_constraintTop_toTopOf="@+id/txt_accounts_label"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_accounts_label"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewHomeAccounts"
+        android:id="@+id/rv_HomeAccounts"
         android:layout_width="0dp"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_account_card"
         tools:itemCount="2"
         android:clipToPadding="false"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAccountsLabel"
+        app:layout_constraintTop_toBottomOf="@+id/txt_accounts_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
-        android:id="@+id/textViewNoHomeAccounts"
+        android:id="@+id/txt_NoHomeAccounts"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="No accounts yet. Add one!"
+        android:text="@string/no_accounts_yet_add_one"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         android:visibility="gone"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerViewHomeAccounts"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@+id/rv_HomeAccounts"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
