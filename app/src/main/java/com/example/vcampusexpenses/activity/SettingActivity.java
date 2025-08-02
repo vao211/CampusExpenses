@@ -1,5 +1,6 @@
 package com.example.vcampusexpenses.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -23,6 +24,9 @@ import androidx.core.content.ContextCompat;
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.authentication.FireBaseAuthen;
 import com.example.vcampusexpenses.authentication.GuestAuthen;
+import com.example.vcampusexpenses.datamanager.ApiCallBack;
+import com.example.vcampusexpenses.datamanager.SyncDataManager;
+import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.services.SettingService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
@@ -33,6 +37,8 @@ public class SettingActivity extends AppCompatActivity {
     TextView txt_displayName, txt_type_currency, txt_description_notif, txt_description_sync, txt_email;
     SessionManager sessionManager;
     SettingService settingService;
+    UserDataManager userDataManager;
+    SyncDataManager syncDataManager;
     // Khởi tạo ActivityResultLauncher để yêu cầu quyền trên Android >= 13
     ActivityResultLauncher<String> requestPermissionLauncher;
     @Override
@@ -55,6 +61,8 @@ public class SettingActivity extends AppCompatActivity {
         txt_description_sync = findViewById(R.id.txt_description_sync);
         txt_email = findViewById(R.id.txt_email);
         settingService = new SettingService(this);
+        userDataManager = UserDataManager.getInstance(this, sessionManager.getUserId());
+        syncDataManager = new SyncDataManager(this, userDataManager);
 
        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(),
                isGranted -> {
@@ -75,8 +83,9 @@ public class SettingActivity extends AppCompatActivity {
         setCurrency();
         feedback();
         about();
+        sync();
         feedback();
-        goToLogin();
+        login();
         backToMain();
         LogOut();
     }
@@ -86,6 +95,37 @@ public class SettingActivity extends AppCompatActivity {
         super.onResume();
         loadLoginState();
         loadSetting();
+    }
+    private void sync(){
+        btn_sync.setOnClickListener(v -> {
+            if(sessionManager.getUserId().equals("Guest")){
+                DisplayToast.Display(this, "Login to sync");
+            }
+            else{
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Sync Data");
+                builder.setMessage("Are you sure you want to sync data?, your data will be overwrite");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        syncDataManager.fetchData(sessionManager.getUserId(), new ApiCallBack() {
+                            @Override
+                            public void onSuccess(String responseData) {
+                                Log.d("SettingActivity", "Sync successfully: " + responseData);
+                                userDataManager.saveData();
+                            }
+                            @Override
+                            public void onFailure(String errorMessage) {
+                                Log.e("SettingActivity", "Sync failed: " + errorMessage);
+                            }
+                        });
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
     private void about(){
         btn_about.setOnClickListener(v -> {
@@ -229,14 +269,34 @@ public class SettingActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    protected void goToLogin(){
-        btn_login.setOnClickListener(v -> {
-            GuestAuthen.LogOut(this);
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            //finish();
-        });
+    private void login() {
+        btn_login.setOnClickListener(v -> showSyncDataDialog());
     }
+
+    private void showSyncDataDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Sync Data")
+                .setMessage("Do you want to keep your data or sync with already existing data?")
+                .setPositiveButton("Keep Data", (dialog, which) -> {
+                    navigateToLogin(true);
+                })
+                .setNegativeButton("Sync Data", (dialog, which) -> {
+                    navigateToLogin(false);
+                })
+                .setNeutralButton("Cancel", null)
+                .setCancelable(false);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    private void navigateToLogin(boolean isGuestSyncRequest) {
+        GuestAuthen.LogOut(SettingActivity.this);
+        Intent intent = new Intent(SettingActivity.this, LoginActivity.class);
+        settingService.setGuestSyncRequest(isGuestSyncRequest);
+        startActivity(intent);
+        // finish();
+    }
+
     private void backToMain(){
         btn_back.setOnClickListener(v -> {
             finish();
@@ -273,8 +333,19 @@ public class SettingActivity extends AppCompatActivity {
                 GuestAuthen.LogOut(this);
                 finish();
             }else{
-                FireBaseAuthen.LogOut(this);
-                finish();
+                syncDataManager.putData(userId, new ApiCallBack(){
+                    @Override
+                    public void onSuccess(String responseData) {
+                        Log.d("SettingActivity", "Sync successfully: " + responseData);
+                        FireBaseAuthen.LogOut(SettingActivity.this);
+                        finish();
+                }
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        Log.e("SettingActivity", "Sync failed: " + errorMessage);
+                    }
+                });
+
             }
         });
     }

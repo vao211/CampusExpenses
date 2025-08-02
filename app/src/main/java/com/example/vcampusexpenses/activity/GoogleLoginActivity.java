@@ -12,11 +12,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.authentication.GoogleAuthen;
+import com.example.vcampusexpenses.datamanager.ApiCallBack;
+import com.example.vcampusexpenses.datamanager.SyncDataManager;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.Category;
 import com.example.vcampusexpenses.services.AccountService;
 import com.example.vcampusexpenses.services.CategoryService;
+import com.example.vcampusexpenses.services.SettingService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -27,12 +30,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 
 @SuppressWarnings("deprecation")
-public class GoogleLoginActivity extends AppCompatActivity {
+public class GoogleLoginActivity extends AppCompatActivity{
     private static final int RC_SIGN_IN = 1;
     private ImageView gifLoading;
     private GoogleAuthen googleAuthen;
     private SessionManager sessionManager;
     private FirebaseAuth fbAuth;
+    private SettingService settingService;
+    private SyncDataManager syncDataManager;
+    private UserDataManager userDataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,11 +72,29 @@ public class GoogleLoginActivity extends AppCompatActivity {
                 if (account != null) {
                     googleAuthen.firebaseAuthWithGoogle(account.getIdToken(), account, new GoogleAuthen.AuthCallback() {
                         @Override
+                        //login ok
                         public void onSuccess(GoogleSignInAccount account) {
                             Log.d("GoogleLoginActivity", "Firebase authentication successful for email: " + account.getEmail());
                             sessionManager.saveLoginSession(account.getEmail(), fbAuth.getUid());
-                            DisplayToast.Display(GoogleLoginActivity.this, "Firebase authentication successful");
+                            settingService = new SettingService(GoogleLoginActivity.this);
+                            //sync
+                            if(settingService.getGuestSyncRequest()){
+                                userDataManager = UserDataManager.getInstance(GoogleLoginActivity.this, sessionManager.getUserId());
+                                syncDataManager = new SyncDataManager(GoogleLoginActivity.this, userDataManager);
+                                syncDataManager.fetchData(sessionManager.getUserId(), new ApiCallBack(){
+                                    @Override
+                                    public void onSuccess(String responseData) {
+                                        Log.d("GoogleLoginActivity", "Sync successfully: "+ responseData);
+                                        settingService.setGuestSyncRequest(false);
+                                    }
+                                    @Override
+                                    public void onFailure(String errorMessage) {
+                                        Log.d("GoogleLoginActivity", "Sync failed: "+ errorMessage);
+                                    }
+                                });
+                            }
 
+                            Log.d("GoogleLoginActivity", "Firebase authentication successful for email: " + account.getEmail());
                             Intent intent = new Intent(GoogleLoginActivity.this, RegistrationPageActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
