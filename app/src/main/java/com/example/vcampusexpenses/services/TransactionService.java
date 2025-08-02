@@ -11,9 +11,12 @@ import com.example.vcampusexpenses.model.UserData;
 import com.example.vcampusexpenses.utils.DisplayToast;
 import com.example.vcampusexpenses.utils.IdGenerator;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class TransactionService {
@@ -22,6 +25,7 @@ public class TransactionService {
     private final String userId;
     private final AccountService accountService;
     private final BudgetService budgetService;
+    private final SimpleDateFormat dateFormat;
 
     public TransactionService(UserDataManager dataManager, AccountService accountService, BudgetService budgetService) {
         this.dataFile = dataManager;
@@ -29,6 +33,7 @@ public class TransactionService {
         this.userId = dataManager.getUserId();
         this.accountService = accountService;
         this.budgetService = budgetService;
+        this.dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Log.d("TransactionService", "Initialized with userId: " + userId);
     }
 
@@ -47,6 +52,7 @@ public class TransactionService {
         Log.d("TransactionService", "Transaction found: " + transaction.getDescription());
         return transaction;
     }
+
     protected void saveTransaction(Transaction transaction) {
         Log.d("TransactionService", "Saving transaction: " + transaction.getDescription());
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
@@ -121,7 +127,7 @@ public class TransactionService {
             DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
             return;
         }
-        if(transaction == null){
+        if (transaction == null) {
             Log.e("TransactionService", "Null Transaction");
             DisplayToast.Display(dataFile.getContext(), "Invalid Transaction");
             return;
@@ -168,10 +174,9 @@ public class TransactionService {
             List<Budget> budgets = budgetService.getListUserBudgets();
             for (Budget budget : budgets) {
                 if (budget.appliesToTransaction(transaction)) {
-                    Double categoryLimit = budget.getCategoryLimits().get(transaction.getCategoryId());
-                    if (categoryLimit != null && transaction.getAmount() > budget.getRemainingAmount()) {
-                        Log.w("TransactionService", "Transaction exceeds category limit for budget: " + budget.getName());
-                        DisplayToast.Display(dataFile.getContext(), "Transaction exceeds category limit");
+                    if (transaction.getAmount() > budget.getRemainingAmount()) {
+                        Log.w("TransactionService", "Transaction exceeds budget: " + budget.getName());
+                        DisplayToast.Display(dataFile.getContext(), "Transaction exceeds budget");
                         return;
                     }
                 }
@@ -238,7 +243,7 @@ public class TransactionService {
             } else if (transactionTemp.getType().equals("OUTCOME")) {
                 accountService.updateBalance(account.getAccountId(), transactionTemp.getAmount());
             }
-            //ddảo ngược tác động lên ngân sách
+            //Đảo ngược tác động lên ngân sách
             budgetService.reverseBudgetUpdate(transactionTemp);
         }
         //Xóa giao dịch
@@ -359,5 +364,55 @@ public class TransactionService {
             Log.w("TransactionService", "No transactions found");
         }
         return transactions;
+    }
+
+    public double getTotalIncome(long startTime, long endTime) {
+        Log.d("TransactionService", "Calculating total income from " + startTime + " to " + endTime);
+        double totalIncome = 0.0;
+        List<Transaction> transactions = getListTransactions();
+        if (transactions == null || transactions.isEmpty()) {
+            Log.w("TransactionService", "No transactions found for income calculation");
+            return totalIncome;
+        }
+
+        for (Transaction transaction : transactions) {
+            if (transaction.getType().equals("INCOME")) {
+                try {
+                    long transactionTime = dateFormat.parse(transaction.getDate()).getTime();
+                    if (transactionTime >= startTime && transactionTime <= endTime) {
+                        totalIncome += transaction.getAmount();
+                    }
+                } catch (ParseException e) {
+                    Log.e("TransactionService", "Error parsing transaction date: " + transaction.getDate(), e);
+                }
+            }
+        }
+        Log.d("TransactionService", "Total income: " + totalIncome);
+        return totalIncome;
+    }
+
+    public double getTotalOutcome(long startTime, long endTime) {
+        Log.d("TransactionService", "Calculating total outcome from " + startTime + " to " + endTime);
+        double totalOutcome = 0.0;
+        List<Transaction> transactions = getListTransactions();
+        if (transactions == null || transactions.isEmpty()) {
+            Log.w("TransactionService", "No transactions found for outcome calculation");
+            return totalOutcome;
+        }
+
+        for (Transaction transaction : transactions) {
+            if (transaction.getType().equals("OUTCOME")) {
+                try {
+                    long transactionTime = dateFormat.parse(transaction.getDate()).getTime();
+                    if (transactionTime >= startTime && transactionTime <= endTime) {
+                        totalOutcome += transaction.getAmount();
+                    }
+                } catch (ParseException e) {
+                    Log.e("TransactionService", "Error parsing transaction date: " + transaction.getDate(), e);
+                }
+            }
+        }
+        Log.d("TransactionService", "Total outcome: " + totalOutcome);
+        return totalOutcome;
     }
 }

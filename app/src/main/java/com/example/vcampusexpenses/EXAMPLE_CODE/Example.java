@@ -131,9 +131,6 @@ public class Example extends AppCompatActivity {
         if (accountId1 != null) {
             budget.addAccount(accountId1);
         }
-        if (categoryId1 != null) {
-            budget.addCategoryLimit(categoryId1, 100);
-        }
         budgetService.addBudget(budget);
         userDataManager.saveData();
 
@@ -162,29 +159,9 @@ public class Example extends AppCompatActivity {
             if (accountId2 != null) {
                 newBudget.addAccount(accountId2);
             }
-            if (categoryId2 != null) {
-                newBudget.addCategoryLimit(categoryId2, 50);
-            }
+
             // Chọn override = true để ghi đè danh sách
             budgetService.updateBudget(budgetId, newBudget, true);
-            userDataManager.saveData();
-        }
-
-        // Add Category Limit
-        if (budgetId != null && categoryId2 != null) {
-            budgetService.addCategoryLimit(budgetId, categoryId2, 75);
-            userDataManager.saveData();
-        }
-
-        // Update Category Limit
-        if (budgetId != null && categoryId2 != null) {
-            budgetService.updateCategoryLimit(budgetId, categoryId2, 100);
-            userDataManager.saveData();
-        }
-
-        // Delete Category Limit
-        if (budgetId != null && categoryId2 != null) {
-            budgetService.deleteCategoryLimit(budgetId, categoryId2);
             userDataManager.saveData();
         }
 
@@ -240,9 +217,7 @@ public class Example extends AppCompatActivity {
         if (accountId1 != null) {
             budget.addAccount(accountId1);
         }
-        if (categoryId1 != null) {
-            budget.addCategoryLimit(categoryId1, 100);
-        }
+
         budgetService.addBudget(budget);
         userDataManager.saveData();
 
