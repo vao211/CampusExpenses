@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vcampusexpenses.R;
 import com.example.vcampusexpenses.activity.BudgetAccountActivity;
-import com.example.vcampusexpenses.adapters.BudgetAdapter;
+import com.example.vcampusexpenses.adapters.AccountBudgetAdapter;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.example.vcampusexpenses.model.AccountBudget;
 import com.example.vcampusexpenses.services.AccountBudgetService;
@@ -32,14 +32,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class AccountBudgetFragment extends Fragment implements BudgetAdapter.OnBudgetClickListener {
+public class AccountBudgetFragment extends Fragment implements AccountBudgetAdapter.OnBudgetClickListener {
     private RecyclerView recyclerViewBudgets;
     private TextView txtEmptyBudgets;
     private AccountBudgetService accountBudgetService;
     private AccountService accountService;
     private CategoryService categoryService;
-    private ImageButton btnAddBudget, btnManageAccounts, btnManageCategories;
+    private ImageButton btnAddBudget;
     private UserDataManager userDataManager;
+    private AccountBudgetAdapter budgetAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,19 +49,19 @@ public class AccountBudgetFragment extends Fragment implements BudgetAdapter.OnB
         txtEmptyBudgets = view.findViewById(R.id.txt_empty_budget);
         btnAddBudget = view.findViewById(R.id.btn_add_budget);
 
-        // Lấy userId từ SessionManager
         SessionManager sessionManager = new SessionManager(requireContext());
         String userId = sessionManager.getUserId();
 
-        userDataManager = new UserDataManager(requireContext(), userId);
+        userDataManager = UserDataManager.getInstance(requireContext(), userId);
         accountBudgetService = new AccountBudgetService(userDataManager);
         accountService = new AccountService(userDataManager);
         categoryService = new CategoryService(userDataManager);
 
-
-        // Thiết lập RecyclerView
         recyclerViewBudgets.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerViewBudgets.addItemDecoration(new DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL));
+
+        budgetAdapter = new AccountBudgetAdapter(null, accountBudgetService, accountService, this);
+        recyclerViewBudgets.setAdapter(budgetAdapter);
 
         addBudget();
         return view;
@@ -72,12 +73,21 @@ public class AccountBudgetFragment extends Fragment implements BudgetAdapter.OnB
         loadBudget();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("AccountBudgetFragment", "onResume called, refreshing budget list");
+        loadBudget();
+    }
+
     private void addBudget() {
         btnAddBudget.setOnClickListener(v -> {
+            Log.d("AccountBudgetFragment", "Starting BudgetAccountActivity to add budget");
             Intent intent = new Intent(requireContext(), BudgetAccountActivity.class);
             startActivity(intent);
         });
     }
+
     private boolean isValidDate(String date) {
         try {
             new SimpleDateFormat("yyyy-MM-dd").parse(date);
@@ -99,17 +109,18 @@ public class AccountBudgetFragment extends Fragment implements BudgetAdapter.OnB
             Log.d("AccountBudgetFragment", "No budgets found");
             txtEmptyBudgets.setVisibility(View.VISIBLE);
             recyclerViewBudgets.setVisibility(View.GONE);
+            budgetAdapter.updateData(null);
         } else {
             Log.d("AccountBudgetFragment", "Found " + accountBudgetList.size() + " budgets");
             txtEmptyBudgets.setVisibility(View.GONE);
             recyclerViewBudgets.setVisibility(View.VISIBLE);
-            BudgetAdapter budgetAdapter = new BudgetAdapter(accountBudgetList, accountBudgetService, accountService,this);
-            recyclerViewBudgets.setAdapter(budgetAdapter);
+            budgetAdapter.updateData(accountBudgetList);
         }
     }
 
     @Override
     public void onEditBudgetClick(String budgetId) {
+        Log.d("AccountBudgetFragment", "Starting BudgetAccountActivity to edit budget: " + budgetId);
         Intent intent = new Intent(requireContext(), BudgetAccountActivity.class);
         intent.putExtra("budgetId", budgetId);
         startActivity(intent);
@@ -117,12 +128,14 @@ public class AccountBudgetFragment extends Fragment implements BudgetAdapter.OnB
 
     @Override
     public void onDeleteBudgetClick(String budgetId) {
+        Log.d("AccountBudgetFragment", "Deleting budget with ID: " + budgetId);
         new AlertDialog.Builder(requireContext())
                 .setTitle("Confirm Delete")
                 .setMessage("Are you sure you want to delete this budget?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     accountBudgetService.deleteBudget(budgetId);
                     userDataManager.saveData();
+                    Log.d("AccountBudgetFragment", "Budget deleted, refreshing list");
                     loadBudget();
                     DisplayToast.Display(requireContext(), "AccountBudget deleted");
                 })
