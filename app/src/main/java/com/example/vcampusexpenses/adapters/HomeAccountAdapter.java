@@ -22,11 +22,9 @@ public class HomeAccountAdapter extends RecyclerView.Adapter<HomeAccountAdapter.
 
     private static final String TAG = "HomeAccountAdapter";
     private List<Account> accountList;
-    private final SettingService settingService;
 
     public HomeAccountAdapter(Context context, List<Account> accountList) {
         this.accountList = accountList != null ? new ArrayList<>(accountList) : new ArrayList<>();
-        this.settingService = new SettingService(context);
     }
 
     @NonNull
@@ -40,7 +38,7 @@ public class HomeAccountAdapter extends RecyclerView.Adapter<HomeAccountAdapter.
     @Override
     public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
         Account account = accountList.get(position);
-        holder.bind(account, settingService);
+        holder.bind(account);
     }
 
     @Override
@@ -56,12 +54,15 @@ public class HomeAccountAdapter extends RecyclerView.Adapter<HomeAccountAdapter.
     static class AccountViewHolder extends RecyclerView.ViewHolder {
         private final TextView txtAccountName;
         private final TextView txtAccountBalance;
+
+        SettingService settingService;
         AccountViewHolder(@NonNull View itemView) {
             super(itemView);
             txtAccountName = itemView.findViewById(R.id.txt_account_name);
             txtAccountBalance = itemView.findViewById(R.id.txt_balance);
+            settingService = new SettingService(itemView.getContext());
         }
-        void bind(Account account, SettingService settingService) {
+        void bind(Account account) {
             txtAccountName.setText(account.getName());
             txtAccountBalance.setText(String.valueOf(account.getBalance() + " " + settingService.getCurrency()));
         }

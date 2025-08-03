@@ -24,6 +24,7 @@ import com.example.vcampusexpenses.activity.SettingActivity;
 import com.example.vcampusexpenses.activity.TransactionActivity;
 import com.example.vcampusexpenses.adapters.HomeAccountAdapter;
 import com.example.vcampusexpenses.model.Account;
+import com.example.vcampusexpenses.services.AccountBudgetService;
 import com.example.vcampusexpenses.services.AccountService;
 import com.example.vcampusexpenses.services.TransactionService;
 import com.example.vcampusexpenses.session.SessionManager;
@@ -52,6 +53,7 @@ public class HomeFragment extends Fragment {
     private HomeAccountAdapter accountAdapter;
     private AccountService accountService;
     private TransactionService transactionService;
+    private AccountBudgetService accountBudgetService;
     private SessionManager sessionManager;
     private UserDataManager dataManager;
 
@@ -92,7 +94,8 @@ public class HomeFragment extends Fragment {
         sessionManager = new SessionManager(requireContext());
         dataManager = UserDataManager.getInstance(requireContext(), sessionManager.getUserId());
         accountService = new AccountService(dataManager);
-        transactionService = new TransactionService(dataManager, accountService, null); // Giả sử AccountBudgetService là null nếu chưa triển khai
+        accountBudgetService = new AccountBudgetService(dataManager);
+        transactionService = new TransactionService(dataManager, accountService, accountBudgetService);
     }
 
     private void initializeViews(View view) {
@@ -169,7 +172,7 @@ public class HomeFragment extends Fragment {
         double totalIncome = transactionService.getTotalIncome(startDate.getTimeInMillis(), endDate.getTimeInMillis());
         double totalOutcome = transactionService.getTotalOutcome(startDate.getTimeInMillis(), endDate.getTimeInMillis());
 
-        txtTotalIncome.setText(String.format(Locale.getDefault(), "%.2f", totalIncome));
-        txtTotalOutcome.setText(String.format(Locale.getDefault(), "%.2f", totalOutcome));
+        txtTotalIncome.setText(String.valueOf(totalIncome));
+        txtTotalOutcome.setText(String.valueOf(totalOutcome));
     }
 }

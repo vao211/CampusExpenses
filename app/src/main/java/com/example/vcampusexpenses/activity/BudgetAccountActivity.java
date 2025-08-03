@@ -157,7 +157,7 @@ public class BudgetAccountActivity extends AppCompatActivity {
                 return;
             }
 
-            AccountBudget accountBudget = new AccountBudget(null, "AccountBudget", amount, amount, startDate, endDate);
+            AccountBudget accountBudget = new AccountBudget(budgetId, "AccountBudget", amount, amount, startDate, endDate);
             accountBudget.addAccount(accountId);
 
             if (budgetId == null) {

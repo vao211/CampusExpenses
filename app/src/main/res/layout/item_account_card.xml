@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp"
-        android:background="@android:color/white">
+        android:background="#F6F6D9">
 
         <ImageView
             android:id="@+id/iv_account_icon"
@@ -21,7 +21,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/ic_cash" />
+            android:src="@drawable/png_account" />
 
         <TextView
             android:id="@+id/txt_account_name"

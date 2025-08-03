@@ -3,13 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/border_account"
+    android:layout_marginTop="5dp"
+    android:layout_marginStart="3dp"
+    android:layout_marginEnd="3dp"
     android:padding="5dp">
 
     <ImageView
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:id="@+id/img_account"
-        android:src="@drawable/ic_cash"
+        android:src="@drawable/png_account"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -19,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="8dp"
         android:text="@string/account_name"
         android:textSize="16sp"
         android:textStyle="bold"
