@@ -27,7 +27,6 @@
         <activity android:name=".activity.GoogleLoginActivity"/>
         <activity android:name=".activity.RegistrationPageActivity"/>
         <activity android:name=".activity.SettingActivity" />
-        <activity android:name=".activity.LogoutActivity" />
         <activity android:name=".activity.AboutActivity" />
         <activity android:name=".activity.TransactionActivity" />
         <activity android:name=".activity.ChartCategoryActivity" />
