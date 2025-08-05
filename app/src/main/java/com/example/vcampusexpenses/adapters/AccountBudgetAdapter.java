@@ -1,5 +1,6 @@
 package com.example.vcampusexpenses.adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,12 +63,11 @@ public class AccountBudgetAdapter extends RecyclerView.Adapter<AccountBudgetAdap
         } else {
             accountNames.append("No accounts");
         }
-
         holder.txtBudgetName.setText(accountBudget.getName() != null ? accountBudget.getName() : "Unnamed Budget");
-        holder.txtBudgetDate.setText(accountBudget.getStartDate() + " to " + accountBudget.getEndDate());
+        holder.txtBudgetDate.setText(String.valueOf(accountBudget.getStartDate() + " to " + accountBudget.getEndDate()));
         holder.txtAccountNames.setText(accountNames.toString());
-        holder.txtRemainingAmount.setText(String.valueOf(accountBudget.getRemainingAmount()));
-        holder.txtTotalAmount.setText(String.valueOf(accountBudget.getTotalAmount()));
+        holder.txtRemainingAmount.setText(String.valueOf("remain: "+accountBudget.getRemainingAmount()));
+        holder.txtTotalAmount.setText(String.valueOf("total: " + accountBudget.getTotalAmount()));
         holder.btnEditBudget.setOnClickListener(v -> listener.onEditBudgetClick(accountBudget.getBudgetId()));
         holder.btnDeleteBudget.setOnClickListener(v -> listener.onDeleteBudgetClick(accountBudget.getBudgetId()));
     }

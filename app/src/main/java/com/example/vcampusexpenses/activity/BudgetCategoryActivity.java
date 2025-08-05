@@ -136,8 +136,8 @@ public class BudgetCategoryActivity extends AppCompatActivity {
         setupAccountSpinner(spinnerAccount, isEditMode ? existingBudget.getAccountId() : null);
 
         if (isEditMode) {
-            etTotalAmount.setText(String.format("%.2f", existingBudget.getTotalAmount()));
-            etRemainingAmount.setText(String.format("%.2f", existingBudget.getRemainingAmount()));
+            etTotalAmount.setText(String.valueOf(existingBudget.getTotalAmount()));
+            etRemainingAmount.setText(String.valueOf(existingBudget.getRemainingAmount()));
         }
 
         AlertDialog dialog = builder.create();

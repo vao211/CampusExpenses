@@ -21,8 +21,10 @@ import com.example.vcampusexpenses.fragments.AccountBudgetFragment;
 import com.example.vcampusexpenses.fragments.CategoriesFragment;
 import com.example.vcampusexpenses.fragments.HomeFragment;
 import com.example.vcampusexpenses.fragments.TransactionFragment;
+import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.AccountBudget;
 import com.example.vcampusexpenses.services.AccountBudgetService;
+import com.example.vcampusexpenses.services.AccountService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -32,6 +34,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private AccountBudgetService accountBudgetService;
+    private AccountService accountService;
     private static final int NOTIFICATION_PERMISSION_CODE = 100;
     private static final String CHANNEL_ID = "BudgetNotificationChannel";
 
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         UserDataManager userDataManager = UserDataManager.getInstance(this, sessionManager.getUserId());
         accountBudgetService = new AccountBudgetService(userDataManager);
+        accountService = new AccountService(userDataManager);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
@@ -107,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 .setSmallIcon(R.drawable.ic_notif) // Thay bằng icon của bạn
                 .setContentTitle("Budget Exhausted")
                 .setContentText("Budget '" + budgetName + "' has no remaining amount!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
@@ -127,7 +131,8 @@ public class MainActivity extends AppCompatActivity {
                     // Kiểm tra xem thông báo đã được gửi chưa
                     if (!prefs.getBoolean("notified_" + budgetId, false)) {
                         Toast.makeText(this, "Budget '" + budget.getName() + "' has no remaining amount!", Toast.LENGTH_LONG).show();
-                        sendNotification(budget.getName());
+                        Account account = accountService.getAccount(budget.getListAccountIds().get(0));
+                        sendNotification(account.getName());
                         editor.putBoolean("notified_" + budgetId, true);
                         editor.apply();
                     }

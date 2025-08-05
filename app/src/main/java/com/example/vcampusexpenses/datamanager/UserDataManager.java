@@ -72,7 +72,7 @@ public class UserDataManager {
         for (String name : categoryNames) {
             String categoryId = IdGenerator.generateId(IdGenerator.ModelType.CATEGORY);
             Category category = new Category(categoryId, name);
-            category.setBudgetForAccount(accountId, Integer.MAX_VALUE);
+//            category.setBudgetForAccount(accountId, Integer.MAX_VALUE);
             categories.put(categoryId, category);
         }
 
