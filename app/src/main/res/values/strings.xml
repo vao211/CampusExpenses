@@ -75,6 +75,7 @@
     <string name="enter_amount">Enter amount</string>
     <string name="description">Enter description</string>
     <string name="amount_of_money">Amount of money</string>
+    <string name="remain_of_money">remain of money</string>
     <string name="select_category">Select category</string>
     <string name="enter_total_amount">Enter total amount</string>
     <string name="enter_remain_amount">Enter remain amount</string>

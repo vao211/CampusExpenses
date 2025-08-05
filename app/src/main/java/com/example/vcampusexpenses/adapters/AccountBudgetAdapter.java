@@ -64,9 +64,10 @@ public class AccountBudgetAdapter extends RecyclerView.Adapter<AccountBudgetAdap
         }
 
         holder.txtBudgetName.setText(accountBudget.getName() != null ? accountBudget.getName() : "Unnamed Budget");
-        holder.txtBudgetDate.setText(accountBudget.getStartDate() + " - " + accountBudget.getEndDate());
+        holder.txtBudgetDate.setText(accountBudget.getStartDate() + " to " + accountBudget.getEndDate());
         holder.txtAccountNames.setText(accountNames.toString());
-        holder.txtTotalAmount.setText(String.format("%.2f", accountBudget.getTotalAmount()));
+        holder.txtRemainingAmount.setText(String.valueOf(accountBudget.getRemainingAmount()));
+        holder.txtTotalAmount.setText(String.valueOf(accountBudget.getTotalAmount()));
         holder.btnEditBudget.setOnClickListener(v -> listener.onEditBudgetClick(accountBudget.getBudgetId()));
         holder.btnDeleteBudget.setOnClickListener(v -> listener.onDeleteBudgetClick(accountBudget.getBudgetId()));
     }
@@ -82,7 +83,7 @@ public class AccountBudgetAdapter extends RecyclerView.Adapter<AccountBudgetAdap
     }
 
     static class BudgetViewHolder extends RecyclerView.ViewHolder {
-        TextView txtBudgetName, txtBudgetDate, txtAccountNames, txtTotalAmount;
+        TextView txtRemainingAmount ,txtBudgetName, txtBudgetDate, txtAccountNames, txtTotalAmount;
         ImageButton btnEditBudget, btnDeleteBudget;
 
         public BudgetViewHolder(@NonNull View itemView) {
@@ -90,6 +91,7 @@ public class AccountBudgetAdapter extends RecyclerView.Adapter<AccountBudgetAdap
             txtBudgetName = itemView.findViewById(R.id.txt_budget_name);
             txtBudgetDate = itemView.findViewById(R.id.txt_budget_date);
             txtAccountNames = itemView.findViewById(R.id.txt_account_name);
+            txtRemainingAmount = itemView.findViewById(R.id.txt_remaining_amount);
             txtTotalAmount = itemView.findViewById(R.id.txt_total_amount);
             btnEditBudget = itemView.findViewById(R.id.btn_edit_budget);
             btnDeleteBudget = itemView.findViewById(R.id.btn_delete_budget);
