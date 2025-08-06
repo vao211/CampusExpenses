@@ -98,7 +98,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:id="@+id/img_hoang"
-        android:src="@drawable/ic_guest"
+        android:src="@drawable/hoang"
         app:layout_constraintTop_toBottomOf="@+id/txt_hoang"
         app:layout_constraintEnd_toEndOf="@id/txt_hoang"
         app:layout_constraintStart_toStartOf="@id/txt_hoang"/>
@@ -109,7 +109,7 @@
         app:layout_constraintTop_toBottomOf="@id/txt_hung"
         app:layout_constraintEnd_toEndOf="@id/txt_hung"
         app:layout_constraintStart_toStartOf="@id/txt_hung"
-        android:src="@drawable/ic_guest"/>
+        android:src="@drawable/hung"/>
     <ImageView
         android:layout_width="70dp"
         android:layout_height="70dp"
@@ -117,7 +117,7 @@
         app:layout_constraintTop_toBottomOf="@id/txt_hwng"
         app:layout_constraintEnd_toEndOf="@id/txt_hwng"
         app:layout_constraintStart_toStartOf="@id/txt_hwng"
-        android:src="@drawable/ic_guest"/>
+        android:src="@drawable/hwng"/>
     <ImageView
         android:layout_width="70dp"
         android:layout_height="70dp"
@@ -125,7 +125,7 @@
         app:layout_constraintTop_toBottomOf="@id/txt_vinh"
         app:layout_constraintEnd_toEndOf="@id/txt_vinh"
         app:layout_constraintStart_toStartOf="@id/txt_vinh"
-        android:src="@drawable/ic_guest"/>
+        android:src="@drawable/vinh"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

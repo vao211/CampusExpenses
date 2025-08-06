@@ -126,13 +126,15 @@ public class MainActivity extends AppCompatActivity {
 
         if (accountBudgetList != null) {
             for (AccountBudget budget : accountBudgetList) {
-                if (budget.getRemainingAmount() == 0) {
+                if (budget.getRemainingAmount() <= budget.getTotalAmount()*0.1) {
                     String budgetId = budget.getBudgetId();
+                    String name;
+                    Account account = accountService.getAccount(budget.getListAccountIds().get(0));
+                    name = account.getName();
                     // Kiểm tra xem thông báo đã được gửi chưa
                     if (!prefs.getBoolean("notified_" + budgetId, false)) {
-                        Toast.makeText(this, "Budget '" + budget.getName() + "' has no remaining amount!", Toast.LENGTH_LONG).show();
-                        Account account = accountService.getAccount(budget.getListAccountIds().get(0));
-                        sendNotification(account.getName());
+                        Toast.makeText(this, "Budget " + name + " has low remaining amount!", Toast.LENGTH_LONG).show();
+                        sendNotification(name);
                         editor.putBoolean("notified_" + budgetId, true);
                         editor.apply();
                     }
