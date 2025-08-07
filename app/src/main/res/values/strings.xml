@@ -107,4 +107,5 @@
     <string name="save">save</string>
     <string name="cancel">cancel</string>
     <string name="category_budget">Category Budget</string>
+    <string name="select_your_birthday">Select your birthday</string>
 </resources>
