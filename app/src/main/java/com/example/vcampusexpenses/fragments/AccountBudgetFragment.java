@@ -104,7 +104,7 @@ public class AccountBudgetFragment extends Fragment implements AccountBudgetAdap
             return;
         }
 
-        List<AccountBudget> accountBudgetList = accountBudgetService.getListUserBudgets();
+        List<AccountBudget> accountBudgetList = accountBudgetService.getListAccountBudgets();
         if (accountBudgetList == null || accountBudgetList.isEmpty()) {
             Log.d("AccountBudgetFragment", "No budgets found");
             txtEmptyBudgets.setVisibility(View.VISIBLE);

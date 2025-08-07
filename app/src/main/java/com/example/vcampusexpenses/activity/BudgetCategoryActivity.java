@@ -105,7 +105,7 @@ public class BudgetCategoryActivity extends AppCompatActivity {
     private void updateCategoryBudgetsList() {
         Category category = categoryService.getCategory(categoryId);
         if (category != null) {
-            adapter.setCategoryBudgets(category.getAccountBudgets());
+            adapter.setCategoryBudgets(category.getAccountInCategoryBudgets());
         }
     }
 

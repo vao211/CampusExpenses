@@ -190,7 +190,7 @@ public class Example extends AppCompatActivity {
         }
 
         // Get List of Budgets
-        List<AccountBudget> listAccountBudgets = accountBudgetService.getListUserBudgets();
+        List<AccountBudget> listAccountBudgets = accountBudgetService.getListAccountBudgets();
     }
 
 

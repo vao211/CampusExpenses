@@ -171,7 +171,7 @@ public class TransactionService {
 
         //Ktra budget của outcome
         if (transaction.getType().equals("OUTCOME")) {
-            List<AccountBudget> accountBudgets = accountBudgetService.getListUserBudgets();
+            List<AccountBudget> accountBudgets = accountBudgetService.getListAccountBudgets();
             for (AccountBudget accountBudget : accountBudgets) {
                 if (accountBudget.appliesToTransaction(transaction)) {
                     if (transaction.getAmount() > accountBudget.getRemainingAmount()) {

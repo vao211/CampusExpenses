@@ -254,7 +254,7 @@ public class AccountBudgetService {
         DisplayToast.Display(dataFile.getContext(), "Budget deleted successfully");
     }
 
-    public List<AccountBudget> getListUserBudgets() {
+    public List<AccountBudget> getListAccountBudgets() {
         Log.d("BudgetService", "Getting list of budgets");
         List<AccountBudget> listBudgets = new ArrayList<>();
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
@@ -279,7 +279,7 @@ public class AccountBudgetService {
             return;
         }
 
-        List<AccountBudget> budgets = getListUserBudgets();
+        List<AccountBudget> budgets = getListAccountBudgets();
         for (AccountBudget budget : budgets) {
             if (budget.appliesToTransaction(transaction)) {
                 budget.updateRemaining(transaction);
@@ -296,7 +296,7 @@ public class AccountBudgetService {
             Log.d("BudgetService", "Transaction is a transfer, skipping reverse budget update");
             return;
         }
-        List<AccountBudget> budgets = getListUserBudgets();
+        List<AccountBudget> budgets = getListAccountBudgets();
         for (AccountBudget budget : budgets) {
             if (budget.appliesToTransaction(transaction)) {
                 if (transaction.getType().equals("INCOME")) {

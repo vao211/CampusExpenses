@@ -1,23 +1,22 @@
 package com.example.vcampusexpenses.model;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Category{
     private String categoryId;
     private String name;
-    private Map<String, CategoryBudget> accountBudgets;
+    private Map<String, CategoryBudget> accountInCategoryBudgets; //accountID, CategoryBudget
 
     public Category(String categoryId, String name) {
         this.categoryId = categoryId;
         this.name = name;
-        this.accountBudgets = new HashMap<>();
+        this.accountInCategoryBudgets = new HashMap<>();
     }
 
     public Category(String name) {
         this.name = name;
-        this.accountBudgets = new HashMap<>();
+        this.accountInCategoryBudgets = new HashMap<>();
     }
 
     public String getCategoryId() {
@@ -36,30 +35,30 @@ public class Category{
         this.name = name;
     }
 
-    public Map<String, CategoryBudget> getAccountBudgets() {
-        if (accountBudgets == null) {
-            accountBudgets = new HashMap<>();
+    public Map<String, CategoryBudget> getAccountInCategoryBudgets() {
+        if (accountInCategoryBudgets == null) {
+            accountInCategoryBudgets = new HashMap<>();
         }
-        return accountBudgets;
+        return accountInCategoryBudgets;
     }
 
-    public void setAccountBudgets(Map<String, CategoryBudget> accountBudgets) {
-        this.accountBudgets = accountBudgets != null ? new HashMap<>(accountBudgets) : new HashMap<>();
+    public void setAccountInCategoryBudgets(Map<String, CategoryBudget> accountInCategoryBudgets) {
+        this.accountInCategoryBudgets = accountInCategoryBudgets != null ? new HashMap<>(accountInCategoryBudgets) : new HashMap<>();
     }
 
     public void setBudgetForAccount(String accountId, double amount) {
         if (amount <= 0) {
-            accountBudgets.remove(accountId);
+            accountInCategoryBudgets.remove(accountId);
         } else {
-            accountBudgets.put(accountId, new CategoryBudget(categoryId, accountId, amount));
+            accountInCategoryBudgets.put(accountId, new CategoryBudget(categoryId, accountId, amount));
         }
     }
 
     public CategoryBudget getBudgetForAccount(String accountId) {
-        return accountBudgets.get(accountId);
+        return accountInCategoryBudgets.get(accountId);
     }
 
     public void removeBudgetForAccount(String accountId) {
-        accountBudgets.remove(accountId);
+        accountInCategoryBudgets.remove(accountId);
     }
 }

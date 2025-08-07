@@ -10,7 +10,9 @@ import com.example.vcampusexpenses.model.Transaction;
 import com.example.vcampusexpenses.model.UserData;
 import com.example.vcampusexpenses.utils.DisplayToast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CategoryBudgetService {
@@ -25,6 +27,31 @@ public class CategoryBudgetService {
         Log.d("CategoryBudgetService", "Initialized with userId: " + userId);
     }
 
+    public Map<String, CategoryBudget> getAllCategoryBudgets(){
+        Log.d("CategoryBudgetService", "Getting list of category budgets");
+        Map<String, CategoryBudget> mapAccountInCategoryBudgets = new HashMap<>();
+        if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
+            Log.e("CategoryBudgetService", "User data not initialized");
+            return mapAccountInCategoryBudgets;
+        }
+        Map<String, Category> categories = userData.getUser().getData().getCategories();
+        if (categories == null) {
+            Log.e("CategoryBudgetService", "No categories found");
+            return mapAccountInCategoryBudgets;
+        }
+
+        for (Map.Entry<String, Category> entry : categories.entrySet()) {
+            String categoryId = entry.getKey();
+            Category category = entry.getValue();
+            Log.d("CategoryBudgetService", "Category: " + category.getName() + ", CategoryId: " + categoryId);
+            Map<String, CategoryBudget> accountInCategoryBudgets = category.getAccountInCategoryBudgets();
+            if (accountInCategoryBudgets != null) {
+                mapAccountInCategoryBudgets.putAll(accountInCategoryBudgets);
+            }
+        }
+        Log.d("CategoryBudgetService", "List of category budgets retrieved");
+        return mapAccountInCategoryBudgets;
+    }
     public void setBudgetForAccount(String categoryId, String accountId, double totalAmount, Double remainingAmount) {
         Log.d("CategoryBudgetService", "Setting budget for categoryId: " + categoryId + " and accountId: " + accountId + ", totalAmount: " + totalAmount + ", remainingAmount: " + (remainingAmount != null ? remainingAmount : "null"));
         if (userData == null || userData.getUser() == null || userData.getUser().getData() == null) {
@@ -49,10 +76,10 @@ public class CategoryBudgetService {
         if (totalAmount <= 0) {
             category.removeBudgetForAccount(accountId);
         } else {
-            if (category.getAccountBudgets() == null) {
-                category.setAccountBudgets(new HashMap<>());
+            if (category.getAccountInCategoryBudgets() == null) {
+                category.setAccountInCategoryBudgets(new HashMap<>());
             }
-            category.getAccountBudgets().put(accountId, new CategoryBudget(categoryId, accountId, totalAmount, finalRemainingAmount));
+            category.getAccountInCategoryBudgets().put(accountId, new CategoryBudget(categoryId, accountId, totalAmount, finalRemainingAmount));
         }
         dataFile.saveData();
         Log.d("CategoryBudgetService", "Budget set for categoryId: " + categoryId + " and accountId: " + accountId);

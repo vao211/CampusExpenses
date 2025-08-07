@@ -137,7 +137,7 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
                 return;
             }
             categoryService.updateCategory(categoryID, newName);
-            dataManager.saveData(); //Lưu dữ liệu sau khi cập nhật
+            dataManager.saveData();
             Log.d("CategoriesFragment", "Category updated: " + newName);
             loadCategories();
         });

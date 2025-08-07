@@ -1,45 +1,133 @@
 {
   "user": {
-    "userId": "....",
     "data": {
-      "account": {
-        "account1":{
-          "name":"Cash",
-          "balance": 0
-        }
-      },
-      "categories": {
-        "cat1": {
-          "name": "Quần Áo"
+      "accounts": {
+        "ACCOUNT-0ec8892b-1ce6-49d7-9108-d7f39dcf46df": {
+          "accountId": "ACCOUNT-0ec8892b-1ce6-49d7-9108-d7f39dcf46df",
+          "balance": 400.0,
+          "budgets": [
+            "BUDGET-99f880c4-70e7-4d0e-8daf-c28509ecba1f"
+          ],
+          "name": "Wallet"
         },
-        "cat2": {
-          "name": "Ăn uống"
-        },
-        "cat3": {
-          "name": "Giáo dục"
-        },
-        "cat4": {
-          "name": "Sức khỏe"
-        },
-        "cat6": {
-          "name": "Internet"
-        },
-        "cat7": {
-          "name": "Điện thoại"
-        },
-        "cat8": {
-          "name": "Tiền điện"
-        },
-        "cat9": {
-          "name": "Tiền nước"
+        "ACCOUNT-0eb7bda6-4d01-470f-b2ab-1d6bdcdb2f5d": {
+          "accountId": "ACCOUNT-0eb7bda6-4d01-470f-b2ab-1d6bdcdb2f5d",
+          "balance": 2480.0,
+          "budgets": [
+            "BUDGET-09cc9e3e-2a31-4e56-8992-a178673ec557"
+          ],
+          "name": "Bank 1"
         }
       },
       "budgets": {
-
+        "BUDGET-09cc9e3e-2a31-4e56-8992-a178673ec557": {
+          "budgetId": "BUDGET-09cc9e3e-2a31-4e56-8992-a178673ec557",
+          "endDate": "2025-09-07",
+          "listAccountIds": [
+            "ACCOUNT-0eb7bda6-4d01-470f-b2ab-1d6bdcdb2f5d"
+          ],
+          "name": "AccountBudget",
+          "remainingAmount": 780.0,
+          "startDate": "2025-08-07",
+          "totalAmount": 1000.0
+        },
+        "BUDGET-99f880c4-70e7-4d0e-8daf-c28509ecba1f": {
+          "budgetId": "BUDGET-99f880c4-70e7-4d0e-8daf-c28509ecba1f",
+          "endDate": "2025-08-14",
+          "listAccountIds": [
+            "ACCOUNT-0ec8892b-1ce6-49d7-9108-d7f39dcf46df"
+          ],
+          "name": "AccountBudget",
+          "remainingAmount": 100.0,
+          "startDate": "2025-08-07",
+          "totalAmount": 100.0
+        }
+      },
+      "categories": {
+        "CATEGORY-88d8e3eb-541b-4be8-91db-e0e27ed0242d": {
+          "accountBudgets": {},
+          "categoryId": "CATEGORY-88d8e3eb-541b-4be8-91db-e0e27ed0242d",
+          "name": "Internet Bill"
+        },
+        "CATEGORY-f801632f-df5d-41be-a88b-25f5ce0f5f76": {
+          "accountBudgets": {},
+          "categoryId": "CATEGORY-f801632f-df5d-41be-a88b-25f5ce0f5f76",
+          "name": "Salary"
+        },
+        "CATEGORY-51b0cd40-3a4d-40f2-b90e-58eb5f3f586a": {
+          "accountBudgets": {},
+          "categoryId": "CATEGORY-51b0cd40-3a4d-40f2-b90e-58eb5f3f586a",
+          "name": "Health"
+        },
+        "CATEGORY-2e00e52b-5c05-4d78-8fc8-0add46e957fa": {
+          "accountBudgets": {},
+          "categoryId": "CATEGORY-2e00e52b-5c05-4d78-8fc8-0add46e957fa",
+          "name": "Food"
+        },
+        "CATEGORY-0dbfc739-4b7a-430f-a50a-823516b9eb27": {
+          "accountBudgets": {},
+          "categoryId": "CATEGORY-0dbfc739-4b7a-430f-a50a-823516b9eb27",
+          "name": "Electricity Bill"
+        },
+        "CATEGORY-9b2c0a4c-e33a-4c77-9fd7-fd34b71cbc7c": {
+          "accountBudgets": {},
+          "categoryId": "CATEGORY-9b2c0a4c-e33a-4c77-9fd7-fd34b71cbc7c",
+          "name": "Water Bill"
+        },
+        "CATEGORY-b77c23b9-5fa4-455f-846e-ccba8610cf13": {
+          "accountBudgets": {},
+          "categoryId": "CATEGORY-b77c23b9-5fa4-455f-846e-ccba8610cf13",
+          "name": "Bank Interest"
+        }
       },
       "transactions": {
-
+        "TRANSACTION-c874e0dc-4f6f-46f0-814d-1cdb393fbaf9": {
+          "accountId": "ACCOUNT-0ec8892b-1ce6-49d7-9108-d7f39dcf46df",
+          "amount": 50.0,
+          "categoryId": "CATEGORY-f801632f-df5d-41be-a88b-25f5ce0f5f76",
+          "date": "2025-08-07",
+          "description": "",
+          "transactionId": "TRANSACTION-c874e0dc-4f6f-46f0-814d-1cdb393fbaf9",
+          "type": "INCOME"
+        },
+        "TRANSACTION-23eb5ac4-1c53-4f5d-a397-0171f0973594": {
+          "accountId": "ACCOUNT-0eb7bda6-4d01-470f-b2ab-1d6bdcdb2f5d",
+          "amount": 300.0,
+          "categoryId": "CATEGORY-2e00e52b-5c05-4d78-8fc8-0add46e957fa",
+          "date": "2025-08-07",
+          "description": "",
+          "transactionId": "TRANSACTION-23eb5ac4-1c53-4f5d-a397-0171f0973594",
+          "type": "OUTCOME"
+        },
+        "TRANSACTION-3492c35c-f7d1-4448-87dc-01f50d83d8c5": {
+          "accountId": "ACCOUNT-0eb7bda6-4d01-470f-b2ab-1d6bdcdb2f5d",
+          "amount": 250.0,
+          "categoryId": "CATEGORY-0dbfc739-4b7a-430f-a50a-823516b9eb27",
+          "date": "2025-08-07",
+          "description": "",
+          "transactionId": "TRANSACTION-3492c35c-f7d1-4448-87dc-01f50d83d8c5",
+          "type": "OUTCOME"
+        },
+        "TRANSACTION-49d59ce2-133b-4e4d-95d3-5a73747e11cd": {
+          "accountId": "ACCOUNT-0eb7bda6-4d01-470f-b2ab-1d6bdcdb2f5d",
+          "amount": 55.0,
+          "categoryId": "CATEGORY-b77c23b9-5fa4-455f-846e-ccba8610cf13",
+          "date": "2025-08-07",
+          "description": "",
+          "transactionId": "TRANSACTION-49d59ce2-133b-4e4d-95d3-5a73747e11cd",
+          "type": "INCOME"
+        },
+        "TRANSACTION-22ac0906-fe63-4e15-b7e0-75a686b279b1": {
+          "accountId": "ACCOUNT-0eb7bda6-4d01-470f-b2ab-1d6bdcdb2f5d",
+          "amount": 25.0,
+          "categoryId": "CATEGORY-9b2c0a4c-e33a-4c77-9fd7-fd34b71cbc7c",
+          "date": "2025-08-07",
+          "description": "",
+          "transactionId": "TRANSACTION-22ac0906-fe63-4e15-b7e0-75a686b279b1",
+          "type": "OUTCOME"
+        }
       }
-    }
+    },
+    "userId": "QJA8AgSX0JdoJBB2YHNw3kgDRA52"
   }
 }

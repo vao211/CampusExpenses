@@ -23,17 +23,24 @@ import com.example.vcampusexpenses.fragments.HomeFragment;
 import com.example.vcampusexpenses.fragments.TransactionFragment;
 import com.example.vcampusexpenses.model.Account;
 import com.example.vcampusexpenses.model.AccountBudget;
+import com.example.vcampusexpenses.model.Category;
+import com.example.vcampusexpenses.model.CategoryBudget;
 import com.example.vcampusexpenses.services.AccountBudgetService;
 import com.example.vcampusexpenses.services.AccountService;
+import com.example.vcampusexpenses.services.CategoryBudgetService;
+import com.example.vcampusexpenses.services.CategoryService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.datamanager.UserDataManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private AccountBudgetService accountBudgetService;
+    private CategoryBudgetService categoryBudgetService;
+    private CategoryService categoryService;
     private AccountService accountService;
     private static final int NOTIFICATION_PERMISSION_CODE = 100;
     private static final String CHANNEL_ID = "BudgetNotificationChannel";
@@ -57,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         UserDataManager userDataManager = UserDataManager.getInstance(this, sessionManager.getUserId());
         accountBudgetService = new AccountBudgetService(userDataManager);
         accountService = new AccountService(userDataManager);
+        categoryBudgetService = new CategoryBudgetService(userDataManager);
+        categoryService = new CategoryService(userDataManager);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
@@ -86,12 +95,14 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
             // Kiểm tra và hiển thị thông báo khi chuyển fragment
-            checkBudgetsForZeroRemaining();
+            checkBudgetsForLowRemaining();
+            checkCategoryBudgetForLowRemaining();
             return true;
         });
 
         // Kiểm tra ngân sách khi khởi động ứng dụng
-        checkBudgetsForZeroRemaining();
+        checkBudgetsForLowRemaining();
+        checkCategoryBudgetForLowRemaining();
     }
 
     private void createNotificationChannel() {
@@ -106,21 +117,36 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendNotification(String budgetName) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notif) // Thay bằng icon của bạn
-                .setContentTitle("Budget Exhausted")
-                .setContentText("Budget '" + budgetName + "' has no remaining amount!")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true);
+    private void sendNotification(String budgetName, String type) {
+        if(type.equals("accountBudget")) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_notif) // Thay bằng icon của bạn
+                    .setContentTitle("Account Budget Exhausted")
+                    .setContentText("Budget '" + budgetName + "' has no remaining amount!")
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            notificationManager.notify(budgetName.hashCode(), builder.build());
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                notificationManager.notify(budgetName.hashCode(), builder.build());
+            }
+        }
+        else{
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_notif) // Thay bằng icon của
+                    .setContentTitle("Category Budget Exhausted")
+                    .setContentText("Category Budget '" + budgetName + "' has no remaining amount!")
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                notificationManager.notify(budgetName.hashCode(), builder.build());
+            }
         }
     }
-    private void checkBudgetsForZeroRemaining() {
-        List<AccountBudget> accountBudgetList = accountBudgetService.getListUserBudgets();
+    private void checkBudgetsForLowRemaining() {
+        List<AccountBudget> accountBudgetList = accountBudgetService.getListAccountBudgets();
         SharedPreferences prefs = getSharedPreferences("BudgetNotifications", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
@@ -134,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                     // Kiểm tra xem thông báo đã được gửi chưa
                     if (!prefs.getBoolean("notified_" + budgetId, false)) {
                         Toast.makeText(this, "Budget " + name + " has low remaining amount!", Toast.LENGTH_LONG).show();
-                        sendNotification(name);
+                        sendNotification(name, "accountBudget");
                         editor.putBoolean("notified_" + budgetId, true);
                         editor.apply();
                     }
@@ -146,8 +172,41 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    // Hàm Test add, KHÔNG ĐƯỢC CHẠY. Chỉ xem để biết cách dùng.
-    private void test() {
-        String userId = sessionManager.getUserId();
+
+    private void checkCategoryBudgetForLowRemaining(){
+        Map<String, CategoryBudget> allCategoryBudgets = categoryBudgetService.getAllCategoryBudgets();
+        SharedPreferences prefs = getSharedPreferences("BudgetNotifications", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        if (allCategoryBudgets != null) {
+            for (Map.Entry<String, CategoryBudget> entry : allCategoryBudgets.entrySet()) {
+                CategoryBudget categoryBudget = entry.getValue();
+                String accountId = categoryBudget.getAccountId();
+                if (categoryBudget.getRemainingAmount() <= categoryBudget.getTotalAmount()*0.1) {
+                    String accountName;
+                    Account account = accountService.getAccount(accountId);
+                    accountName = account.getName();
+
+                    String categoryName;
+                    Category category = categoryService.getCategory(categoryBudget.getCategoryId());
+                    categoryName = category.getName();
+
+                    String name = accountName + " - " + categoryName;
+                    // Kiểm tra xem thông báo đã được gửi chưa
+                    if (!prefs.getBoolean("notified_" + accountId, false)) {
+                        Toast.makeText(this, "Category Budget " + name + " has low remaining amount!", Toast.LENGTH_LONG).show();
+                        sendNotification(name, "categoryBudget");
+                        editor.putBoolean("notified_" + accountId, true);
+                        editor.apply();
+                    }
+                    }
+                    else {
+                        // Xóa trạng thái thông báo nếu remainingAmount không còn là 0
+                        editor.remove("notified_" + categoryBudget.getAccountId());
+                        editor.apply();
+                    }
+                }
+        }
+
     }
 }

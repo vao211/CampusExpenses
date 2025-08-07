@@ -10,7 +10,7 @@
         app:layout_constraintTop_toTopOf="@id/btn_close"
         android:text="@string/chart_for_category"
         android:layout_marginTop="5dp"
-        android:textSize="21sp"/>
+        android:textSize="16sp"/>
     <ImageButton
         android:layout_width="40dp"
         android:layout_height="40dp"
