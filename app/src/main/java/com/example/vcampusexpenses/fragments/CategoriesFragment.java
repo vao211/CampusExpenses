@@ -157,7 +157,8 @@ public class CategoriesFragment extends Fragment implements CategoryAdapter.OnCa
                 .setMessage("Are you sure you want to delete this category?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     categoryService.deleteCategory(categoryId);
-                    dataManager.saveData();//Lưu data sau khi xóa danh mục
+                    dataManager.saveData();
+                    loadCategories();
                     Log.d("CategoriesFragment", "Category deleted: " + categoryId);
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
