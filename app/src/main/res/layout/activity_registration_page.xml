@@ -25,15 +25,16 @@
         app:layout_constraintTop_toBottomOf="@id/edtDisplayName"
         android:hint="@string/your_name"
         android:inputType="textPersonName" />
-    <EditText
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txt_birthday"
+        android:textSize="16sp"
+        android:layout_marginBottom="5dp"
         android:text="@string/select_your_birthday"
         app:layout_constraintTop_toBottomOf="@id/edtRealName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
     <DatePicker
         android:id="@+id/datePicker"
         android:layout_width="wrap_content"
