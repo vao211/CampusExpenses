@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -310,8 +312,11 @@ public class TransactionActivity extends AppCompatActivity {
             Button btnAdd = dialogView.findViewById(R.id.btn_add);
             btnAdd.setVisibility(View.GONE);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setNestedScrollingEnabled(true);
 
             AlertDialog alertDialog = new AlertDialog.Builder(this).setView(dialogView).create();
+
+
 
             AccountRadioAdapter adapter = new AccountRadioAdapter(accounts, selectedAccount -> {
                 txtSelectedToAccount.setText(selectedAccount.getName());
@@ -320,6 +325,29 @@ public class TransactionActivity extends AppCompatActivity {
                 Log.d("TransactionActivity", "Selected to-account: " + selectedAccount.getName());
             });
             recyclerView.setAdapter(adapter);
+
+            // Set dialog window attributes
+            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.white);
+            WindowManager.LayoutParams params = alertDialog.getWindow().getAttributes();
+            params.width = WindowManager.LayoutParams.MATCH_PARENT; // Ensure full width
+            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            alertDialog.getWindow().setAttributes(params);
+
+            // Adjust dialog size to 70% height and full width after showing
+            alertDialog.show();
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int dialogHeight = (int) (displayMetrics.heightPixels * 0.7);
+            int dialogWidth = displayMetrics.widthPixels; // Use full screen width
+
+            // Post a runnable to adjust size after dialog is shown
+            dialogView.post(() -> {
+                WindowManager.LayoutParams updatedParams = alertDialog.getWindow().getAttributes();
+                updatedParams.height = dialogHeight;
+                updatedParams.width = dialogWidth; // Explicitly set to full width
+                alertDialog.getWindow().setAttributes(updatedParams);
+            });
+
             alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.white);
             alertDialog.show();
         });
@@ -330,12 +358,22 @@ public class TransactionActivity extends AppCompatActivity {
             Log.d("TransactionActivity", "Showing category selection dialog");
             List<Category> categories = categoryService.getListCategories();
 
+            if (categories == null || categories.isEmpty()) {
+                Log.w("TransactionActivity", "No categories available");
+                txtSelectedCategory.setText("No categories available");
+                txtSelectedCategory.setTextColor(Color.RED);
+                return;
+            }
+
             View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_select_item, null);
             RecyclerView recyclerView = dialogView.findViewById(R.id.rv_item_list);
             Button btnAdd = dialogView.findViewById(R.id.btn_add);
+            btnAdd.setVisibility(View.VISIBLE);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setNestedScrollingEnabled(true);
 
-            AlertDialog alertDialog = new AlertDialog.Builder(this)
+            // Use a custom theme to ensure dialog respects size constraints
+            AlertDialog alertDialog = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar)
                     .setView(dialogView)
                     .create();
 
@@ -347,12 +385,27 @@ public class TransactionActivity extends AppCompatActivity {
             });
             recyclerView.setAdapter(adapter);
 
-            if (categories == null || categories.isEmpty()) {
-                Log.w("TransactionActivity", "No categories available");
-                txtSelectedCategory.setText("No categories available");
-                txtSelectedCategory.setTextColor(Color.RED);
-                return;
-            }
+            // Set dialog window attributes
+            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.white);
+            WindowManager.LayoutParams params = alertDialog.getWindow().getAttributes();
+            params.width = WindowManager.LayoutParams.MATCH_PARENT; // Ensure full width
+            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            alertDialog.getWindow().setAttributes(params);
+
+            // Adjust dialog size to 70% height and full width after showing
+            alertDialog.show();
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int dialogHeight = (int) (displayMetrics.heightPixels * 0.7);
+            int dialogWidth = displayMetrics.widthPixels; // Use full screen width
+
+            // Post a runnable to adjust size after dialog is shown
+            dialogView.post(() -> {
+                WindowManager.LayoutParams updatedParams = alertDialog.getWindow().getAttributes();
+                updatedParams.height = dialogHeight;
+                updatedParams.width = dialogWidth; // Explicitly set to full width
+                alertDialog.getWindow().setAttributes(updatedParams);
+            });
 
             btnAdd.setOnClickListener(v1 -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -373,7 +426,7 @@ public class TransactionActivity extends AppCompatActivity {
                     dataManager.saveData();
                     Log.d("TransactionActivity", "Category added: " + categoryName);
 
-                    //refresh
+                    // Refresh adapter
                     List<Category> updatedCategories = categoryService.getListCategories();
                     adapter.updateCategories(updatedCategories);
                 });
@@ -381,9 +434,6 @@ public class TransactionActivity extends AppCompatActivity {
                 builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
                 builder.show();
             });
-
-            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.white);
-            alertDialog.show();
         });
     }
     private void setTransactionTypeSelection() {
