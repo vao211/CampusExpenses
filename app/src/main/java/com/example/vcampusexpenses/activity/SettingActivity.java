@@ -135,7 +135,7 @@ public class SettingActivity extends AppCompatActivity {
     }
     private void feedback(){
         btn_feedback.setOnClickListener(v -> {
-            String url = "https://forms.gle/Bur8gxR8Rb16U1Sn9";
+            String url = "https://docs.google.com/forms/d/e/1FAIpQLScceeaAlJW0EF4zmt9UWhirW2T5zJ04s66VCoVNypdsk3_q7g/viewform";
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             try {
                 startActivity(intent);
