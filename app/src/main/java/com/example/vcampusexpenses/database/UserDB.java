@@ -6,11 +6,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+//Luwu registration len fb
 public class UserDB {
     private final FirebaseAuth fbAuth;
     private final FirebaseFirestore fireStoreDB;
 
-    //callback truy vấn
+    //callback
     public interface UserDataCallback {
         void onSuccess(String displayName, String realName, String dateOfBirth);
         void onError(String errorMessage);
