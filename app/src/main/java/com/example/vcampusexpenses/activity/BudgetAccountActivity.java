@@ -26,8 +26,10 @@ import com.example.vcampusexpenses.services.AccountService;
 import com.example.vcampusexpenses.session.SessionManager;
 import com.example.vcampusexpenses.utils.DisplayToast;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -156,7 +158,21 @@ public class BudgetAccountActivity extends AppCompatActivity {
                 DisplayToast.Display(this, "Please select valid start and end dates.");
                 return;
             }
-
+            //check end datê
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                Date start = sdf.parse(startDate);
+                Date end = sdf.parse(endDate);
+                if (end.before(start)) {
+                    Log.w("BudgetAccountActivity", "End date is before start date");
+                    DisplayToast.Display(this, "End date cannot be before start date.");
+                    return;
+                }
+            } catch (ParseException e) {
+                Log.e("BudgetAccountActivity", "Date parsing error: " + e.getMessage());
+                DisplayToast.Display(this, "Invalid date format.");
+                return;
+            }
             AccountBudget accountBudget = new AccountBudget(budgetId, "AccountBudget", amount, amount, startDate, endDate);
             accountBudget.addAccount(accountId);
 
@@ -230,6 +246,7 @@ public class BudgetAccountActivity extends AppCompatActivity {
                         String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d",
                                 selectedYear, selectedMonth + 1, selectedDayOfMonth);
                         txtStartDate.setText(selectedDate);
+                        txtEndDate.setText(selectedDate);
                         Log.d("BudgetAccountActivity", "Selected start date: " + selectedDate);
                     },
                     year, month, day);
@@ -254,6 +271,18 @@ public class BudgetAccountActivity extends AppCompatActivity {
                         Log.d("BudgetAccountActivity", "Selected end date: " + selectedDate);
                     },
                     year, month, day);
+            try {
+                String startDateText = txtStartDate.getText().toString();
+                if (!startDateText.equals(getString(R.string.start_date))) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    Date startDate = sdf.parse(startDateText);
+                    if (startDate != null) {
+                        datePickerDialog.getDatePicker().setMinDate(startDate.getTime());
+                    }
+                }
+            } catch (ParseException e) {
+                Log.e("BudgetAccountActivity", "Error parsing start date: " + e.getMessage());
+            }
             datePickerDialog.show();
         });
     }
