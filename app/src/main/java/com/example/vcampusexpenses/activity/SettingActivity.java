@@ -96,6 +96,9 @@ public class SettingActivity extends AppCompatActivity {
         loadLoginState();
         loadSetting();
     }
+    private void changeLanguage(){
+
+    }
     private void sync(){
         btn_sync.setOnClickListener(v -> {
             if(sessionManager.getUserId().equals("Guest")){

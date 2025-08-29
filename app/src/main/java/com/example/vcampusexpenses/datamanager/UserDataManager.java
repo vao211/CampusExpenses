@@ -32,7 +32,7 @@ public class UserDataManager {
     private UserData userData;
     private final String userId;
 
-    public UserDataManager(Context context, String userId) {
+    private UserDataManager(Context context, String userId) {
         this.context = context;
         this.userId = userId;
         this.file = new File(context.getFilesDir(), FILE_NAME);
